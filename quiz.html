@@ -3,129 +3,232 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>マンホール蓋クイズ (10択)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>マンホール蓋クイズ Mobile</title>
     <style>
+        :root {
+            --primary-color: #007bff;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --bg-color: #000;
+            /* より引き締まる純黒 */
+        }
+
         body {
-            font-family: sans-serif;
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 20px;
-            background: #f0f2f5;
+            font-family: -apple-system, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: var(--bg-color);
+            color: #eee;
+            overflow-x: hidden;
+            -webkit-user-select: none;
+        }
+
+        /* スコアエリアをコンパクトに上部固定 */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 15px;
+            background: #1a1a1a;
+            border-bottom: 1px solid #333;
+        }
+
+        .score-box {
             text-align: center;
         }
 
-        .quiz-container {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        .score-label {
+            font-size: 10px;
+            color: #888;
         }
 
-        .crop-image-area {
-            margin: 20px auto;
-            width: 300px;
-            height: 300px;
+        .score-val {
+            font-size: 1.2rem;
+            font-weight: 900;
+        }
+
+        #currentScore {
+            color: var(--primary-color);
+        }
+
+        #bestScore {
+            color: #f1c40f;
+        }
+
+        /* メインコンテンツ：余白を極限まで削る */
+        .quiz-container {
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        /* 画像エリア：画面幅いっぱいに近く */
+        .crop-area {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            max-width: 350px;
+            /* 大きすぎ防止 */
+            margin: 0 auto 10px;
             border-radius: 50%;
             overflow: hidden;
-            border: 5px solid #007bff;
-            background: #eee;
+            border: 4px solid var(--primary-color);
+            background: #111;
+            box-shadow: 0 0 20px rgba(0, 123, 255, 0.3);
         }
 
-        .crop-image-area img {
+        .crop-area img {
             width: 100%;
-            height: auto;
-            display: block;
-        }
-
-        /* 10択なので2列から3列に変更してスッキリさせます */
-        .options-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        button {
-            padding: 12px;
-            font-size: 14px;
-            cursor: pointer;
-            border-radius: 8px;
-            border: 1px solid #ddd;
-            background: #fff;
-            transition: 0.2s;
-        }
-
-        button:hover {
-            background: #e9ecef;
-        }
-
-        button.correct {
-            background: #28a745 !important;
-            border-color: #28a745;
-            color: white;
-        }
-
-        button.wrong {
-            background: #dc3545 !important;
-            border-color: #dc3545;
-            color: white;
+            height: 100%;
+            object-fit: cover;
         }
 
         #result-message {
-            font-size: 20px;
-            font-weight: bold;
-            margin: 20px 0;
-            min-height: 30px;
+            text-align: center;
+            height: 1.2em;
+            font-size: 1.4rem;
+            font-weight: 900;
+            margin-bottom: 10px;
         }
 
+        /* 10択ボタン：グリッドを最適化 */
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 6px;
+        }
+
+        button.choice {
+            height: 48px;
+            /* 親指サイズ */
+            font-size: 0.9rem;
+            font-weight: bold;
+            border-radius: 8px;
+            border: 1px solid #333;
+            background: #222;
+            color: #fff;
+            padding: 0 4px;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        button.choice:active {
+            background: #444;
+        }
+
+        button.correct {
+            background: var(--success-color) !important;
+            border-color: transparent;
+        }
+
+        button.wrong {
+            background: var(--danger-color) !important;
+            border-color: transparent;
+        }
+
+        /* 次へボタン：押しやすく巨大に */
         .next-btn {
-            background: #007bff;
+            background: var(--primary-color);
             color: white;
             border: none;
-            padding: 12px 40px;
-            margin-top: 20px;
-            cursor: pointer;
-            border-radius: 5px;
+            width: 100%;
+            height: 60px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            border-radius: 12px;
+            margin-top: 10px;
             display: none;
         }
 
-        .card-info {
-            margin-top: 20px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 8px;
+        /* 正解パネル：画像と情報を横並びに近くして高さを節約 */
+        .info-panel {
+            margin-top: 15px;
+            padding: 12px;
+            background: #1a1a1a;
+            border-radius: 12px;
             display: none;
+            border: 1px solid #333;
+        }
+
+        .info-content {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .info-text {
+            flex: 1;
+        }
+
+        .info-panel img {
+            width: 80px;
+            height: auto;
+            border-radius: 4px;
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-4px);
+            }
+
+            75% {
+                transform: translateX(4px);
+            }
+        }
+
+        .wrong-shake {
+            animation: shake 0.15s ease-in-out 2;
         }
     </style>
 </head>
 
 <body>
 
-    <h1>マンホール蓋クイズ</h1>
-    <p>このデザインはどこの自治体でしょうか？（10択）</p>
+    <div class="header">
+        <div class="score-box">
+            <div class="score-label">COMBO</div>
+            <div class="score-val" id="currentScore">0</div>
+        </div>
+        <div style="font-weight: bold; font-size: 0.9rem; color: #888;">MANHOLE QUIZ</div>
+        <div class="score-box">
+            <div class="score-label">BEST</div>
+            <div class="score-val" id="bestScore">0</div>
+        </div>
+    </div>
 
     <div class="quiz-container">
-        <div class="crop-image-area">
-            <img id="quizImage" src="" alt="クイズ画像">
+        <div class="crop-area">
+            <img id="quizImage" src="" alt="">
         </div>
 
         <div id="result-message"></div>
 
         <div id="options" class="options-grid"></div>
 
-        <button id="nextBtn" class="next-btn" onclick="startQuiz()">次の問題へ</button>
+        <button id="nextBtn" class="next-btn" onclick="startQuiz()">NEXT ➔</button>
 
-        <div id="answerInfo" class="card-info">
-            <h3>正解：<span id="correctCity"></span></h3>
-            <p><span id="correctPref"></span> / <span id="correctEd"></span></p>
-            <img id="originalCard" src=""
-                style="width: 240px; border-radius: 5px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+        <div id="answerInfo" class="info-panel">
+            <div class="info-content">
+                <div class="info-text">
+                    <div style="color: var(--success-color); font-size: 10px; font-weight: bold;">正解のカード</div>
+                    <div id="correctCity" style="font-size: 1.1rem; font-weight: bold;"></div>
+                    <div id="locationInfo" style="font-size: 0.8rem; color: #888;"></div>
+                </div>
+                <img id="originalCard" src="">
+            </div>
         </div>
     </div>
 
     <script>
         let masterData = [];
         const CROP_DIR = "manhole_crops/";
+        let score = 0;
+        let bestScore = localStorage.getItem('manholeBestScore') || 0;
+        document.getElementById('bestScore').textContent = bestScore;
 
         fetch('master_data.json')
             .then(res => res.json())
@@ -135,36 +238,30 @@
             });
 
         function startQuiz() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
             document.getElementById('result-message').textContent = "";
             document.getElementById('nextBtn').style.display = 'none';
             document.getElementById('answerInfo').style.display = 'none';
             const optionsDiv = document.getElementById('options');
             optionsDiv.innerHTML = "";
+            optionsDiv.style.display = 'grid'; // 復活
 
-            // 1. 正解を選ぶ
             const correctData = masterData[Math.floor(Math.random() * masterData.length)];
-
-            // 2. 画像を表示（修正ポイント：テンプレートリテラルの空白を削除）
             document.getElementById('quizImage').src = `${CROP_DIR}${correctData.city}.png`;
 
-            // 3. 選択肢を10個作る (正解1 + 不正解9)
             let dummyData = masterData.filter(d => d.city !== correctData.city);
             let choices = [correctData];
-
-            // 不正解を9個ランダムに抽出
             for (let i = 0; i < 9; i++) {
                 if (dummyData.length > 0) {
                     const idx = Math.floor(Math.random() * dummyData.length);
                     choices.push(dummyData.splice(idx, 1)[0]);
                 }
             }
-
-            // 4. シャッフル
             choices.sort(() => Math.random() - 0.5);
 
-            // 5. ボタン作成
             choices.forEach(choice => {
                 const btn = document.createElement('button');
+                btn.className = 'choice';
                 btn.textContent = choice.city;
                 btn.onclick = () => checkAnswer(btn, choice.city, correctData);
                 optionsDiv.appendChild(btn);
@@ -174,28 +271,39 @@
         function checkAnswer(selectedBtn, selectedCity, correctData) {
             const buttons = document.querySelectorAll('#options button');
             buttons.forEach(btn => btn.disabled = true);
-
             const msg = document.getElementById('result-message');
 
             if (selectedCity === correctData.city) {
-                msg.textContent = "正解！お見事！";
-                msg.style.color = "#28a745";
+                score++;
+                msg.textContent = "CORRECT!";
+                msg.style.color = "var(--success-color)";
                 selectedBtn.classList.add('correct');
             } else {
-                msg.textContent = `残念！正解は ${correctData.city} でした。`;
-                msg.style.color = "#dc3545";
+                score = 0;
+                msg.textContent = "WRONG...";
+                msg.style.color = "var(--danger-color)";
                 selectedBtn.classList.add('wrong');
+                selectedBtn.classList.add('wrong-shake');
                 buttons.forEach(btn => {
                     if (btn.textContent === correctData.city) btn.classList.add('correct');
                 });
             }
 
+            document.getElementById('currentScore').textContent = score;
+            if (score > bestScore) {
+                bestScore = score;
+                localStorage.setItem('manholeBestScore', bestScore);
+                document.getElementById('bestScore').textContent = bestScore;
+            }
+
             document.getElementById('correctCity').textContent = correctData.city;
-            document.getElementById('correctPref').textContent = correctData.pref;
-            document.getElementById('correctEd').textContent = correctData.edition;
+            document.getElementById('locationInfo').textContent = `${correctData.pref} / ${correctData.edition}`;
             document.getElementById('originalCard').src = correctData.url;
+
+            // 操作性アップ：正解後は選択肢を隠して結果を見やすくする
+            document.getElementById('options').style.display = 'none';
             document.getElementById('answerInfo').style.display = 'block';
-            document.getElementById('nextBtn').style.display = 'inline-block';
+            document.getElementById('nextBtn').style.display = 'block';
         }
     </script>
 </body>

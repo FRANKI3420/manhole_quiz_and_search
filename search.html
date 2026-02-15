@@ -3,180 +3,187 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>マンホールカード類似検索</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>マンホール類似検索</title>
     <style>
         body {
             font-family: sans-serif;
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 20px;
-            background: #f0f2f5;
-            color: #333;
-        }
-
-        .selector-area {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            margin-bottom: 30px;
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-
-        .select-group {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            flex: 1;
-            min-width: 200px;
-        }
-
-        label {
-            font-size: 13px;
-            font-weight: bold;
-            color: #007bff;
-        }
-
-        select {
-            padding: 12px;
-            font-size: 15px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-            background: #fff;
-            cursor: pointer;
-        }
-
-        select:disabled {
-            background: #eee;
-            cursor: not-allowed;
-        }
-
-        .display-container {
-            display: grid;
-            grid-template-columns: 320px 1fr;
-            gap: 30px;
-        }
-
-        .main-card-area {
-            position: sticky;
-            top: 20px;
-        }
-
-        .card {
-            background: white;
-            padding: 12px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-            text-align: center;
-        }
-
-        .card img {
-            width: 100%;
-            height: auto;
-            border-radius: 4px;
-            display: block;
-            margin-bottom: 10px;
-        }
-
-        .card-title {
-            font-size: 13px;
-            font-weight: bold;
+            margin: 0;
+            padding: 0;
+            background: #121212;
+            color: #eee;
             line-height: 1.4;
         }
 
-        .main-card {
-            border: 4px solid #007bff;
+        h1 {
+            font-size: 1.2rem;
+            text-align: center;
+            padding: 15px 0;
+            margin: 0;
+            background: #1f1f1f;
+            border-bottom: 2px solid #333;
         }
 
-        .results-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 15px;
+        /* 操作エリア：フォントサイズを16px以上に（自動ズーム防止） */
+        .selector-area {
+            background: #1f1f1f;
+            padding: 15px;
+            border-bottom: 2px solid #444;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            color: #4dabff;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        select {
+            width: 100%;
+            height: 50px;
+            font-size: 16px !important;
+            margin-bottom: 12px;
+            padding: 0 10px;
+            border-radius: 8px;
+            border: 1px solid #555;
+            background: #333;
+            color: #fff;
+            box-sizing: border-box;
         }
 
         h2 {
-            font-size: 18px;
-            border-left: 5px solid #007bff;
-            padding-left: 12px;
-            margin-bottom: 20px;
+            font-size: 1rem;
+            background: #333;
+            margin: 0;
+            padding: 10px 15px;
+            border-left: 5px solid #4dabff;
+        }
+
+        /* 【メイン表示】 */
+        #targetCard {
+            width: 100%;
+            background: #1f1f1f;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        #targetCard img {
+            width: 80%;
+            /* ほどよい大きさ */
+            max-width: 320px;
+            height: auto;
+            margin: 0 auto;
+            display: block;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.6);
+        }
+
+        .main-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+
+        /* 【TOP10エリア】見切れない設定 */
+        #recommendResults {
+            display: flex;
+            flex-wrap: wrap;
+            /* 2列を作るための設定 */
+            padding: 10px;
+            justify-content: space-between;
+        }
+
+        .card {
+            width: 48%;
+            /* 2列(隙間2%×2) */
+            background: #272729;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+        }
+
+        /* ここが重要：画像を見切れさせない */
+        .card img {
+            width: 100%;
+            height: auto;
+            /* 縦横比を維持 */
+            display: block;
+            object-fit: contain;
+            /* 枠の中に収める */
+        }
+
+        .card-info {
+            padding: 10px 5px;
+            text-align: center;
+        }
+
+        .card-title {
+            font-size: 1rem;
+            /* 文字を少し大きく */
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 3px;
+        }
+
+        .card-sub {
+            font-size: 0.8rem;
+            color: #bbb;
         }
 
         .placeholder {
-            color: #999;
             text-align: center;
-            padding: 60px;
-            background: #e9ecef;
-            border-radius: 8px;
-            border: 2px dashed #ccc;
+            padding: 50px 20px;
+            color: #777;
+            font-size: 1rem;
         }
 
         .reset-btn {
-            font-size: 12px;
-            margin-left: auto;
-            cursor: pointer;
-            color: #666;
-            text-decoration: underline;
+            width: 100%;
+            padding: 10px;
             background: none;
             border: none;
+            color: #aaa;
+            text-decoration: underline;
+            font-size: 14px;
         }
     </style>
 </head>
 
 <body>
 
-    <h1>マンホールカード類似検索</h1>
+    <h1>マンホール類似検索</h1>
 
     <div class="selector-area">
-        <div class="select-group">
-            <label>都道府県で絞り込む</label>
-            <select id="prefSelect">
-                <option value="">すべての都道府県</option>
-            </select>
-        </div>
-        <div class="select-group">
-            <label>弾数で絞り込む</label>
-            <select id="editionSelect">
-                <option value="">すべての弾数</option>
-            </select>
-        </div>
-        <div class="select-group">
-            <label>対象のカードを選択（必須）</label>
-            <select id="citySelect">
-                <option value="">選択してください</option>
-            </select>
-        </div>
-        <button class="reset-btn" onclick="resetFilters()">フィルタをリセット</button>
+        <label>都道府県</label>
+        <select id="prefSelect"></select>
+
+        <label>弾数</label>
+        <select id="editionSelect"></select>
+
+        <label>対象のカード</label>
+        <select id="citySelect"></select>
+
+        <button class="reset-btn" onclick="resetFilters()">条件をリセット</button>
     </div>
 
-    <div class="display-container">
-        <div class="main-card-area">
-            <h2>選択したカード</h2>
-            <div id="targetCardPlaceholder" class="placeholder">リストからカードを<br>選択してください</div>
-            <div id="targetCard" class="card main-card" style="display:none;"></div>
-        </div>
+    <div id="targetSection">
+        <h2>選択したカード</h2>
+        <div id="targetCardPlaceholder" class="placeholder">リストから選択してください</div>
+        <div id="targetCard" style="display:none;"></div>
+    </div>
 
-        <div>
-            <h2>似ているデザイン TOP10</h2>
-            <div id="recommendPlaceholder" class="placeholder">カードを選択すると<br>類似結果が表示されます</div>
-            <div id="recommendResults" class="results-grid"></div>
-        </div>
+    <div id="resultSection">
+        <h2>似ているデザイン TOP10</h2>
+        <div id="recommendPlaceholder" class="placeholder">ここに結果が表示されます</div>
+        <div id="recommendResults"></div>
     </div>
 
     <script>
         let masterData = [];
         let similarityIndex = {};
-
-        // 都道府県の並び順定義
-        const prefOrder = [
-            "その他", "北海道", "青森県", "岩手県", "宮城県", "秋田県", "山形県", "福島県",
-            "茨城県", "栃木県", "群馬県", "埼玉県", "千葉県", "東京都", "神奈川県",
-            "新潟県", "富山県", "石川県", "福井県", "山梨県", "長野県", "岐阜県", "静岡県", "愛知県",
-            "三重県", "滋賀県", "京都府", "大阪府", "兵庫県", "奈良県", "和歌山県",
-            "鳥取県", "島根県", "岡山県", "広島県", "山口県", "徳島県", "香川県", "愛媛県", "高知県",
-            "福岡県", "佐賀県", "長崎県", "熊本県", "大分県", "宮崎県", "鹿児島県", "沖縄県"
-        ];
+        const prefOrder = ["北海道", "青森県", "岩手県", "宮城県", "秋田県", "山形県", "福島県", "茨城県", "栃木県", "群馬県", "埼玉県", "千葉県", "東京都", "神奈川県", "新潟県", "富山県", "石川県", "福井県", "山梨県", "長野県", "岐阜県", "静岡県", "愛知県", "三重県", "滋賀県", "京都府", "大阪府", "兵庫県", "奈良県", "和歌山県", "鳥取県", "島根県", "岡山県", "広島県", "山口県", "徳島県", "香川県", "愛媛県", "高知県", "福岡県", "佐賀県", "長崎県", "熊本県", "大分県", "宮崎県", "鹿児島県", "沖縄県"];
 
         Promise.all([
             fetch('master_data.json').then(res => res.json()),
@@ -191,43 +198,15 @@
         const editionSelect = document.getElementById('editionSelect');
         const citySelect = document.getElementById('citySelect');
 
-        // カスタムソート用の関数
-        function sortPrefectures(prefs) {
-            return prefs.sort((a, b) => {
-                let indexA = prefOrder.indexOf(a);
-                let indexB = prefOrder.indexOf(b);
-                if (indexA === -1) indexA = 999; // 定義にない場合は後ろへ
-                if (indexB === -1) indexB = 999;
-                return indexA - indexB;
-            });
-        }
-
         function updateFilters() {
             const selectedPref = prefSelect.value;
             const selectedEd = editionSelect.value;
-
-            // 1. 都道府県リストの更新（カスタムソートを適用）
-            const rawPrefs = [...new Set(masterData
-                .filter(d => !selectedEd || d.edition === selectedEd)
-                .map(d => d.pref))];
-
-            const currentPrefs = sortPrefectures(rawPrefs);
-
-            updateOptions(prefSelect, currentPrefs, selectedPref, "すべての都道府県");
-
-            // 2. 弾数リストの更新
-            const currentEds = [...new Set(masterData
-                .filter(d => !selectedPref || d.pref === selectedPref)
-                .map(d => d.edition))].sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
-
+            const rawPrefs = [...new Set(masterData.filter(d => !selectedEd || d.edition === selectedEd).map(d => d.pref))];
+            const sortedPrefs = rawPrefs.sort((a, b) => prefOrder.indexOf(a) - prefOrder.indexOf(b));
+            updateOptions(prefSelect, sortedPrefs, selectedPref, "すべての都道府県");
+            const currentEds = [...new Set(masterData.filter(d => !selectedPref || d.pref === selectedPref).map(d => d.edition))].sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
             updateOptions(editionSelect, currentEds, selectedEd, "すべての弾数");
-
-            // 3. 市町村リストの更新
-            const filteredCities = masterData.filter(d =>
-                (!selectedPref || d.pref === selectedPref) &&
-                (!selectedEd || d.edition === selectedEd)
-            );
-
+            const filteredCities = masterData.filter(d => (!selectedPref || d.pref === selectedPref) && (!selectedEd || d.edition === selectedEd));
             citySelect.innerHTML = '<option value="">カードを選択してください</option>';
             filteredCities.forEach(item => {
                 const opt = document.createElement('option');
@@ -237,36 +216,36 @@
             });
         }
 
-        function updateOptions(selectElement, list, currentValue, defaultText) {
-            selectElement.innerHTML = `<option value="">${defaultText}</option>`;
-            list.forEach(val => {
+        function updateOptions(el, list, curr, def) {
+            el.innerHTML = `<option value="">${def}</option>`;
+            list.forEach(v => {
                 const opt = document.createElement('option');
-                opt.value = opt.textContent = val;
-                if (val === currentValue) opt.selected = true;
-                selectElement.appendChild(opt);
+                opt.value = opt.textContent = v;
+                if (v === curr) opt.selected = true;
+                el.appendChild(opt);
             });
         }
 
         function resetFilters() {
-            prefSelect.value = "";
-            editionSelect.value = "";
-            updateFilters();
+            prefSelect.value = ""; editionSelect.value = ""; updateFilters();
         }
 
-        prefSelect.onchange = () => updateFilters();
-        editionSelect.onchange = () => updateFilters();
+        prefSelect.onchange = updateFilters;
+        editionSelect.onchange = updateFilters;
 
         citySelect.onchange = () => {
             const selectedId = citySelect.value;
             if (!selectedId) return;
-
             const targetData = masterData.find(item => item.city === selectedId);
-            const similarIds = similarityIndex[selectedId + ".png"] || [];
+            const similarIds = (similarityIndex[selectedId + ".png"] || []).slice(0, 10);
 
             document.getElementById('targetCardPlaceholder').style.display = 'none';
             const targetDiv = document.getElementById('targetCard');
             targetDiv.style.display = 'block';
-            targetDiv.innerHTML = `<img src="${targetData.url}"><div class="card-title">${targetData.pref}<br>${targetData.city}<br>${targetData.edition}</div>`;
+            targetDiv.innerHTML = `
+                <img src="${targetData.url}">
+                <div class="main-title">${targetData.city}</div>
+                <div style="font-size:0.9rem; color:#aaa;">${targetData.pref} / ${targetData.edition}</div>`;
 
             document.getElementById('recommendPlaceholder').style.display = 'none';
             const resultDiv = document.getElementById('recommendResults');
@@ -278,10 +257,16 @@
                 if (d) {
                     const card = document.createElement('div');
                     card.className = 'card';
-                    card.innerHTML = `<img src="${d.url}"><div class="card-title">${d.city}</div>`;
+                    card.innerHTML = `
+                        <img src="${d.url}">
+                        <div class="card-info">
+                            <div class="card-title">${d.city}</div>
+                            <div class="card-sub">${d.pref}</div>
+                        </div>`;
                     resultDiv.appendChild(card);
                 }
             });
+            targetDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
         };
     </script>
 </body>
