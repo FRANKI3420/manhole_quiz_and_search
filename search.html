@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <title>マンホールカード類似検索</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f0f2f5;
+            color: #333;
+        }
+
+        .selector-area {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .select-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        label {
+            font-size: 13px;
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        select {
+            padding: 12px;
+            font-size: 15px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            background: #fff;
+            cursor: pointer;
+        }
+
+        select:disabled {
+            background: #eee;
+            cursor: not-allowed;
+        }
+
+        .display-container {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 30px;
+        }
+
+        .main-card-area {
+            position: sticky;
+            top: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            text-align: center;
+        }
+
+        .card img {
+            width: 100%;
+            height: auto;
+            border-radius: 4px;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .card-title {
+            font-size: 13px;
+            font-weight: bold;
+            line-height: 1.4;
+        }
+
+        .main-card {
+            border: 4px solid #007bff;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        h2 {
+            font-size: 18px;
+            border-left: 5px solid #007bff;
+            padding-left: 12px;
+            margin-bottom: 20px;
+        }
+
+        .placeholder {
+            color: #999;
+            text-align: center;
+            padding: 60px;
+            background: #e9ecef;
+            border-radius: 8px;
+            border: 2px dashed #ccc;
+        }
+
+        .reset-btn {
+            font-size: 12px;
+            margin-left: auto;
+            cursor: pointer;
+            color: #666;
+            text-decoration: underline;
+            background: none;
+            border: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>マンホールカード類似検索</h1>
+
+    <div class="selector-area">
+        <div class="select-group">
+            <label>都道府県で絞り込む</label>
+            <select id="prefSelect">
+                <option value="">すべての都道府県</option>
+            </select>
+        </div>
+        <div class="select-group">
+            <label>弾数で絞り込む</label>
+            <select id="editionSelect">
+                <option value="">すべての弾数</option>
+            </select>
+        </div>
+        <div class="select-group">
+            <label>対象のカードを選択（必須）</label>
+            <select id="citySelect">
+                <option value="">選択してください</option>
+            </select>
+        </div>
+        <button class="reset-btn" onclick="resetFilters()">フィルタをリセット</button>
+    </div>
+
+    <div class="display-container">
+        <div class="main-card-area">
+            <h2>選択したカード</h2>
+            <div id="targetCardPlaceholder" class="placeholder">リストからカードを<br>選択してください</div>
+            <div id="targetCard" class="card main-card" style="display:none;"></div>
+        </div>
+
+        <div>
+            <h2>似ているデザイン TOP10</h2>
+            <div id="recommendPlaceholder" class="placeholder">カードを選択すると<br>類似結果が表示されます</div>
+            <div id="recommendResults" class="results-grid"></div>
+        </div>
+    </div>
+
+    <script>
+        let masterData = [];
+        let similarityIndex = {};
+
+        // 都道府県の並び順定義
+        const prefOrder = [
+            "その他", "北海道", "青森県", "岩手県", "宮城県", "秋田県", "山形県", "福島県",
+            "茨城県", "栃木県", "群馬県", "埼玉県", "千葉県", "東京都", "神奈川県",
+            "新潟県", "富山県", "石川県", "福井県", "山梨県", "長野県", "岐阜県", "静岡県", "愛知県",
+            "三重県", "滋賀県", "京都府", "大阪府", "兵庫県", "奈良県", "和歌山県",
+            "鳥取県", "島根県", "岡山県", "広島県", "山口県", "徳島県", "香川県", "愛媛県", "高知県",
+            "福岡県", "佐賀県", "長崎県", "熊本県", "大分県", "宮崎県", "鹿児島県", "沖縄県"
+        ];
+
+        Promise.all([
+            fetch('master_data.json').then(res => res.json()),
+            fetch('similarity_index.json').then(res => res.json())
+        ]).then(([data, index]) => {
+            masterData = data;
+            similarityIndex = index;
+            updateFilters();
+        });
+
+        const prefSelect = document.getElementById('prefSelect');
+        const editionSelect = document.getElementById('editionSelect');
+        const citySelect = document.getElementById('citySelect');
+
+        // カスタムソート用の関数
+        function sortPrefectures(prefs) {
+            return prefs.sort((a, b) => {
+                let indexA = prefOrder.indexOf(a);
+                let indexB = prefOrder.indexOf(b);
+                if (indexA === -1) indexA = 999; // 定義にない場合は後ろへ
+                if (indexB === -1) indexB = 999;
+                return indexA - indexB;
+            });
+        }
+
+        function updateFilters() {
+            const selectedPref = prefSelect.value;
+            const selectedEd = editionSelect.value;
+
+            // 1. 都道府県リストの更新（カスタムソートを適用）
+            const rawPrefs = [...new Set(masterData
+                .filter(d => !selectedEd || d.edition === selectedEd)
+                .map(d => d.pref))];
+
+            const currentPrefs = sortPrefectures(rawPrefs);
+
+            updateOptions(prefSelect, currentPrefs, selectedPref, "すべての都道府県");
+
+            // 2. 弾数リストの更新
+            const currentEds = [...new Set(masterData
+                .filter(d => !selectedPref || d.pref === selectedPref)
+                .map(d => d.edition))].sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+
+            updateOptions(editionSelect, currentEds, selectedEd, "すべての弾数");
+
+            // 3. 市町村リストの更新
+            const filteredCities = masterData.filter(d =>
+                (!selectedPref || d.pref === selectedPref) &&
+                (!selectedEd || d.edition === selectedEd)
+            );
+
+            citySelect.innerHTML = '<option value="">カードを選択してください</option>';
+            filteredCities.forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = item.city;
+                opt.textContent = `${item.city} (${item.edition})`;
+                citySelect.appendChild(opt);
+            });
+        }
+
+        function updateOptions(selectElement, list, currentValue, defaultText) {
+            selectElement.innerHTML = `<option value="">${defaultText}</option>`;
+            list.forEach(val => {
+                const opt = document.createElement('option');
+                opt.value = opt.textContent = val;
+                if (val === currentValue) opt.selected = true;
+                selectElement.appendChild(opt);
+            });
+        }
+
+        function resetFilters() {
+            prefSelect.value = "";
+            editionSelect.value = "";
+            updateFilters();
+        }
+
+        prefSelect.onchange = () => updateFilters();
+        editionSelect.onchange = () => updateFilters();
+
+        citySelect.onchange = () => {
+            const selectedId = citySelect.value;
+            if (!selectedId) return;
+
+            const targetData = masterData.find(item => item.city === selectedId);
+            const similarIds = similarityIndex[selectedId + ".png"] || [];
+
+            document.getElementById('targetCardPlaceholder').style.display = 'none';
+            const targetDiv = document.getElementById('targetCard');
+            targetDiv.style.display = 'block';
+            targetDiv.innerHTML = `<img src="${targetData.url}"><div class="card-title">${targetData.pref}<br>${targetData.city}<br>${targetData.edition}</div>`;
+
+            document.getElementById('recommendPlaceholder').style.display = 'none';
+            const resultDiv = document.getElementById('recommendResults');
+            resultDiv.innerHTML = '';
+
+            similarIds.forEach(idWithExt => {
+                const cityName = idWithExt.replace('.png', '');
+                const d = masterData.find(item => item.city === cityName);
+                if (d) {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.innerHTML = `<img src="${d.url}"><div class="card-title">${d.city}</div>`;
+                    resultDiv.appendChild(card);
+                }
+            });
+        };
+    </script>
+</body>
+
+</html>

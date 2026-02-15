@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>マンホールカード・コレクション・ナビ</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background: #f0f2f5;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            text-align: center;
+            max-width: 800px;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #007bff;
+        }
+
+        p.subtitle {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 40px;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .menu-card {
+            background: white;
+            padding: 40px 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .menu-card:hover {
+            transform: translateY(-10px);
+            border-color: #007bff;
+        }
+
+        .icon {
+            font-size: 50px;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .menu-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .menu-desc {
+            font-size: 0.95rem;
+            color: #777;
+            line-height: 1.5;
+        }
+
+        .footer {
+            margin-top: 50px;
+            font-size: 0.8rem;
+            color: #aaa;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>Manhole Card Lab</h1>
+        <p class="subtitle">マンホールカードのデザインをAIで解析・楽しむポータルサイト</p>
+
+        <div class="menu-grid">
+            <a href="search.html" class="menu-card">
+                <span class="icon">🔍</span>
+                <span class="menu-title">類似デザイン検索</span>
+                <span class="menu-desc">1,100枚以上のカードから、似たデザインのマンホールをAIが即座に見つけ出します。</span>
+            </a>
+
+            <a href="quiz.html" class="menu-card">
+                <span class="icon">🎮</span>
+                <span class="menu-title">マンホール蓋クイズ</span>
+                <span class="menu-desc">切り抜かれた蓋のデザインだけで自治体を当てる、マニア向けの4択クイズに挑戦！</span>
+            </a>
+        </div>
+
+        <div class="footer">
+            &copy; 2026 Manhole Card Fan Project
+        </div>
+    </div>
+
+</body>
+
+</html>
