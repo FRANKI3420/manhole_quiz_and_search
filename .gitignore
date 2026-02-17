@@ -7,5 +7,6 @@ venv/bin/*
 # キャッシュファイル
 __pycache__/
 *.pyc
-
+*.pt
+vit_b_32.pt
 

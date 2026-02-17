@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>マンホール図鑑 - コレクション</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #121212;
+            color: #eee;
+        }
+
+        header {
+            background: #1f1f1f;
+            padding: 20px 15px;
+            /* 上下に少し余裕を */
+            text-align: center;
+            border-bottom: 2px solid #333;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        /* タイトルの文字サイズアップ */
+        header div[style*="font-size:16px"] {
+            font-size: 20px !important;
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+        }
+
+        /* 進捗バーの背景を少し太く、見やすく */
+        .progress-bar-bg {
+            background: #333;
+            height: 12px;
+            /* 少し太く */
+            border-radius: 6px;
+            width: 90%;
+            margin: 12px auto;
+            overflow: hidden;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        /* 収集済み・達成率のテキストスタイル */
+        .stats-text {
+            font-size: 16px;
+            /* 12pxから大幅アップ */
+            color: #eee;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        /* 達成率バッジの装飾 */
+        .rate-badge {
+            background: #4dabff;
+            color: white;
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        /* 分母の数字を少し控えめに */
+        #totalCount {
+            color: #888;
+            font-size: 0.9em;
+        }
+
+        #totalProgress {
+            background: #4dabff;
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s;
+        }
+
+        .stats-text {
+            font-size: 12px;
+            color: #aaa;
+        }
+
+        /* 操作エリア */
+        .control-panel {
+            background: #1f1f1f;
+            padding: 15px;
+            border-bottom: 1px solid #444;
+        }
+
+        .select-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        select {
+            flex: 1;
+            height: 40px;
+            background: #333;
+            color: white;
+            border: 1px solid #555;
+            border-radius: 6px;
+            font-size: 14px;
+            padding: 0 5px;
+        }
+
+        .backup-row {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .btn-utility {
+            background: none;
+            border: 1px solid #555;
+            color: #888;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        /* カードリスト表示 */
+        #collectionList {
+            padding: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+        .card-container {
+            width: 31%;
+            margin-bottom: 15px;
+            background: #222;
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* 画像の全体表示設定 */
+        .card-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: contain;
+            /* 画像を枠内に収める */
+            filter: grayscale(100%) brightness(30%);
+        }
+
+        .card-container.collected img {
+            filter: grayscale(0%) brightness(100%);
+        }
+
+        /* カード情報のテキストエリアを強化 */
+        .card-info {
+            font-size: 13px;
+            /* サイズアップ */
+            font-weight: bold;
+            /* 太字で読みやすく */
+            text-align: center;
+            padding: 8px 2px;
+            /* 上下に余裕を持たせる */
+            background: #272729;
+            color: #eee;
+            /* 少し明るい白に */
+            white-space: nowrap;
+            /* 改行させない */
+            overflow: hidden;
+            /* はみ出しを隠す */
+            text-overflow: ellipsis;
+            /* 長い名前は「...」にする */
+            border-top: 1px solid #444;
+        }
+
+        /* 選択モード中のテキストエリアの色を変える（さらに分かりやすく） */
+        .selecting-active .card-info {
+            background: #28a745;
+            /* 背景を緑に */
+            color: white;
+        }
+
+        /* カード全体のサイズ感を少し調整（3列表示を維持しつつ余白を最適化） */
+        .card-container {
+            width: 31%;
+            margin-bottom: 12px;
+            background: #222;
+            border-radius: 8px;
+            /* 角を少し丸く */
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        /* 取得チェックマーク */
+        .check-mark {
+            position: absolute;
+            top: 3px;
+            right: 3px;
+            background: #4dabff;
+            color: white;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            font-size: 10px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            z-index: 5;
+        }
+
+        .collected .check-mark {
+            display: flex;
+        }
+
+        .empty-state {
+            width: 100%;
+            text-align: center;
+            padding: 80px 0;
+            color: #555;
+            font-size: 14px;
+        }
+
+        /* モーダル */
+        #modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            width: 85%;
+            max-width: 350px;
+            background: #1f1f1f;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .modal-img {
+            width: 100%;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .date-input {
+            width: 80%;
+            padding: 8px;
+            margin: 10px 0;
+            background: #333;
+            color: white;
+            border: 1px solid #555;
+            border-radius: 5px;
+        }
+
+        .btn-main {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        /* 選択モード時のカードスタイル */
+        .card-container.selecting {
+            border: 2px solid #4dabff;
+            transform: scale(0.95);
+        }
+
+        /* 選択用チェックボックスの擬似表示 */
+        .select-overlay {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            width: 20px;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid #fff;
+            border-radius: 4px;
+            z-index: 10;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .selection-active .select-overlay {
+            display: flex;
+        }
+
+        .card-container.selected-for-bulk .select-overlay {
+            background: #28a745;
+            border-color: #28a745;
+        }
+
+        .card-container.selected-for-bulk .select-overlay::after {
+            content: '✓';
+            color: white;
+            font-size: 14px;
+        }
+
+        /* カードのベース設定 */
+        .card-container {
+            position: relative;
+            background: #222;
+            /* 画像がない時の背景色 */
+            min-height: 100px;
+            /* 画像がなくても高さを確保 */
+        }
+
+        /* 選択中（緑枠＋暗くする） */
+        .card-container.selecting-active {
+            outline: 4px solid #28a745 !important;
+            outline-offset: -4px;
+        }
+
+        /* 選択モード中に重なる半透明の膜 */
+        .card-container.selecting-active::after {
+            content: "選択中";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(40, 167, 69, 0.3);
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+        }
+
+        /* 画像読み込みエラー時の対応 */
+        .card-container img {
+            min-height: 80px;
+            background: #333;
+        }
+
+        #filterStats {
+            padding: 12px;
+            background: #1a1a1a;
+            text-align: center;
+            font-size: 14px;
+            /* 少し大きく */
+            color: #4dabff;
+            border-bottom: 2px solid #333;
+            display: none;
+            line-height: 1.6;
+        }
+
+        #filterStats b {
+            color: #fff;
+            /* 数字を白くして強調 */
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div style="font-weight:bold;">マンホール図鑑</div>
+        <div class="progress-bar-bg">
+            <div id="totalProgress"></div>
+        </div>
+        <div class="stats-text">
+        </div>
+    </header>
+
+    <div class="control-panel">
+        <div class="select-group">
+            <select id="prefFilter" onchange="renderCollection()">
+                <option value="">都道府県で絞り込む</option>
+            </select>
+            <select id="editionFilter" onchange="renderCollection()">
+                <option value="">弾数で絞り込む</option>
+            </select>
+        </div>
+        <div id="filterStats"
+            style="padding: 10px; background: #222; text-align: center; font-size: 13px; color: #4dabff; border-bottom: 1px solid #333; display: none;">
+            表示中: <span id="currentFilteredCount">0</span>枚 （取得済み: <span id="currentCollectedInFilter">0</span>枚）
+        </div>
+        <div id="selectionModeArea" style="text-align: center; margin: 10px 0; display:none;">
+            <button id="selectModeBtn" class="btn-utility" onclick="toggleSelectionMode()"
+                style="background: #444; color: white; width: 45%;">選択モード開始</button>
+            <button id="executeBulkBtn" class="btn-main" onclick="executeSelectedCollect()"
+                style="display:none; background: #28a745; width: 45%; margin:0; padding: 8px;">選択分を登録</button>
+        </div>
+        <div id="bulkActionArea" style="display: none; text-align: center; margin: 10px 0;">
+            <button class="btn-main" id="bulkCollectBtn" onclick="bulkToggleCollect()"
+                style="margin-top:0; padding: 8px; font-size: 13px; background: #28a745;">
+                表示中の <span id="bulkCount">0</span> 枚を一括登録
+            </button>
+        </div>
+
+    </div>
+
+    <div id="collectionList">
+        <div class="empty-state">都道府県か弾数を選択してください</div>
+    </div>
+
+    <div id="modal" onclick="closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <img id="modalImg" class="modal-img" src="">
+            <h3 id="modalTitle" style="margin:5px 0;"></h3>
+            <p id="modalSub" style="color:#888; font-size:12px; margin:0;"></p>
+
+            <div id="dateArea" style="margin-top:15px;">
+                <label style="font-size:11px; color:#4dabff;">取得日を記録</label><br>
+                <input type="date" id="collectDate" class="date-input">
+            </div>
+
+            <button id="getBtn" class="btn-main" onclick="toggleCollect()"></button>
+
+            <button id="deleteBtn" class="btn-utility" onclick="deleteCollect()"
+                style="width: 100%; margin-top: 10px; background: #333; color: #ff4d4d; border: 1px solid #444; display: none;">
+                取得記録を削除
+            </button>
+
+            <button onclick="closeModal()"
+                style="background:none; border:none; color:#888; margin-top:15px; font-size:13px;">閉じる</button>
+        </div>
+    </div>
+
+    <script>
+        let masterData = [];
+        let userStats = JSON.parse(localStorage.getItem('manhole_collection')) || {};
+        let isSelectionMode = false; // 選択モード管理
+        let selectedCities = new Set(); // 選択中リスト
+
+        const prefOrder = ["その他", "北海道", "青森県", "岩手県", "宮城県", "秋田県", "山形県", "福島県", "茨城県", "栃木県", "群馬県", "埼玉県", "千葉県", "東京都", "神奈川県", "新潟県", "富山県", "石川県", "福井県", "山梨県", "長野県", "岐阜県", "静岡県", "愛知県", "三重県", "滋賀県", "京都府", "大阪府", "兵庫県", "奈良県", "和歌山県", "鳥取県", "島根県", "岡山県", "広島県", "山口県", "徳島県", "香川県", "愛媛県", "高知県", "福岡県", "佐賀県", "長崎県", "熊本県", "大分県", "宮崎県", "鹿児島県", "沖縄県"];
+
+        fetch('master_data.json').then(res => res.json()).then(data => {
+            masterData = data;
+            updateStats();
+            initFilters();
+        });
+
+        function updateStats() {
+            const total = masterData.length;
+            const collected = Object.keys(userStats).filter(k => userStats[k].collected).length;
+            const rate = total > 0 ? Math.round((collected / total) * 100) : 0;
+
+            // 数値を更新
+            const statsText = document.querySelector('.stats-text');
+            statsText.innerHTML = `
+        <span>
+            <span id="collectedCount" style="font-size: 1.2em; color: #4dabff;">${collected}</span> 
+            <span style="color: #888;">/</span> 
+            <span id="totalCount">${total}</span> 
+            <small style="font-weight: normal; margin-left: 4px;">収集済み</small>
+        </span>
+        <span class="rate-badge">達成率: ${rate}%</span>
+    `;
+
+            // バーを更新
+            const progressBar = document.getElementById('totalProgress');
+            if (progressBar) {
+                progressBar.style.width = rate + '%';
+            }
+        }
+
+        function initFilters() {
+            const pSel = document.getElementById('prefFilter');
+            prefOrder.forEach(p => pSel.innerHTML += `<option value="${p}">${p}</option>`);
+
+            const eSel = document.getElementById('editionFilter');
+            const eds = [...new Set(masterData.map(d => d.edition))].sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+            eds.forEach(e => eSel.innerHTML += `<option value="${e}">${e}</option>`);
+        }
+
+        // 選択モードの切り替え
+        function toggleSelectionMode() {
+            isSelectionMode = !isSelectionMode;
+            const bulkBtn = document.getElementById('bulkCollectBtn');
+            const bulkArea = document.getElementById('bulkActionArea');
+
+            if (isSelectionMode) {
+                bulkBtn.textContent = "選択したものを登録";
+                bulkBtn.style.background = "#28a745"; // 登録時は緑
+            } else {
+                bulkBtn.textContent = "カードを選択して登録";
+                bulkBtn.style.background = "#4dabff"; // 通常時は青
+                selectedCities.clear();
+            }
+            renderCollection();
+        }
+
+        function renderCollection() {
+            const pref = document.getElementById('prefFilter').value;
+            const ed = document.getElementById('editionFilter').value;
+            const listDiv = document.getElementById('collectionList');
+            const bulkArea = document.getElementById('bulkActionArea');
+            const bulkBtn = document.getElementById('bulkCollectBtn');
+            const statsDiv = document.getElementById('filterStats'); // 取得率表示用
+
+            if (!pref && !ed) {
+                listDiv.innerHTML = '<div class="empty-state">都道府県か弾数を選択してください</div>';
+                bulkArea.style.display = 'none';
+                if (statsDiv) statsDiv.style.display = 'none';
+                return;
+            }
+
+            let filtered = masterData;
+            if (pref) filtered = filtered.filter(d => d.pref === pref);
+            if (ed) filtered = filtered.filter(d => d.edition === ed);
+
+            // --- 追加：取得率の計算と表示 ---
+            if (statsDiv) {
+                const totalInFilter = filtered.length;
+                const collectedInFilter = filtered.filter(c => userStats[c.city]?.collected).length;
+                const rate = totalInFilter > 0 ? Math.round((collectedInFilter / totalInFilter) * 100) : 0;
+
+                statsDiv.style.display = 'block';
+                statsDiv.innerHTML = `
+            表示中: <b>${totalInFilter}</b>枚 / 
+            取得済み: <b>${collectedInFilter}</b>枚 
+            <span style="margin-left:8px; padding:2px 8px; background:#4dabff; color:white; border-radius:12px; font-size:12px; font-weight:bold;">
+                達成率: ${rate}%
+            </span>
+        `;
+            }
+
+            // 選択モードに応じてボタンの表示を調整
+            bulkArea.style.display = (filtered.length > 0) ? 'block' : 'none';
+            if (isSelectionMode) {
+                bulkBtn.onclick = executeBulkRegistration;
+                bulkBtn.textContent = selectedCities.size > 0 ? `${selectedCities.size}枚を登録する` : "キャンセルして戻る";
+                if (selectedCities.size === 0) {
+                    bulkBtn.onclick = toggleSelectionMode;
+                }
+            } else {
+                bulkBtn.onclick = toggleSelectionMode;
+                bulkBtn.textContent = "カードを選択して登録";
+            }
+
+            listDiv.innerHTML = filtered.map(c => {
+                const isCollected = userStats[c.city]?.collected;
+                const isSelected = selectedCities.has(c.city);
+
+                // 状態によるクラス分け
+                let statusClass = isCollected ? 'collected' : '';
+                if (isSelectionMode && isSelected) statusClass = 'selecting-active';
+
+                return `
+            <div class="card-container ${statusClass}" onclick="handleCardClick('${c.city.replace(/'/g, "\\'")}')">
+                <div class="check-mark">✓</div>
+                
+                ${isSelectionMode && !isCollected ? `
+                    <div class="select-dot ${isSelected ? 'dot-active' : ''}"></div>` : ''}
+
+                <img src="${c.url}" loading="lazy" alt="${c.city}">
+                
+                <div class="card-info">${c.city}</div>
+            </div>
+        `;
+            }).join('');
+        }
+
+        // カードクリック時の動作
+        function handleCardClick(city) {
+            if (isSelectionMode) {
+                // すでに持っているものは選択不可
+                if (userStats[city]?.collected) return;
+
+                if (selectedCities.has(city)) {
+                    selectedCities.delete(city);
+                } else {
+                    selectedCities.add(city);
+                }
+                renderCollection();
+            } else {
+                openModal(city);
+            }
+        }
+
+        // 選択したものを一括で保存（日付を空にする修正版）
+        function executeBulkRegistration() {
+            if (selectedCities.size === 0) return;
+
+            if (confirm(`${selectedCities.size}枚を一括で登録しますか？\n（日付は未設定で登録されます）`)) {
+                selectedCities.forEach(city => {
+                    // すでに登録済みのものは上書きしない、または新規登録
+                    userStats[city] = {
+                        collected: true,
+                        date: "" // ここを空白にする
+                    };
+                });
+
+                localStorage.setItem('manhole_collection', JSON.stringify(userStats));
+                selectedCities.clear();
+                isSelectionMode = false;
+                updateStats();
+                renderCollection();
+                alert('登録しました！');
+            }
+        }
+
+        // --- 以下、既存のモーダル・バックアップ処理はそのまま ---
+        let currentCity = null;
+        // --- モーダルを開く処理 ---
+        // --- モーダルを開く処理 ---
+        function openModal(c) {
+            currentCity = c;
+            const d = masterData.find(x => x.city === c);
+            const saved = userStats[c] || { collected: false, date: "" };
+
+            document.getElementById('modalImg').src = d.url;
+            document.getElementById('modalTitle').textContent = d.city;
+            document.getElementById('modalSub').textContent = `${d.pref} / 第${d.edition}弾`;
+            document.getElementById('collectDate').value = saved.date || "";
+
+            const getBtn = document.getElementById('getBtn');
+            const delBtn = document.getElementById('deleteBtn');
+
+            if (saved.collected) {
+                // 取得済みの場合
+                getBtn.textContent = '日付を更新して保存';
+                getBtn.style.background = '#28a745';
+                delBtn.style.display = 'block'; // 削除ボタンを表示
+            } else {
+                // 未取得の場合
+                getBtn.textContent = '取得済みにする';
+                getBtn.style.background = '#4dabff';
+                delBtn.style.display = 'none';  // 削除ボタンを隠す
+            }
+
+            document.getElementById('modal').style.display = 'flex';
+        }
+
+        // --- 取得・更新処理 ---
+        function toggleCollect() {
+            const dateVal = document.getElementById('collectDate').value;
+
+            // 新規でも更新でも、この内容で上書き保存
+            userStats[currentCity] = {
+                collected: true,
+                date: dateVal
+            };
+
+            saveAndRefresh();
+        }
+
+        // --- 【新規追加】削除処理 ---
+        function deleteCollect() {
+            if (confirm(`${currentCity} の取得記録を削除しますか？`)) {
+                delete userStats[currentCity];
+                saveAndRefresh();
+            }
+        }
+
+        // 共通の保存・更新処理
+        function saveAndRefresh() {
+            localStorage.setItem('manhole_collection', JSON.stringify(userStats));
+            updateStats();
+            renderCollection();
+            closeModal();
+        }
+
+        function closeModal() { document.getElementById('modal').style.display = 'none'; }
+
+        function exportBackup() {
+            const blob = new Blob([JSON.stringify(userStats, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `manhole_record_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+        }
+
+        function importBackup(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (confirm('現在の記録を上書きしてインポートしますか？')) {
+                        userStats = data;
+                        localStorage.setItem('manhole_collection', JSON.stringify(userStats));
+                        updateStats();
+                        renderCollection();
+                        alert('インポート完了');
+                    }
+                } catch (e) { alert('エラー: ファイル形式が正しくありません'); }
+            };
+            reader.readAsText(file);
+        }
+    </script>
+</body>
+<footer
+    style="margin-top: 40px; padding: 30px 15px; border-top: 1px solid #333; text-align: center; background: #1a1a1a;">
+    <div style="font-size: 12px; color: #666; margin-bottom: 15px;">データ管理（機種変更時の移行など）</div>
+    <div class="backup-row">
+        <button class="btn-utility" onclick="exportBackup()">エクスポート</button>
+        <button class="btn-utility" onclick="document.getElementById('importFile').click()">インポート</button>
+        <input type="file" id="importFile" style="display:none" onchange="importBackup(event)">
+    </div>
+    <div style="font-size: 10px; color: #444; margin-top: 20px;">© マンホール図鑑</div>
+</footer>
+
+</html>

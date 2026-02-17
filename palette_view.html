@@ -159,25 +159,6 @@
             font-size: 14px;
             cursor: pointer;
         }
-
-        .card {
-            width: 48%;
-            background: #272729;
-            margin-bottom: 15px;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-            cursor: pointer;
-            /* 追加：指マークにする */
-            transition: transform 0.2s, background-color 0.2s;
-            /* 追加：アニメーション */
-        }
-
-        .card:active {
-            transform: scale(0.95);
-            /* 追加：タップした時に少し凹む演出 */
-            background-color: #3a3a3c;
-        }
     </style>
 </head>
 
@@ -230,29 +211,6 @@
         const prefSelect = document.getElementById('prefSelect');
         const editionSelect = document.getElementById('editionSelect');
         const citySelect = document.getElementById('citySelect');
-
-        window.onload = () => {
-            // 1. URLパラメータを取得
-            const urlParams = new URLSearchParams(window.location.search);
-            const targetCity = urlParams.get('city');
-
-            if (targetCity) {
-                // 2. セレクトボックス（citySelect）から該当する値を探してセット
-                const citySelect = document.getElementById('citySelect');
-
-                // データ読み込み完了を待つ必要があるため、データロード処理の中に組み込むのが理想
-                const checkDataLoad = setInterval(() => {
-                    if (masterData.length > 0) {
-                        citySelect.value = targetCity;
-
-                        // 3. 値が変わったことを通知して検索ロジックを発火させる
-                        citySelect.dispatchEvent(new Event('change'));
-
-                        clearInterval(checkDataLoad);
-                    }
-                }, 100);
-            }
-        };
 
         function updateFilters() {
             const selectedPref = prefSelect.value;
@@ -344,72 +302,6 @@
                 }
             });
             targetDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        };
-
-        // --- 変更点：カード生成部分に onclick を追加 ---
-        function createCardElement(d) {
-            const card = document.createElement('div');
-            card.className = 'card';
-            // クリック時に selectCard 関数を呼ぶように設定
-            card.onclick = () => selectCard(d.city);
-            card.innerHTML = `
-        <img src="${d.url}">
-        <div class="card-info">
-            <div class="card-title">${d.city}</div>
-            <div class="card-sub">${d.pref}</div>
-            ${createPaletteHTML(d.palette)}
-        </div>`;
-            return card;
-        }
-
-        // --- 新機能：カードを選択して再検索する関数 ---
-        function selectCard(cityName) {
-            // 1. フィルタをリセット（またはその都市が表示されるように調整）
-            // 一番確実なのは、一旦すべての都市を選択肢に出してから選ぶこと
-            resetFilters();
-
-            // 2. セレクトボックスの値を書き換え
-            citySelect.value = cityName;
-
-            // 3. changeイベントを手動で実行
-            citySelect.dispatchEvent(new Event('change'));
-
-            // 4. 画面上部（メインカード）へスムーズにスクロール
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        // --- 既存の citySelect.onchange 内のカード生成部分を差し替え ---
-        citySelect.onchange = () => {
-            const selectedId = citySelect.value;
-            if (!selectedId) return;
-            const targetData = masterData.find(item => item.city === selectedId);
-            const similarIds = (similarityIndex[selectedId + ".png"] || []).slice(0, 10);
-
-            // メイン表示
-            document.getElementById('targetCardPlaceholder').style.display = 'none';
-            const targetDiv = document.getElementById('targetCard');
-            targetDiv.style.display = 'block';
-            targetDiv.innerHTML = `
-        <img src="${targetData.url}">
-        <div class="main-title">${targetData.city}</div>
-        <div class="main-sub">${targetData.pref} / ${targetData.edition}</div>
-        ${createPaletteHTML(targetData.palette)}
-    `;
-
-            // おすすめ表示
-            document.getElementById('recommendPlaceholder').style.display = 'none';
-            const resultDiv = document.getElementById('recommendResults');
-            resultDiv.innerHTML = '';
-
-            similarIds.forEach(idWithExt => {
-                const cityName = idWithExt.replace('.png', '');
-                const d = masterData.find(item => item.city === cityName);
-                if (d) {
-                    // ここで共通化した関数を使用
-                    const cardElement = createCardElement(d);
-                    resultDiv.appendChild(cardElement);
-                }
-            });
         };
     </script>
 </body>
