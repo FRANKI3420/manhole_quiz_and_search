@@ -400,11 +400,16 @@
             <button id="executeBulkBtn" class="btn-main" onclick="executeSelectedCollect()"
                 style="display:none; background: #28a745; width: 45%; margin:0; padding: 8px;">選択分を登録</button>
         </div>
-        <div id="bulkActionArea" style="display: none; text-align: center; margin: 10px 0;">
-            <button class="btn-main" id="bulkCollectBtn" onclick="bulkToggleCollect()"
-                style="margin-top:0; padding: 8px; font-size: 13px; background: #28a745;">
-                表示中の <span id="bulkCount">0</span> 枚を一括登録
-            </button>
+        <div id="bulkActionArea" style="display:none; margin: 10px 0;">
+            <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 10px;">
+                <button id="selectAllBtn" class="btn-utility" onclick="selectAllFiltered()"
+                    style="flex: 1; display: none; background: #444;">
+                    表示中をすべて選択
+                </button>
+                <button id="bulkCollectBtn" class="btn-main" style="flex: 2;">
+                    カードを選択して登録
+                </button>
+            </div>
         </div>
 
     </div>
@@ -429,6 +434,11 @@
             <button id="deleteBtn" class="btn-utility" onclick="deleteCollect()"
                 style="width: 100%; margin-top: 10px; background: #333; color: #ff4d4d; border: 1px solid #444; display: none;">
                 取得記録を削除
+            </button>
+
+            <button id="customSearchBtn" class="btn-main" onclick="goToSearchPage()"
+                style="width: 100%; margin-top: 10px; background: #6c757d; color: #fff;">
+                🔍 この画像で判定・検索
             </button>
 
             <button onclick="closeModal()"
@@ -474,6 +484,19 @@
             }
         }
 
+        function goToSearchPage() {
+            if (!currentCity) return;
+            const d = masterData.find(x => x.city === currentCity);
+            if (!d || !d.url) return;
+
+            /**
+             * search.htmlへ遷移します。
+             * 画像URLをパラメータとして渡すことで、移動先で自動的にその画像を表示できます。
+             */
+            const targetUrl = `search.html?img=${encodeURIComponent(d.url)}&city=${encodeURIComponent(d.city)}`;
+            window.open(targetUrl, '_blank'); // 別タブで開く場合
+            // window.location.href = targetUrl; // 同じタブで移動する場合
+        }
         function initFilters() {
             const pSel = document.getElementById('prefFilter');
             prefOrder.forEach(p => pSel.innerHTML += `<option value="${p}">${p}</option>`);
@@ -483,20 +506,45 @@
             eds.forEach(e => eSel.innerHTML += `<option value="${e}">${e}</option>`);
         }
 
-        // 選択モードの切り替え
         function toggleSelectionMode() {
             isSelectionMode = !isSelectionMode;
-            const bulkBtn = document.getElementById('bulkCollectBtn');
-            const bulkArea = document.getElementById('bulkActionArea');
+            const selectAllBtn = document.getElementById('selectAllBtn');
 
-            if (isSelectionMode) {
-                bulkBtn.textContent = "選択したものを登録";
-                bulkBtn.style.background = "#28a745"; // 登録時は緑
-            } else {
-                bulkBtn.textContent = "カードを選択して登録";
-                bulkBtn.style.background = "#4dabff"; // 通常時は青
+            if (!isSelectionMode) {
                 selectedCities.clear();
             }
+
+            // 選択モード中のみ「すべて選択」ボタンを表示
+            if (selectAllBtn) {
+                selectAllBtn.style.display = isSelectionMode ? 'block' : 'none';
+            }
+
+            renderCollection();
+        }
+
+        function selectAllFiltered() {
+            // 現在のフィルター条件で絞り込まれたデータを取得
+            const pref = document.getElementById('prefFilter').value;
+            const ed = document.getElementById('editionFilter').value;
+
+            let filtered = masterData;
+            if (pref) filtered = filtered.filter(d => d.pref === pref);
+            if (ed) filtered = filtered.filter(d => d.edition === ed);
+
+            // 未取得のものだけを抽出
+            const uncollectedInFilter = filtered.filter(c => !userStats[c.city]?.collected);
+
+            // 全選択か全解除かを判定（すでに全て選択済みなら解除、そうでなければ全選択）
+            const allSelected = uncollectedInFilter.every(c => selectedCities.has(c.city));
+
+            if (allSelected) {
+                // すでに全選択状態なら、このフィルター内の選択を解除
+                uncollectedInFilter.forEach(c => selectedCities.delete(c.city));
+            } else {
+                // 未選択が含まれるなら、すべて選択に追加
+                uncollectedInFilter.forEach(c => selectedCities.add(c.city));
+            }
+
             renderCollection();
         }
 
