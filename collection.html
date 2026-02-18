@@ -226,33 +226,44 @@
             font-size: 14px;
         }
 
-        /* モーダル */
+        /* モーダル外枠：ここをflexにするのが重要 */
         #modal {
             display: none;
+            /* JSでflexに切り替える */
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            z-index: 1000;
+            width: 100vw;
+            height: 100vh;
+            background: #000;
+            z-index: 2000;
             justify-content: center;
             align-items: center;
         }
 
+        /* モーダル内側：スクロールさせない設定 */
         .modal-content {
-            width: 85%;
-            max-width: 350px;
-            background: #1f1f1f;
-            border-radius: 15px;
-            padding: 20px;
-            text-align: center;
+            background: #1a1a1a;
+            width: 100%;
+            height: 100%;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            /* スクロールを禁止 */
+            box-sizing: border-box;
         }
 
+        /* 画像：余白を自動で埋める設定 */
         .modal-img {
+            flex-grow: 1;
+            /* これで画像が余白分大きくなる */
+            min-height: 0;
+            /* 重要：flex内での縮小を許可する */
             width: 100%;
-            border-radius: 10px;
-            margin-bottom: 10px;
+            object-fit: contain;
+            background: #000;
+            border-radius: 8px;
         }
 
         .date-input {
@@ -420,29 +431,41 @@
 
     <div id="modal" onclick="closeModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <img id="modalImg" class="modal-img" src="">
-            <h3 id="modalTitle" style="margin:5px 0;"></h3>
-            <p id="modalSub" style="color:#888; font-size:12px; margin:0;"></p>
 
-            <div id="dateArea" style="margin-top:15px;">
-                <label style="font-size:11px; color:#4dabff;">取得日を記録</label><br>
-                <input type="date" id="collectDate" class="date-input">
+            <div
+                style="flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <span onclick="closeModal()" style="font-size: 28px; color: #888; cursor: pointer;">✕</span>
+                <span id="modalTitle" style="font-size: 20px; font-weight: bold; color: #fff;"></span>
+                <span style="width: 28px;"></span>
             </div>
 
-            <button id="getBtn" class="btn-main" onclick="toggleCollect()"></button>
+            <img id="modalImg" src="" class="modal-img">
 
-            <button id="deleteBtn" class="btn-utility" onclick="deleteCollect()"
-                style="width: 100%; margin-top: 10px; background: #333; color: #ff4d4d; border: 1px solid #444; display: none;">
-                取得記録を削除
-            </button>
+            <div style="flex-shrink: 0; text-align: center; margin: 10px 0;">
+                <p id="modalSub" style="color: #888; font-size: 13px; margin-bottom: 8px;"></p>
+                <button id="customSearchBtn" class="btn-main" onclick="goToSearchPage()"
+                    style="width: 70%; background: #444; color: #fff; padding: 8px; font-size: 13px; border-radius: 6px; margin: 0 auto; display: block;">
+                    🔍 画像で判定・検索
+                </button>
+            </div>
 
-            <button id="customSearchBtn" class="btn-main" onclick="goToSearchPage()"
-                style="width: 100%; margin-top: 10px; background: #6c757d; color: #fff;">
-                🔍 この画像で判定・検索
-            </button>
+            <div
+                style="flex-shrink: 0; background: #222; padding: 12px; border-radius: 10px; display: flex; flex-direction: column; gap: 10px;">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <label style="font-size: 11px; color: #4dabff;">取得日</label>
+                    <input type="date" id="collectDate" class="date-input" style="width: 60%; margin: 0; padding: 5px;">
+                </div>
 
-            <button onclick="closeModal()"
-                style="background:none; border:none; color:#888; margin-top:15px; font-size:13px;">閉じる</button>
+                <button id="getBtn" class="btn-main" onclick="toggleCollect()"
+                    style="margin: 0; padding: 12px; font-size: 16px;"></button>
+
+                <div style="display: flex; gap: 8px;">
+                    <button id="deleteBtn" onclick="deleteCollect()"
+                        style="flex: 1; background: none; color: #ff4d4d; border: 1px solid #ff4d4d44; font-size: 12px; padding: 8px; border-radius: 6px; display: none;">削除</button>
+                    <button onclick="closeModal()" class="btn-utility"
+                        style="flex: 2; background: #333; color: #ccc; border: 1px solid #444; font-size: 14px; padding: 8px;">一覧に戻る</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -669,7 +692,7 @@
 
             document.getElementById('modalImg').src = d.url;
             document.getElementById('modalTitle').textContent = d.city;
-            document.getElementById('modalSub').textContent = `${d.pref} / 第${d.edition}弾`;
+            document.getElementById('modalSub').textContent = `${d.pref} / ${d.edition}`;
             document.getElementById('collectDate').value = saved.date || "";
 
             const getBtn = document.getElementById('getBtn');
