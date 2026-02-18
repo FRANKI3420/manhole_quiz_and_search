@@ -1,5 +1,13 @@
 [
   {
+    "pref": "世界",
+    "city": "シェムリアップ市",
+    "url": "https://anythingsearch.info/card/wp-content/uploads/2023/04/a7985dbaf69d04162970f805ccd0d69e.jpg",
+    "edition": "第19弾",
+    "id": "シェムリアップ市",
+    "palette": []
+  },
+  {
     "pref": "その他",
     "city": "日本下水道事業団",
     "url": "http://www.gk-p.jp/wp-content/uploads/mhc/00-101-A01.jpg",
@@ -26043,10 +26051,10 @@
   },
   {
     "pref": "大阪府",
-    "city": "太子町",
+    "city": "太子町 (大阪)",
     "url": "http://www.gk-p.jp/wp-content/uploads/mhc/27-381-A-01.jpg",
     "edition": "第07弾",
-    "id": "太子町",
+    "id": "太子町 (大阪)",
     "palette": [
       {
         "hex": "#12100d",
@@ -27319,10 +27327,10 @@
   },
   {
     "pref": "兵庫県",
-    "city": "太子町",
+    "city": "太子町 (兵庫)",
     "url": "http://www.gk-p.jp/wp-content/uploads/mhc/28-464-A-01.jpg",
     "edition": "第23弾",
-    "id": "太子町",
+    "id": "太子町 (兵庫)",
     "palette": [
       {
         "hex": "#12100d",
