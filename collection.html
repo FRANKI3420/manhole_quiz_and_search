@@ -308,6 +308,7 @@
             justify-content: center;
         }
 
+
         .selection-active .select-overlay {
             display: flex;
         }
@@ -333,10 +334,10 @@
         }
 
         /* 選択中（緑枠＋暗くする） */
-        .card-container.selecting-active {
+        /* .card-container.selecting-active {
             outline: 4px solid #28a745 !important;
             outline-offset: -4px;
-        }
+        } */
 
         /* 選択モード中に重なる半透明の膜 */
         .card-container.selecting-active::after {
@@ -379,6 +380,16 @@
             /* 数字を白くして強調 */
             font-size: 16px;
         }
+
+        /* 選択モード中に選んでいるカードの見た目 */
+        .card-container.selecting-active {
+            outline: 3px solid #4dabff;
+            /* 青い枠線で強調 */
+            transform: scale(0.98);
+            /* 少し凹ませて選択感を出す */
+            opacity: 1 !important;
+            /* 登録済みで半透明になっていても、選択中はクッキリ見せる */
+        }
     </style>
 </head>
 
@@ -412,6 +423,13 @@
                 style="display:none; background: #28a745; width: 45%; margin:0; padding: 8px;">選択分を登録</button>
         </div>
         <div id="bulkActionArea" style="display:none; margin: 10px 0;">
+            <div id="bulkDateArea"
+                style="display: none; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px; background: #2a2a2a; padding: 8px; border-radius: 8px;">
+                <label style="font-size: 12px; color: #4dabff; font-weight: bold;">一括登録日:</label>
+                <input type="date" id="bulkDateInput"
+                    style="padding: 5px; border-radius: 4px; border: 1px solid #444; background: #333; color: #fff; font-size: 14px;">
+            </div>
+
             <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 10px;">
                 <button id="selectAllBtn" class="btn-utility" onclick="selectAllFiltered()"
                     style="flex: 1; display: none; background: #444;">
@@ -608,20 +626,29 @@
 
             // 選択モードに応じてボタンの表示を調整
             bulkArea.style.display = (filtered.length > 0) ? 'block' : 'none';
+            // ... renderCollection 関数の中のボタン制御部分 ...
             if (isSelectionMode) {
                 bulkBtn.onclick = executeBulkRegistration;
-                bulkBtn.textContent = selectedCities.size > 0 ? `${selectedCities.size}枚を登録する` : "キャンセルして戻る";
+                bulkBtn.textContent = selectedCities.size > 0 ? `${selectedCities.size}枚を一括登録` : "キャンセルして戻る";
+
+                // 選択されている時だけ日付入力欄を出す
+                document.getElementById('bulkDateArea').style.display = selectedCities.size > 0 ? 'flex' : 'none';
+
                 if (selectedCities.size === 0) {
                     bulkBtn.onclick = toggleSelectionMode;
                 }
             } else {
                 bulkBtn.onclick = toggleSelectionMode;
                 bulkBtn.textContent = "カードを選択して登録";
+                document.getElementById('bulkDateArea').style.display = 'none'; // 通常時は隠す
             }
 
             listDiv.innerHTML = filtered.map(c => {
                 const isCollected = userStats[c.city]?.collected;
                 const isSelected = selectedCities.has(c.city);
+
+                // --- 追加：このカードの取得日を取得 ---
+                const collectDate = (isCollected && userStats[c.city]?.date) ? userStats[c.city].date.replace(/-/g, '.') : "";
 
                 // 状態によるクラス分け
                 let statusClass = isCollected ? 'collected' : '';
@@ -636,51 +663,65 @@
 
                 <img src="${c.url}" loading="lazy" alt="${c.city}">
                 
-                <div class="card-info">${c.city}</div>
+                <div class="card-info">
+                    <div>${c.city}</div>
+                    <div style="font-size: 10px; color: #4dabff; font-weight: normal; margin-top: 2px; height: 12px;">
+                        ${collectDate}
+                    </div>
+                </div>
             </div>
         `;
             }).join('');
         }
-
-        // カードクリック時の動作
-        function handleCardClick(city) {
+        // カードクリック時の判定ロジック（例）
+        function handleCardClick(cityName) {
             if (isSelectionMode) {
-                // すでに持っているものは選択不可
-                if (userStats[city]?.collected) return;
-
-                if (selectedCities.has(city)) {
-                    selectedCities.delete(city);
+                if (selectedCities.has(cityName)) {
+                    selectedCities.delete(cityName);
                 } else {
-                    selectedCities.add(city);
+                    selectedCities.add(cityName);
                 }
-                renderCollection();
+                renderCollection(); // 再描画してチェック状態を更新
             } else {
-                openModal(city);
+                // 通常モードなら詳細モーダルを開く
+                const cityData = masterData.find(d => d.city === cityName);
+                openModal(cityData);
             }
         }
 
-        // 選択したものを一括で保存（日付を空にする修正版）
         function executeBulkRegistration() {
             if (selectedCities.size === 0) return;
 
-            if (confirm(`${selectedCities.size}枚を一括で登録しますか？\n（日付は未設定で登録されます）`)) {
-                selectedCities.forEach(city => {
-                    // すでに登録済みのものは上書きしない、または新規登録
-                    userStats[city] = {
-                        collected: true,
-                        date: "" // ここを空白にする
-                    };
-                });
-
-                localStorage.setItem('manhole_collection', JSON.stringify(userStats));
-                selectedCities.clear();
-                isSelectionMode = false;
-                updateStats();
-                renderCollection();
-                alert('登録しました！');
+            // 入力された日付を取得（空なら今日）
+            let targetDate = document.getElementById('bulkDateInput').value;
+            if (!targetDate) {
+                targetDate = new Date().toISOString().split('T')[0];
             }
-        }
 
+            // 確認メッセージ（登録済みが含まれる場合を考慮）
+            if (!confirm(`${selectedCities.size}枚のカードを ${targetDate} で登録・更新しますか？`)) {
+                return;
+            }
+
+            // 選択されたカードすべてをループして更新
+            selectedCities.forEach(cityName => {
+                // すでに登録済みであっても、新しい日付で上書き（または新規作成）
+                userStats[cityName] = {
+                    collected: true,
+                    date: targetDate
+                };
+            });
+
+            // ストレージに保存
+            saveStats();
+
+            // モード解除とUI更新
+            isSelectionMode = false;
+            selectedCities.clear();
+            renderCollection();
+
+            alert("一括更新が完了しました！");
+        }
         // --- 以下、既存のモーダル・バックアップ処理はそのまま ---
         let currentCity = null;
         // --- モーダルを開く処理 ---
