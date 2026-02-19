@@ -492,79 +492,65 @@
         let userStats = JSON.parse(localStorage.getItem('manhole_collection')) || {};
         let isSelectionMode = false; // 選択モード管理
         let selectedCities = new Set(); // 選択中リスト
+        let currentCity = null; // モーダルで開いている都市名
 
         const prefOrder = ["世界", "その他", "北海道", "青森県", "岩手県", "宮城県", "秋田県", "山形県", "福島県", "茨城県", "栃木県", "群馬県", "埼玉県", "千葉県", "東京都", "神奈川県", "新潟県", "富山県", "石川県", "福井県", "山梨県", "長野県", "岐阜県", "静岡県", "愛知県", "三重県", "滋賀県", "京都府", "大阪府", "兵庫県", "奈良県", "和歌山県", "鳥取県", "島根県", "岡山県", "広島県", "山口県", "徳島県", "香川県", "愛媛県", "高知県", "福岡県", "佐賀県", "長崎県", "熊本県", "大分県", "宮崎県", "鹿児島県", "沖縄県"];
 
+        // データ読み込み
         fetch('master_data.json').then(res => res.json()).then(data => {
             masterData = data;
             updateStats();
             initFilters();
         });
 
+        // 全体の進捗更新
         function updateStats() {
             const total = masterData.length;
             const collected = Object.keys(userStats).filter(k => userStats[k].collected).length;
             const rate = total > 0 ? Math.round((collected / total) * 100) : 0;
 
-            // 数値を更新
             const statsText = document.querySelector('.stats-text');
             statsText.innerHTML = `
-        <span>
-            <span id="collectedCount" style="font-size: 1.2em; color: #4dabff;">${collected}</span> 
-            <span style="color: #888;">/</span> 
-            <span id="totalCount">${total}</span> 
-            <small style="font-weight: normal; margin-left: 4px;">収集済み</small>
-        </span>
-        <span class="rate-badge">達成率: ${rate}%</span>
-    `;
+                <span>
+                    <span id="collectedCount" style="font-size: 1.2em; color: #4dabff;">${collected}</span> 
+                    <span style="color: #888;">/</span> 
+                    <span id="totalCount">${total}</span> 
+                    <small style="font-weight: normal; margin-left: 4px;">収集済み</small>
+                </span>
+                <span class="rate-badge">達成率: ${rate}%</span>
+            `;
 
-            // バーを更新
             const progressBar = document.getElementById('totalProgress');
             if (progressBar) {
                 progressBar.style.width = rate + '%';
             }
         }
 
-        function goToSearchPage() {
-            if (!currentCity) return;
-            const d = masterData.find(x => x.city === currentCity);
-            if (!d || !d.url) return;
-
-            /**
-             * search.htmlへ遷移します。
-             * 画像URLをパラメータとして渡すことで、移動先で自動的にその画像を表示できます。
-             */
-            const targetUrl = `search.html?img=${encodeURIComponent(d.url)}&city=${encodeURIComponent(d.city)}`;
-            window.open(targetUrl, '_blank'); // 別タブで開く場合
-            // window.location.href = targetUrl; // 同じタブで移動する場合
-        }
+        // フィルター初期化
         function initFilters() {
             const pSel = document.getElementById('prefFilter');
-            prefOrder.forEach(p => pSel.innerHTML += `<option value="${p}">${p}</option>`);
+            prefOrder.forEach(p => {
+                if (masterData.some(d => d.pref === p)) {
+                    pSel.innerHTML += `<option value="${p}">${p}</option>`;
+                }
+            });
 
             const eSel = document.getElementById('editionFilter');
             const eds = [...new Set(masterData.map(d => d.edition))].sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
             eds.forEach(e => eSel.innerHTML += `<option value="${e}">${e}</option>`);
         }
 
+        // 選択モードの切り替え
         function toggleSelectionMode() {
             isSelectionMode = !isSelectionMode;
-            const selectAllBtn = document.getElementById('selectAllBtn');
-
             if (!isSelectionMode) {
                 selectedCities.clear();
             }
-
-            // 選択モード中のみ「すべて選択」ボタンを表示
-            if (selectAllBtn) {
-                selectAllBtn.style.display = isSelectionMode ? 'block' : 'none';
-            }
-
             renderCollection();
         }
 
+        // 表示中をすべて選択
         function selectAllFiltered() {
-            // 現在のフィルター条件で絞り込まれたデータを取得
             const pref = document.getElementById('prefFilter').value;
             const ed = document.getElementById('editionFilter').value;
 
@@ -572,30 +558,26 @@
             if (pref) filtered = filtered.filter(d => d.pref === pref);
             if (ed) filtered = filtered.filter(d => d.edition === ed);
 
-            // 未取得のものだけを抽出
-            const uncollectedInFilter = filtered.filter(c => !userStats[c.city]?.collected);
-
-            // 全選択か全解除かを判定（すでに全て選択済みなら解除、そうでなければ全選択）
-            const allSelected = uncollectedInFilter.every(c => selectedCities.has(c.city));
+            const allSelected = filtered.every(c => selectedCities.has(c.city));
 
             if (allSelected) {
-                // すでに全選択状態なら、このフィルター内の選択を解除
-                uncollectedInFilter.forEach(c => selectedCities.delete(c.city));
+                filtered.forEach(c => selectedCities.delete(c.city));
             } else {
-                // 未選択が含まれるなら、すべて選択に追加
-                uncollectedInFilter.forEach(c => selectedCities.add(c.city));
+                filtered.forEach(c => selectedCities.add(c.city));
             }
-
             renderCollection();
         }
 
+        // メイン描画処理
         function renderCollection() {
             const pref = document.getElementById('prefFilter').value;
             const ed = document.getElementById('editionFilter').value;
             const listDiv = document.getElementById('collectionList');
             const bulkArea = document.getElementById('bulkActionArea');
             const bulkBtn = document.getElementById('bulkCollectBtn');
-            const statsDiv = document.getElementById('filterStats'); // 取得率表示用
+            const statsDiv = document.getElementById('filterStats');
+            const selectAllBtn = document.getElementById('selectAllBtn');
+            const bulkDateArea = document.getElementById('bulkDateArea');
 
             if (!pref && !ed) {
                 listDiv.innerHTML = '<div class="empty-state">都道府県か弾数を選択してください</div>';
@@ -608,31 +590,23 @@
             if (pref) filtered = filtered.filter(d => d.pref === pref);
             if (ed) filtered = filtered.filter(d => d.edition === ed);
 
-            // --- 追加：取得率の計算と表示 ---
+            // フィルター内統計
             if (statsDiv) {
                 const totalInFilter = filtered.length;
                 const collectedInFilter = filtered.filter(c => userStats[c.city]?.collected).length;
                 const rate = totalInFilter > 0 ? Math.round((collectedInFilter / totalInFilter) * 100) : 0;
-
                 statsDiv.style.display = 'block';
-                statsDiv.innerHTML = `
-            表示中: <b>${totalInFilter}</b>枚 / 
-            取得済み: <b>${collectedInFilter}</b>枚 
-            <span style="margin-left:8px; padding:2px 8px; background:#4dabff; color:white; border-radius:12px; font-size:12px; font-weight:bold;">
-                達成率: ${rate}%
-            </span>
-        `;
+                statsDiv.innerHTML = `表示中: <b>${totalInFilter}</b>枚 / 取得済み: <b>${collectedInFilter}</b>枚 <span class="rate-badge" style="margin-left:8px;">達成率: ${rate}%</span>`;
             }
 
-            // 選択モードに応じてボタンの表示を調整
+            // ボタン表示制御
             bulkArea.style.display = (filtered.length > 0) ? 'block' : 'none';
-            // ... renderCollection 関数の中のボタン制御部分 ...
+
             if (isSelectionMode) {
                 bulkBtn.onclick = executeBulkRegistration;
-                bulkBtn.textContent = selectedCities.size > 0 ? `${selectedCities.size}枚を一括登録` : "キャンセルして戻る";
-
-                // 選択されている時だけ日付入力欄を出す
-                document.getElementById('bulkDateArea').style.display = selectedCities.size > 0 ? 'flex' : 'none';
+                bulkBtn.textContent = selectedCities.size > 0 ? `${selectedCities.size}枚を一括登録・更新` : "キャンセル";
+                if (selectAllBtn) selectAllBtn.style.display = 'block';
+                if (bulkDateArea) bulkDateArea.style.display = (selectedCities.size > 0) ? 'flex' : 'none';
 
                 if (selectedCities.size === 0) {
                     bulkBtn.onclick = toggleSelectionMode;
@@ -640,96 +614,88 @@
             } else {
                 bulkBtn.onclick = toggleSelectionMode;
                 bulkBtn.textContent = "カードを選択して登録";
-                document.getElementById('bulkDateArea').style.display = 'none'; // 通常時は隠す
+                if (selectAllBtn) selectAllBtn.style.display = 'none';
+                if (bulkDateArea) bulkDateArea.style.display = 'none';
             }
 
+            // リスト生成
             listDiv.innerHTML = filtered.map(c => {
                 const isCollected = userStats[c.city]?.collected;
                 const isSelected = selectedCities.has(c.city);
-
-                // --- 追加：このカードの取得日を取得 ---
                 const collectDate = (isCollected && userStats[c.city]?.date) ? userStats[c.city].date.replace(/-/g, '.') : "";
 
-                // 状態によるクラス分け
                 let statusClass = isCollected ? 'collected' : '';
                 if (isSelectionMode && isSelected) statusClass = 'selecting-active';
 
                 return `
-            <div class="card-container ${statusClass}" onclick="handleCardClick('${c.city.replace(/'/g, "\\'")}')">
-                <div class="check-mark">✓</div>
-                
-                ${isSelectionMode && !isCollected ? `
-                    <div class="select-dot ${isSelected ? 'dot-active' : ''}"></div>` : ''}
-
-                <img src="${c.url}" loading="lazy" alt="${c.city}">
-                
-                <div class="card-info">
-                    <div>${c.city}</div>
-                    <div style="font-size: 10px; color: #4dabff; font-weight: normal; margin-top: 2px; height: 12px;">
-                        ${collectDate}
+                    <div class="card-container ${statusClass}" onclick="handleCardClick('${c.id}')">
+                        <div class="check-mark">✓</div>
+                        <img src="${c.url}" loading="lazy" alt="${c.city}">
+                        <div class="card-info">
+                            <div>${c.city}</div>
+                            <div style="font-size: 10px; color: #4dabff; font-weight: normal; margin-top: 2px; height: 12px;">
+                                ${collectDate}
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
-        `;
+                `;
             }).join('');
         }
-        // カードクリック時の判定ロジック（例）
-        function handleCardClick(cityName) {
+
+        // クリックハンドラ
+        function handleCardClick(cardId) {
+            const cityData = masterData.find(d => d.id === cardId);
+            if (!cityData) return;
+
             if (isSelectionMode) {
-                if (selectedCities.has(cityName)) {
-                    selectedCities.delete(cityName);
+                const identifier = cityData.city;
+                if (selectedCities.has(identifier)) {
+                    selectedCities.delete(identifier);
                 } else {
-                    selectedCities.add(cityName);
+                    selectedCities.add(identifier);
                 }
-                renderCollection(); // 再描画してチェック状態を更新
+                renderCollection();
             } else {
-                // 通常モードなら詳細モーダルを開く
-                const cityData = masterData.find(d => d.city === cityName);
-                openModal(cityData);
+                openModal(cardId);
             }
         }
 
+        // 一括登録・更新の実行（日付が空なら空のまま登録）
         function executeBulkRegistration() {
             if (selectedCities.size === 0) return;
 
-            // 入力された日付を取得（空なら今日）
+            // 入力された日付を取得（入力がなければ空文字列 "" になる）
             let targetDate = document.getElementById('bulkDateInput').value;
-            if (!targetDate) {
-                targetDate = new Date().toISOString().split('T')[0];
-            }
 
-            // 確認メッセージ（登録済みが含まれる場合を考慮）
-            if (!confirm(`${selectedCities.size}枚のカードを ${targetDate} で登録・更新しますか？`)) {
+            // 確認メッセージの出し分け
+            const dateMsg = targetDate ? `${targetDate} で` : "日付なしで";
+            if (!confirm(`${selectedCities.size}枚のカードを ${dateMsg}一括登録・更新しますか？`)) {
                 return;
             }
 
             // 選択されたカードすべてをループして更新
             selectedCities.forEach(cityName => {
-                // すでに登録済みであっても、新しい日付で上書き（または新規作成）
                 userStats[cityName] = {
                     collected: true,
-                    date: targetDate
+                    date: targetDate // 空ならそのまま "" が保存される
                 };
             });
 
-            // ストレージに保存
-            saveStats();
-
-            // モード解除とUI更新
+            // 状態をリセットして保存
             isSelectionMode = false;
             selectedCities.clear();
-            renderCollection();
+            saveAndRefresh();
 
             alert("一括更新が完了しました！");
         }
-        // --- 以下、既存のモーダル・バックアップ処理はそのまま ---
-        let currentCity = null;
-        // --- モーダルを開く処理 ---
-        // --- モーダルを開く処理 ---
-        function openModal(c) {
-            currentCity = c;
-            const d = masterData.find(x => x.city === c);
-            const saved = userStats[c] || { collected: false, date: "" };
+
+        // モーダル表示
+        function openModal(cardId) {
+            const d = masterData.find(x => x.id === cardId);
+            if (!d) return;
+
+            currentCity = d.city;
+            const saved = userStats[d.city] || { collected: false, date: "" };
 
             document.getElementById('modalImg').src = d.url;
             document.getElementById('modalTitle').textContent = d.city;
@@ -740,34 +706,29 @@
             const delBtn = document.getElementById('deleteBtn');
 
             if (saved.collected) {
-                // 取得済みの場合
                 getBtn.textContent = '日付を更新して保存';
                 getBtn.style.background = '#28a745';
-                delBtn.style.display = 'block'; // 削除ボタンを表示
+                delBtn.style.display = 'block';
             } else {
-                // 未取得の場合
                 getBtn.textContent = '取得済みにする';
                 getBtn.style.background = '#4dabff';
-                delBtn.style.display = 'none';  // 削除ボタンを隠す
+                delBtn.style.display = 'none';
             }
 
             document.getElementById('modal').style.display = 'flex';
         }
 
-        // --- 取得・更新処理 ---
+        // 取得・更新
         function toggleCollect() {
             const dateVal = document.getElementById('collectDate').value;
-
-            // 新規でも更新でも、この内容で上書き保存
             userStats[currentCity] = {
                 collected: true,
                 date: dateVal
             };
-
             saveAndRefresh();
         }
 
-        // --- 【新規追加】削除処理 ---
+        // 削除
         function deleteCollect() {
             if (confirm(`${currentCity} の取得記録を削除しますか？`)) {
                 delete userStats[currentCity];
@@ -775,7 +736,7 @@
             }
         }
 
-        // 共通の保存・更新処理
+        // 保存と画面リフレッシュ
         function saveAndRefresh() {
             localStorage.setItem('manhole_collection', JSON.stringify(userStats));
             updateStats();
@@ -783,8 +744,20 @@
             closeModal();
         }
 
-        function closeModal() { document.getElementById('modal').style.display = 'none'; }
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
 
+        // 検索ページへ
+        function goToSearchPage() {
+            if (!currentCity) return;
+            const d = masterData.find(x => x.city === currentCity);
+            if (!d || !d.url) return;
+            const targetUrl = `search.html?img=${encodeURIComponent(d.url)}&city=${encodeURIComponent(d.city)}`;
+            window.open(targetUrl, '_blank');
+        }
+
+        // バックアップ関連
         function exportBackup() {
             const blob = new Blob([JSON.stringify(userStats, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
