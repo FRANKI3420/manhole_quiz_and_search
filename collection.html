@@ -134,6 +134,9 @@
         }
 
         .card-container {
+            content-visibility: auto;
+            /* 画面外のカードの描画負荷をカット */
+            contain-intrinsic-size: auto 147px;
             width: 31%;
             margin-bottom: 15px;
             background: #222;
@@ -390,6 +393,31 @@
             opacity: 1 !important;
             /* 登録済みで半透明になっていても、選択中はクッキリ見せる */
         }
+
+        /* 日付未入力バッジ */
+        .no-date-badge {
+            position: absolute;
+            bottom: 45px;
+            /* カード情報の少し上 */
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 77, 77, 0.9);
+            color: white;
+            font-size: 9px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        /* 日付登録率バーのスタイル */
+        #dateProgress {
+            background: #ffc107;
+            /* 黄色っぽいオレンジ */
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s;
+        }
     </style>
 </head>
 
@@ -399,8 +427,10 @@
         <div class="progress-bar-bg">
             <div id="totalProgress"></div>
         </div>
-        <div class="stats-text">
+        <div class="progress-bar-bg" style="height: 4px; margin-top: -8px; opacity: 0.8;">
+            <div id="dateProgress" style="background: #ffc107; height: 100%; width: 0%; transition: width 0.5s;"></div>
         </div>
+        <div class="stats-text"></div>
     </header>
 
     <div class="control-panel">
@@ -490,57 +520,65 @@
     <script>
         let masterData = [];
         let userStats = JSON.parse(localStorage.getItem('manhole_collection')) || {};
-        let isSelectionMode = false; // 選択モード管理
-        let selectedCities = new Set(); // 選択中リスト
-        let currentCity = null; // モーダルで開いている都市名
+        let isSelectionMode = false;
+        let selectedCities = new Set();
+        let currentCity = null;
 
         const prefOrder = ["世界", "その他", "北海道", "青森県", "岩手県", "宮城県", "秋田県", "山形県", "福島県", "茨城県", "栃木県", "群馬県", "埼玉県", "千葉県", "東京都", "神奈川県", "新潟県", "富山県", "石川県", "福井県", "山梨県", "長野県", "岐阜県", "静岡県", "愛知県", "三重県", "滋賀県", "京都府", "大阪府", "兵庫県", "奈良県", "和歌山県", "鳥取県", "島根県", "岡山県", "広島県", "山口県", "徳島県", "香川県", "愛媛県", "高知県", "福岡県", "佐賀県", "長崎県", "熊本県", "大分県", "宮崎県", "鹿児島県", "沖縄県"];
 
-        // データ読み込み
+        // 初期ロード
         fetch('master_data.json').then(res => res.json()).then(data => {
             masterData = data;
             updateStats();
             initFilters();
         });
 
-        // 全体の進捗更新
+        // 全体統計の更新
         function updateStats() {
             const total = masterData.length;
-            const collected = Object.keys(userStats).filter(k => userStats[k].collected).length;
-            const rate = total > 0 ? Math.round((collected / total) * 100) : 0;
+            const collectedCards = Object.values(userStats).filter(s => s.collected);
+            const collectedCount = collectedCards.length;
+            const datedCount = collectedCards.filter(s => s.date && s.date !== "").length;
+
+            const collectRate = total > 0 ? Math.round((collectedCount / total) * 100) : 0;
+            const dateRate = collectedCount > 0 ? Math.round((datedCount / collectedCount) * 100) : 0;
 
             const statsText = document.querySelector('.stats-text');
-            statsText.innerHTML = `
-                <span>
-                    <span id="collectedCount" style="font-size: 1.2em; color: #4dabff;">${collected}</span> 
-                    <span style="color: #888;">/</span> 
-                    <span id="totalCount">${total}</span> 
-                    <small style="font-weight: normal; margin-left: 4px;">収集済み</small>
-                </span>
-                <span class="rate-badge">達成率: ${rate}%</span>
-            `;
-
-            const progressBar = document.getElementById('totalProgress');
-            if (progressBar) {
-                progressBar.style.width = rate + '%';
+            if (statsText) {
+                statsText.innerHTML = `
+                        <div style="display:flex; flex-direction:column; align-items:center; gap:2px;">
+                            <div>
+                                <span style="color: #4dabff; font-size: 1.1em;">${collectedCount}</span> / <span>${total}</span> 
+                                <small>収集</small>
+                                <span class="rate-badge" style="margin-left:8px;">収集率: ${collectRate}%</span>
+                            </div>
+                            <div style="font-size: 11px; color: #ffc107; margin-top: 2px;">
+                                日付登録済み: ${datedCount}枚 (登録率: ${dateRate}%)
+                            </div>
+                        </div>
+                    `;
             }
+            document.getElementById('totalProgress').style.width = collectRate + '%';
+            document.getElementById('dateProgress').style.width = dateRate + '%';
         }
 
-        // フィルター初期化
         function initFilters() {
             const pSel = document.getElementById('prefFilter');
+            const eSel = document.getElementById('editionFilter');
+            pSel.innerHTML = '<option value="">都道府県を選択</option>';
+            eSel.innerHTML = '<option value="">弾数を選択</option>';
+
             prefOrder.forEach(p => {
                 if (masterData.some(d => d.pref === p)) {
                     pSel.innerHTML += `<option value="${p}">${p}</option>`;
                 }
             });
 
-            const eSel = document.getElementById('editionFilter');
             const eds = [...new Set(masterData.map(d => d.edition))].sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
             eds.forEach(e => eSel.innerHTML += `<option value="${e}">${e}</option>`);
         }
 
-        // 選択モードの切り替え
+        // 選択モード切り替え（画像リクエストを発生させない）
         function toggleSelectionMode() {
             isSelectionMode = !isSelectionMode;
             if (!isSelectionMode) {
@@ -553,31 +591,29 @@
         function selectAllFiltered() {
             const pref = document.getElementById('prefFilter').value;
             const ed = document.getElementById('editionFilter').value;
-
-            let filtered = masterData;
-            if (pref) filtered = filtered.filter(d => d.pref === pref);
-            if (ed) filtered = filtered.filter(d => d.edition === ed);
+            let filtered = masterData.filter(d => (!pref || d.pref === pref) && (!ed || d.edition === ed));
 
             const allSelected = filtered.every(c => selectedCities.has(c.city));
-
-            if (allSelected) {
-                filtered.forEach(c => selectedCities.delete(c.city));
-            } else {
-                filtered.forEach(c => selectedCities.add(c.city));
-            }
-            renderCollection();
+            filtered.forEach(c => {
+                const el = document.querySelector(`[data-id="${c.id}"]`);
+                if (allSelected) {
+                    selectedCities.delete(c.city);
+                    if (el) el.classList.remove('selecting-active');
+                } else {
+                    selectedCities.add(c.city);
+                    if (el) el.classList.add('selecting-active');
+                }
+            });
+            updateBulkButtonUI();
         }
 
-        // メイン描画処理
+        // メイン描画（ここでのみ画像リクエストが発生）
         function renderCollection() {
             const pref = document.getElementById('prefFilter').value;
             const ed = document.getElementById('editionFilter').value;
             const listDiv = document.getElementById('collectionList');
             const bulkArea = document.getElementById('bulkActionArea');
-            const bulkBtn = document.getElementById('bulkCollectBtn');
             const statsDiv = document.getElementById('filterStats');
-            const selectAllBtn = document.getElementById('selectAllBtn');
-            const bulkDateArea = document.getElementById('bulkDateArea');
 
             if (!pref && !ed) {
                 listDiv.innerHTML = '<div class="empty-state">都道府県か弾数を選択してください</div>';
@@ -586,127 +622,127 @@
                 return;
             }
 
-            let filtered = masterData;
-            if (pref) filtered = filtered.filter(d => d.pref === pref);
-            if (ed) filtered = filtered.filter(d => d.edition === ed);
+            let filtered = masterData.filter(d => (!pref || d.pref === pref) && (!ed || d.edition === ed));
 
             // フィルター内統計
             if (statsDiv) {
                 const totalInFilter = filtered.length;
-                const collectedInFilter = filtered.filter(c => userStats[c.city]?.collected).length;
-                const rate = totalInFilter > 0 ? Math.round((collectedInFilter / totalInFilter) * 100) : 0;
+                const collectedInFilter = filtered.filter(c => userStats[c.city]?.collected);
+                const collectedCount = collectedInFilter.length;
+                const datedCountInFilter = collectedInFilter.filter(c => userStats[c.city]?.date).length;
+                const dateRateInFilter = collectedCount > 0 ? Math.round((datedCountInFilter / collectedCount) * 100) : 0;
+                const collectRateInFilter = totalInFilter > 0 ? Math.round((collectedCount / totalInFilter) * 100) : 0;
+
                 statsDiv.style.display = 'block';
-                statsDiv.innerHTML = `表示中: <b>${totalInFilter}</b>枚 / 取得済み: <b>${collectedInFilter}</b>枚 <span class="rate-badge" style="margin-left:8px;">達成率: ${rate}%</span>`;
+                statsDiv.innerHTML = `
+                        <div style="margin-bottom: 5px;">
+                            表示中: <b>${totalInFilter}</b>枚 / 取得済み: <b>${collectedCount}</b>枚 
+                            <span class="rate-badge" style="margin-left:5px;">収集率: ${collectRateInFilter}%</span>
+                        </div>
+                        <div style="font-size: 11px; color: #ffc107;">
+                            表示内の日付登録: <b>${datedCountInFilter}</b>枚 (登録率: ${dateRateInFilter}%)
+                        </div>
+                    `;
             }
 
-            // ボタン表示制御
             bulkArea.style.display = (filtered.length > 0) ? 'block' : 'none';
+            updateBulkButtonUI();
 
-            if (isSelectionMode) {
-                bulkBtn.onclick = executeBulkRegistration;
-                bulkBtn.textContent = selectedCities.size > 0 ? `${selectedCities.size}枚を一括登録・更新` : "キャンセル";
-                if (selectAllBtn) selectAllBtn.style.display = 'block';
-                if (bulkDateArea) bulkDateArea.style.display = (selectedCities.size > 0) ? 'flex' : 'none';
-
-                if (selectedCities.size === 0) {
-                    bulkBtn.onclick = toggleSelectionMode;
-                }
-            } else {
-                bulkBtn.onclick = toggleSelectionMode;
-                bulkBtn.textContent = "カードを選択して登録";
-                if (selectAllBtn) selectAllBtn.style.display = 'none';
-                if (bulkDateArea) bulkDateArea.style.display = 'none';
-            }
-
-            // リスト生成
             listDiv.innerHTML = filtered.map(c => {
-                const isCollected = userStats[c.city]?.collected;
+                if (!c.url) return '';
+                const stats = userStats[c.city];
+                const isCollected = stats?.collected;
                 const isSelected = selectedCities.has(c.city);
-                const collectDate = (isCollected && userStats[c.city]?.date) ? userStats[c.city].date.replace(/-/g, '.') : "";
+                const hasDate = stats?.date && stats.date !== "";
+                const collectDateText = hasDate ? stats.date.replace(/-/g, '.') : (isCollected ? "日付未登録" : "");
 
                 let statusClass = isCollected ? 'collected' : '';
                 if (isSelectionMode && isSelected) statusClass = 'selecting-active';
 
                 return `
-                    <div class="card-container ${statusClass}" onclick="handleCardClick('${c.id}')">
-                        <div class="check-mark">✓</div>
-                        <img src="${c.url}" loading="lazy" alt="${c.city}">
-                        <div class="card-info">
-                            <div>${c.city}</div>
-                            <div style="font-size: 10px; color: #4dabff; font-weight: normal; margin-top: 2px; height: 12px;">
-                                ${collectDate}
+                        <div class="card-container ${statusClass}" data-id="${c.id}" onclick="handleCardClick('${c.id}')">
+                            <div class="check-mark">✓</div>
+                            <img src="${c.url}" loading="lazy" alt="${c.city}" onerror="this.style.opacity='0.3';this.onerror=null;">
+                            <div class="card-info">
+                                <div>${c.city}</div>
+                                <div class="date-text" style="font-size: 10px; color: ${hasDate ? '#4dabff' : '#ffc107'}; height: 12px;">
+                                    ${collectDateText}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                `;
+                    `;
             }).join('');
         }
 
-        // クリックハンドラ
+        // カードクリック（クラスの切り替えのみで再描画しない）
         function handleCardClick(cardId) {
             const cityData = masterData.find(d => d.id === cardId);
             if (!cityData) return;
 
             if (isSelectionMode) {
                 const identifier = cityData.city;
+                const cardElement = document.querySelector(`[data-id="${cardId}"]`);
                 if (selectedCities.has(identifier)) {
                     selectedCities.delete(identifier);
+                    if (cardElement) cardElement.classList.remove('selecting-active');
                 } else {
                     selectedCities.add(identifier);
+                    if (cardElement) cardElement.classList.add('selecting-active');
                 }
-                renderCollection();
+                updateBulkButtonUI();
             } else {
                 openModal(cardId);
             }
         }
 
-        // 一括登録・更新の実行（日付が空なら空のまま登録）
+        // UIパーツのみ更新
+        function updateBulkButtonUI() {
+            const bulkBtn = document.getElementById('bulkCollectBtn');
+            const bulkDateArea = document.getElementById('bulkDateArea');
+            const selectAllBtn = document.getElementById('selectAllBtn');
+
+            if (isSelectionMode) {
+                bulkBtn.onclick = executeBulkRegistration;
+                bulkBtn.textContent = selectedCities.size > 0 ? `${selectedCities.size}枚を一括登録・更新` : "キャンセル";
+                if (selectAllBtn) selectAllBtn.style.display = 'block';
+                if (bulkDateArea) bulkDateArea.style.display = (selectedCities.size > 0) ? 'flex' : 'none';
+                if (selectedCities.size === 0) bulkBtn.onclick = toggleSelectionMode;
+            } else {
+                bulkBtn.onclick = toggleSelectionMode;
+                bulkBtn.textContent = "カードを選択して登録";
+                if (selectAllBtn) selectAllBtn.style.display = 'none';
+                if (bulkDateArea) bulkDateArea.style.display = 'none';
+            }
+        }
+
         function executeBulkRegistration() {
             if (selectedCities.size === 0) return;
-
-            // 入力された日付を取得（入力がなければ空文字列 "" になる）
             let targetDate = document.getElementById('bulkDateInput').value;
-
-            // 確認メッセージの出し分け
             const dateMsg = targetDate ? `${targetDate} で` : "日付なしで";
-            if (!confirm(`${selectedCities.size}枚のカードを ${dateMsg}一括登録・更新しますか？`)) {
-                return;
-            }
+            if (!confirm(`${selectedCities.size}枚を ${dateMsg}一括登録しますか？`)) return;
 
-            // 選択されたカードすべてをループして更新
             selectedCities.forEach(cityName => {
-                userStats[cityName] = {
-                    collected: true,
-                    date: targetDate // 空ならそのまま "" が保存される
-                };
+                userStats[cityName] = { collected: true, date: targetDate };
             });
 
-            // 状態をリセットして保存
             isSelectionMode = false;
             selectedCities.clear();
             saveAndRefresh();
-
-            alert("一括更新が完了しました！");
         }
 
-        // モーダル表示
         function openModal(cardId) {
             const d = masterData.find(x => x.id === cardId);
             if (!d) return;
-
             currentCity = d.city;
             const saved = userStats[d.city] || { collected: false, date: "" };
-
             document.getElementById('modalImg').src = d.url;
             document.getElementById('modalTitle').textContent = d.city;
             document.getElementById('modalSub').textContent = `${d.pref} / ${d.edition}`;
             document.getElementById('collectDate').value = saved.date || "";
-
             const getBtn = document.getElementById('getBtn');
             const delBtn = document.getElementById('deleteBtn');
-
             if (saved.collected) {
-                getBtn.textContent = '日付を更新して保存';
+                getBtn.textContent = '更新して保存';
                 getBtn.style.background = '#28a745';
                 delBtn.style.display = 'block';
             } else {
@@ -714,29 +750,22 @@
                 getBtn.style.background = '#4dabff';
                 delBtn.style.display = 'none';
             }
-
             document.getElementById('modal').style.display = 'flex';
         }
 
-        // 取得・更新
         function toggleCollect() {
             const dateVal = document.getElementById('collectDate').value;
-            userStats[currentCity] = {
-                collected: true,
-                date: dateVal
-            };
+            userStats[currentCity] = { collected: true, date: dateVal };
             saveAndRefresh();
         }
 
-        // 削除
         function deleteCollect() {
-            if (confirm(`${currentCity} の取得記録を削除しますか？`)) {
+            if (confirm(`${currentCity} を削除しますか？`)) {
                 delete userStats[currentCity];
                 saveAndRefresh();
             }
         }
 
-        // 保存と画面リフレッシュ
         function saveAndRefresh() {
             localStorage.setItem('manhole_collection', JSON.stringify(userStats));
             updateStats();
@@ -744,25 +773,19 @@
             closeModal();
         }
 
-        function closeModal() {
-            document.getElementById('modal').style.display = 'none';
-        }
+        function closeModal() { document.getElementById('modal').style.display = 'none'; }
 
-        // 検索ページへ
         function goToSearchPage() {
             if (!currentCity) return;
             const d = masterData.find(x => x.city === currentCity);
             if (!d || !d.url) return;
-            const targetUrl = `search.html?img=${encodeURIComponent(d.url)}&city=${encodeURIComponent(d.city)}`;
-            window.open(targetUrl, '_blank');
+            window.open(`search.html?img=${encodeURIComponent(d.url)}&city=${encodeURIComponent(d.city)}`, '_blank');
         }
 
-        // バックアップ関連
         function exportBackup() {
             const blob = new Blob([JSON.stringify(userStats, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = url;
+            a.href = URL.createObjectURL(blob);
             a.download = `manhole_record_${new Date().toISOString().split('T')[0]}.json`;
             a.click();
         }
@@ -773,15 +796,12 @@
             const reader = new FileReader();
             reader.onload = (e) => {
                 try {
-                    const data = JSON.parse(e.target.result);
-                    if (confirm('現在の記録を上書きしてインポートしますか？')) {
-                        userStats = data;
-                        localStorage.setItem('manhole_collection', JSON.stringify(userStats));
-                        updateStats();
-                        renderCollection();
-                        alert('インポート完了');
-                    }
-                } catch (e) { alert('エラー: ファイル形式が正しくありません'); }
+                    userStats = JSON.parse(e.target.result);
+                    localStorage.setItem('manhole_collection', JSON.stringify(userStats));
+                    updateStats();
+                    renderCollection();
+                    alert('インポート完了');
+                } catch (e) { alert('形式エラー'); }
             };
             reader.readAsText(file);
         }
