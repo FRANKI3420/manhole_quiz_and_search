@@ -434,6 +434,10 @@
     </header>
 
     <div class="control-panel">
+        <div style="margin: 10px 0;">
+            <input type="text" id="searchInput" placeholder="市町村名で検索..." oninput="renderCollection()"
+                style="width: 100%; padding: 12px; background: #222; color: white; border: 1px solid #444; border-radius: 8px; box-sizing: border-box; font-size: 16px;">
+        </div>
         <div class="select-group">
             <select id="prefFilter" onchange="renderCollection()">
                 <option value="">都道府県で絞り込む</option>
@@ -502,6 +506,12 @@
                 <div style="display: flex; align-items: center; justify-content: space-between;">
                     <label style="font-size: 11px; color: #4dabff;">取得日</label>
                     <input type="date" id="collectDate" class="date-input" style="width: 60%; margin: 0; padding: 5px;">
+                </div>
+
+                <div style="margin-top:10px;">
+                    <label style="font-size:12px; color:#aaa;">思い出メモ（一行）</label>
+                    <input type="text" id="memoInput" placeholder="例：家族旅行で立ち寄った！"
+                        style="width:100%; padding:8px; background:#333; color:white; border:1px solid #444; border-radius:4px; box-sizing:border-box;">
                 </div>
 
                 <button id="getBtn" class="btn-main" onclick="toggleCollect()"
@@ -614,15 +624,24 @@
             const listDiv = document.getElementById('collectionList');
             const bulkArea = document.getElementById('bulkActionArea');
             const statsDiv = document.getElementById('filterStats');
+            const searchText = document.getElementById('searchInput').value.trim(); // ★追加
 
-            if (!pref && !ed) {
-                listDiv.innerHTML = '<div class="empty-state">都道府県か弾数を選択してください</div>';
+            // ★ 検索条件のロジックを更新
+            // 検索文字がある場合は、都道府県・弾数が未選択でも表示するように変更
+            if (!pref && !ed && !searchText) {
+                listDiv.innerHTML = '<div class="empty-state">都道府県・弾数を選択するか、市町村名を入力してください</div>';
                 bulkArea.style.display = 'none';
                 if (statsDiv) statsDiv.style.display = 'none';
                 return;
             }
 
-            let filtered = masterData.filter(d => (!pref || d.pref === pref) && (!ed || d.edition === ed));
+            let filtered = masterData.filter(d => {
+                const pMatch = !pref || d.pref === pref;
+                const eMatch = !ed || d.edition === ed;
+                // ★ 市町村名に検索文字が含まれているか判定（大文字小文字を区別しない）
+                const sMatch = !searchText || d.city.toLowerCase().includes(searchText.toLowerCase());
+                return pMatch && eMatch && sMatch;
+            });
 
             // フィルター内統計
             if (statsDiv) {
@@ -656,21 +675,26 @@
                 const hasDate = stats?.date && stats.date !== "";
                 const collectDateText = hasDate ? stats.date.replace(/-/g, '.') : (isCollected ? "日付未登録" : "");
 
+                // ★ メモがあれば表示用HTMLを作成（はみ出さないように ellipsis 指定）
+                const memoText = stats?.memo ?
+                    `<div style="font-size:9px; color:#aaa; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; margin-top:2px;">${stats.memo}</div>`
+                    : "";
+
                 let statusClass = isCollected ? 'collected' : '';
                 if (isSelectionMode && isSelected) statusClass = 'selecting-active';
 
                 return `
-                        <div class="card-container ${statusClass}" data-id="${c.id}" onclick="handleCardClick('${c.id}')">
-                            <div class="check-mark">✓</div>
-                            <img src="${c.url}" loading="lazy" alt="${c.city}" onerror="this.style.opacity='0.3';this.onerror=null;">
-                            <div class="card-info">
-                                <div>${c.city}</div>
-                                <div class="date-text" style="font-size: 10px; color: ${hasDate ? '#4dabff' : '#ffc107'}; height: 12px;">
-                                    ${collectDateText}
-                                </div>
+                    <div class="card-container ${statusClass}" data-id="${c.id}" onclick="handleCardClick('${c.id}')">
+                        <div class="check-mark">✓</div>
+                        <img src="${c.url}" loading="lazy" alt="${c.city}" onerror="this.style.opacity='0.3';this.onerror=null;">
+                        <div class="card-info">
+                            <div style="font-weight:bold;">${c.city}</div>
+                            ${memoText} <div class="date-text" style="font-size: 10px; color: ${hasDate ? '#4dabff' : '#ffc107'}; height: 12px; margin-top: 2px;">
+                                ${collectDateText}
                             </div>
                         </div>
-                    `;
+                    </div>
+                `;
             }).join('');
         }
 
@@ -721,8 +745,15 @@
             const dateMsg = targetDate ? `${targetDate} で` : "日付なしで";
             if (!confirm(`${selectedCities.size}枚を ${dateMsg}一括登録しますか？`)) return;
 
+            // executeBulkRegistration 関数内のループ部分
             selectedCities.forEach(cityName => {
-                userStats[cityName] = { collected: true, date: targetDate };
+                // 既存のメモがあれば維持し、なければ空にする
+                const existingMemo = userStats[cityName]?.memo || "";
+                userStats[cityName] = {
+                    collected: true,
+                    date: targetDate,
+                    memo: existingMemo
+                };
             });
 
             isSelectionMode = false;
@@ -730,15 +761,23 @@
             saveAndRefresh();
         }
 
+        // モーダルを開くとき
         function openModal(cardId) {
             const d = masterData.find(x => x.id === cardId);
             if (!d) return;
             currentCity = d.city;
-            const saved = userStats[d.city] || { collected: false, date: "" };
+
+            // userStatsから既存のデータを取得（memoがなければ空文字）
+            const saved = userStats[d.city] || { collected: false, date: "", memo: "" };
+
             document.getElementById('modalImg').src = d.url;
             document.getElementById('modalTitle').textContent = d.city;
             document.getElementById('modalSub').textContent = `${d.pref} / ${d.edition}`;
             document.getElementById('collectDate').value = saved.date || "";
+
+            // ★メモをセット
+            document.getElementById('memoInput').value = saved.memo || "";
+
             const getBtn = document.getElementById('getBtn');
             const delBtn = document.getElementById('deleteBtn');
             if (saved.collected) {
@@ -753,9 +792,16 @@
             document.getElementById('modal').style.display = 'flex';
         }
 
+        // 取得・更新ボタンを押したとき
         function toggleCollect() {
             const dateVal = document.getElementById('collectDate').value;
-            userStats[currentCity] = { collected: true, date: dateVal };
+            const memoVal = document.getElementById('memoInput').value; // ★メモを取得
+
+            userStats[currentCity] = {
+                collected: true,
+                date: dateVal,
+                memo: memoVal // ★メモを保存
+            };
             saveAndRefresh();
         }
 
