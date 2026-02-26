@@ -418,6 +418,64 @@
             width: 0%;
             transition: width 0.5s;
         }
+
+        /* 都道府県別の統計エリア */
+        #prefStatsContainer {
+            background: #222;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stats-title {
+            font-size: 14px;
+            color: var(--accent);
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .pref-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 12px;
+            max-height: 200px;
+            /* 増えすぎた時にスクロール可能に */
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .pref-item {
+            font-size: 11px;
+        }
+
+        .pref-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 3px;
+            color: #ccc;
+        }
+
+        .bar-bg {
+            background: #333;
+            /* バーの背景（未取得分） */
+            height: 8px;
+            border-radius: 4px;
+            margin-top: 4px;
+        }
+
+        .bar-fill {
+            /* 背景色はJSで動的に設定するため削除 */
+            height: 100%;
+            border-radius: 4px;
+            width: 0%;
+            transition: width 0.8s ease-out, background-color 0.8s ease;
+        }
+
+        /* 100%の時の特別な光は残す */
+        .bar-complete {
+            box-shadow: 0 0 10px rgba(255, 193, 7, 0.6);
+        }
     </style>
 </head>
 
@@ -434,6 +492,14 @@
     </header>
 
     <div class="control-panel">
+        <div id="prefStatsContainer">
+            <div class="stats-title">
+                <span>都道府県別 制覇率</span>
+                <small id="totalProgressText" style="color:#888;"></small>
+            </div>
+            <div id="prefStatsGrid" class="pref-grid">
+            </div>
+        </div>
         <div style="margin: 10px 0;">
             <input type="text" id="searchInput" placeholder="市町村名で検索..." oninput="renderCollection()"
                 style="width: 100%; padding: 12px; background: #222; color: white; border: 1px solid #444; border-radius: 8px; box-sizing: border-box; font-size: 16px;">
@@ -445,6 +511,23 @@
             <select id="editionFilter" onchange="renderCollection()">
                 <option value="">弾数で絞り込む</option>
             </select>
+        </div>
+        <div style="margin-top: 15px; display: flex; flex-direction: column; gap: 12px; align-items: center;">
+            <a href="calender.html" style="
+                                    display: inline-block;
+                                    width: 80%;
+                                    padding: 10px;
+                                    background: #333;
+                                    color: #4dabff;
+                                    text-decoration: none;
+                                    font-size: 14px;
+                                    border: 1px solid #4dabff;
+                                    border-radius: 8px;
+                                    text-align: center;
+                                    font-weight: bold;
+                                ">📅 取得記録をカレンダーで見る</a>
+
+            <a href="index.html" style="color: #888; text-decoration: none; font-size: 13px;">← メニューに戻る</a>
         </div>
         <div id="filterStats"
             style="padding: 10px; background: #222; text-align: center; font-size: 13px; color: #4dabff; border-bottom: 1px solid #333; display: none;">
@@ -541,6 +624,7 @@
             masterData = data;
             updateStats();
             initFilters();
+            updatePrefStats();
         });
 
         // 全体統計の更新
@@ -817,6 +901,7 @@
             updateStats();
             renderCollection();
             closeModal();
+            updatePrefStats(); // ★追加：都道府県別統計も更新
         }
 
         function closeModal() { document.getElementById('modal').style.display = 'none'; }
@@ -851,6 +936,74 @@
             };
             reader.readAsText(file);
         }
+
+        function updatePrefStats() {
+            const grid = document.getElementById('prefStatsGrid');
+            const totalText = document.getElementById('totalProgressText');
+            if (!grid || masterData.length === 0) return;
+
+            // 日本の標準的な都道府県順（北海道〜沖縄）
+            const prefOrder = [
+                "世界", "その他", "北海道", "青森県", "岩手県", "宮城県", "秋田県", "山形県", "福島県",
+                "茨城県", "栃木県", "群馬県", "埼玉県", "千葉県", "東京都", "神奈川県",
+                "新潟県", "富山県", "石川県", "福井県", "山梨県", "長野県", "岐阜県",
+                "静岡県", "愛知県", "三重県", "滋賀県", "京都府", "大阪府", "兵庫県",
+                "奈良県", "和歌山県", "鳥取県", "島根県", "岡山県", "広島県", "山口県",
+                "徳島県", "香川県", "愛媛県", "高知県", "福岡県", "佐賀県", "長崎県",
+                "熊本県", "大分県", "宮崎県", "鹿児島県", "沖縄県"
+            ];
+
+            const stats = {};
+            masterData.forEach(card => {
+                if (!stats[card.pref]) stats[card.pref] = { total: 0, collected: 0 };
+                stats[card.pref].total++;
+                const fullKey = `${card.city} (${card.id})`;
+                if (userStats[fullKey]?.collected || userStats[card.city]?.collected) {
+                    stats[card.pref].collected++;
+                }
+            });
+
+            // 全体進捗の表示
+            const allTotal = masterData.length;
+            const allCollected = Object.values(userStats).filter(s => s.collected).length;
+            totalText.textContent = `全体: ${allCollected} / ${allTotal} (${Math.floor((allCollected / allTotal) * 100) || 0}%)`;
+
+            // 都道府県順に並び替え（データが存在するものだけ抽出）
+            const sortedPrefs = prefOrder.filter(p => stats[p]);
+
+            grid.innerHTML = sortedPrefs.map(pref => {
+                const { total, collected } = stats[pref];
+                const percent = Math.floor((collected / total) * 100);
+
+                // ★ 取得率に応じたグラデーション色を計算
+                // 0% (赤っぽい) -> 50% (黄色) -> 99% (緑っぽい)
+                let barColor;
+                if (collected === total) {
+                    barColor = '#ffc107'; // 100%は金
+                } else {
+                    // HSL色空間を使って、色相(Hue)を 0(赤)から120(緑)まで変化させる
+                    const hue = Math.floor(percent * 1.2);
+                    barColor = `hsl(${hue}, 70%, 50%)`;
+                }
+
+                const completeClass = collected === total ? 'bar-complete' : '';
+
+                return `
+            <div class="pref-item">
+                <div class="pref-info">
+                    <span>${pref}</span>
+                    <span>${collected}/${total}</span>
+                </div>
+                <div class="bar-bg">
+                    <div class="bar-fill ${completeClass}" 
+                         style="width: ${percent}%; background-color: ${barColor};">
+                    </div>
+                </div>
+            </div>
+        `;
+            }).join('');
+        }
+
     </script>
 </body>
 <footer
