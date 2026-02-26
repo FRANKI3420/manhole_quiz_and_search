@@ -5577,10 +5577,10 @@
   },
   {
     "pref": "茨城県",
-    "city": "流域下水道",
+    "city": "茨城県 (流域下水道)",
     "url": "http://www.gk-p.jp/wp-content/uploads/mhc/08-000-A-01.jpg",
     "edition": "第27弾",
-    "id": "流域下水道",
+    "id": "茨城県 (流域下水道)",
     "palette": [
       {
         "hex": "#202732",
@@ -9956,10 +9956,10 @@
   },
   {
     "pref": "千葉県",
-    "city": "流域下水道",
+    "city": "千葉県 (流域下水道)",
     "url": "http://www.gk-p.jp/wp-content/uploads/mhc/12-000-A-01.jpg",
     "edition": "第21弾",
-    "id": "流域下水道",
+    "id": "千葉県 (流域下水道)",
     "palette": [
       {
         "hex": "#202732",
@@ -11087,10 +11087,10 @@
   },
   {
     "pref": "東京都",
-    "city": "流域下水道",
+    "city": "東京都 (流域下水道)",
     "url": "http://www.gk-p.jp/wp-content/uploads/mhc/13-000-A01-3.jpg",
     "edition": "第13弾",
-    "id": "流域下水道",
+    "id": "東京都 (流域下水道)",
     "palette": [
       {
         "hex": "#202732",

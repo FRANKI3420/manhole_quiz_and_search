@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>取得カレンダー - マンホール図鑑</title>
+    <style>
+        :root {
+            --bg: #1a1a1a;
+            --card-bg: #2a2a2a;
+            --accent: #4dabff;
+            --text: #eee;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: sans-serif;
+            margin: 0;
+            padding: 15px;
+        }
+
+        .nav {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .back-btn {
+            background: #444;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        /* カレンダー本体のスタイル */
+        .calendar-container {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .cal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .cal-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            text-align: center;
+        }
+
+        .day-label {
+            font-size: 12px;
+            color: #888;
+            padding-bottom: 5px;
+        }
+
+        .day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 14px;
+            position: relative;
+            transition: 0.2s;
+        }
+
+        .day:hover {
+            background: #444;
+        }
+
+        /* 記録がある日の強調 */
+        .has-record {
+            border: 2px solid var(--accent);
+            font-weight: bold;
+            color: var(--accent);
+        }
+
+        .selected-day {
+            background: var(--accent) !important;
+            color: white !important;
+        }
+
+        /* 下部に並ぶカードリスト */
+        #resultArea {
+            margin-top: 25px;
+        }
+
+        .result-title {
+            font-size: 16px;
+            border-left: 4px solid var(--accent);
+            padding-left: 10px;
+            margin-bottom: 15px;
+            color: var(--accent);
+        }
+
+        .card-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+        }
+
+        /* カードの見切れを防止 */
+        .card-mini img {
+            width: 100%;
+            aspect-ratio: 2/3;
+            /* マンホールカードの比率に合わせる */
+            object-fit: contain;
+            /* 全体が入るように調整 */
+            background: #000;
+        }
+
+        /* モーダルのスタイル（index.htmlから移植） */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* モーダルの箱：少し縦に余裕を持たせる */
+        .modal-content {
+            background: #2a2a2a;
+            padding: 30px 20px 20px;
+            /* 上の余白を30pxに増やしてボタン位置を確保 */
+            border-radius: 15px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        /* ×ボタン：画像に被らないよう、絶対配置で右上に固定 */
+        .close-btn {
+            position: absolute;
+            top: 5px;
+            /* 上端からの距離 */
+            right: 10px;
+            /* 右端からの距離 */
+            font-size: 28px;
+            cursor: pointer;
+            color: #bbb;
+            z-index: 1010;
+            /* 画像より上に表示 */
+            padding: 5px;
+            /* タップしやすくする */
+        }
+
+        /* 画像：ボタンに被らないようマージンを調整 */
+        #modalImg {
+            width: 100%;
+            max-height: 60vh;
+            /* スマホで画面からはみ出さないよう高さを制限 */
+            object-fit: contain;
+            border-radius: 10px;
+            margin-top: 10px;
+            /* ボタンとの間に隙間を作る */
+            margin-bottom: 15px;
+        }
+
+        /* カード全体の枠組みをスリムに */
+        .card-mini {
+            background: var(--card-bg);
+            border-radius: 6px;
+            /* 少し角を丸める */
+            overflow: hidden;
+            border: 1px solid #444;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* カードリストのグリッドを少し余裕のあるサイズに */
+        .card-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+            /* 85pxから90pxへ微増 */
+            gap: 10px;
+        }
+
+        /* 文字エリアの設定 */
+        .card-mini-info {
+            padding: 6px 4px;
+            /* 上下に少し余裕を持たせる */
+            background: #222;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            /* 中央寄せ */
+            min-height: 20px;
+            /* 高さを確保してガタつきを抑える */
+        }
+
+        /* 都市名のテキストスタイル */
+        .card-mini-info div {
+            font-size: 11px;
+            /* 10pxから11pxへ。視認性を確保 */
+            line-height: 1.3;
+            text-align: center;
+            /* 文字自体を中央寄せ */
+            width: 100%;
+            /* 幅いっぱい使って中央判定を安定させる */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: #eee;
+            /* 少しだけ明るくして読みやすく */
+            font-weight: 500;
+            /* 細すぎず太すぎない中間の太さ */
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="nav">
+        <a href="search.html" class="back-btn">← 図鑑に戻る</a>
+        <!-- <div id="currentMonthDisplay" style="font-weight: bold;">2024年 1月</div> -->
+    </div>
+
+    <div class="calendar-container">
+        <div class="cal-header">
+            <button onclick="changeMonth(-1)"
+                style="background:none; border:none; color:white; cursor:pointer;">◀</button>
+            <div id="monthYear"></div>
+            <button onclick="changeMonth(1)"
+                style="background:none; border:none; color:white; cursor:pointer;">▶</button>
+        </div>
+        <div class="cal-grid" id="calendarGrid">
+        </div>
+    </div>
+
+    <div id="resultArea">
+        <div id="selectedDateTitle" class="result-title">日付を選択してください</div>
+        <div id="cardList" class="card-list"></div>
+    </div>
+
+    <div id="modal" class="modal-overlay" onclick="if(event.target==this)closeModal()">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <img id="modalImg" src="" alt="">
+            <h3 id="modalTitle" style="margin:10px 0 5px;"></h3>
+            <p id="modalSub" style="color:#888; font-size:12px; margin-bottom:15px;"></p>
+            <div id="modalMemo"
+                style="background:#1a1a1a; padding:15px; border-radius:8px; text-align:left; font-size:14px; color:#ddd; line-height:1.6;">
+            </div>
+            <div id="modalDate" style="margin-top:10px; font-size:12px; color:var(--accent);"></div>
+        </div>
+    </div>
+
+    <script>
+        let masterData = [];
+        let userStats = JSON.parse(localStorage.getItem('manhole_collection')) || {};
+        let currentDisplayDate = new Date();
+
+        // 初期読み込み
+        async function init() {
+            try {
+                const res = await fetch('master_data.json');
+                if (!res.ok) throw new Error("JSON読み込み失敗");
+                masterData = await res.json();
+                renderCalendar();
+            } catch (e) {
+                console.error(e);
+                alert("データの読み込みに失敗しました。");
+            }
+        }
+
+        init();
+
+        function renderCalendar() {
+            const grid = document.getElementById('calendarGrid');
+            const monthYearDisplay = document.getElementById('monthYear');
+            grid.innerHTML = '';
+
+            const year = currentDisplayDate.getFullYear();
+            const month = currentDisplayDate.getMonth();
+            monthYearDisplay.textContent = `${year}年 ${month + 1}月`;
+
+            ['日', '月', '火', '水', '木', '金', '土'].forEach(d => {
+                grid.innerHTML += `<div class="day-label">${d}</div>`;
+            });
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const lastDate = new Date(year, month + 1, 0).getDate();
+
+            for (let i = 0; i < firstDay; i++) grid.innerHTML += `<div>
+        </div>`;
+
+            for (let date = 1; date <= lastDate; date++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0'
+                )}-${String(date).padStart(2, '0')}`; const hasRecord = Object.values(userStats).some(stat =>
+                    stat.collected && stat.date === dateStr
+                );
+
+                const dayEl = document.createElement('div');
+                dayEl.className = `day ${hasRecord ? 'has-record' : ''}`;
+                dayEl.textContent = date;
+                dayEl.onclick = () => showCardsForDate(dateStr, dayEl);
+                grid.appendChild(dayEl);
+            }
+        }
+
+        function showCardsForDate(dateStr, element) {
+            document.querySelectorAll('.day').forEach(d => d.classList.remove('selected-day'));
+            element.classList.add('selected-day');
+
+            const title = document.getElementById('selectedDateTitle');
+            const list = document.getElementById('cardList');
+            list.innerHTML = '';
+
+            const [y, m, d] = dateStr.split('-');
+            title.textContent = `${y}年${m}月${d}日 の取得`;
+
+            // 日付に一致するキーを取得
+            const targetKeys = Object.keys(userStats).filter(key => {
+                return userStats[key].collected && userStats[key].date === dateStr;
+            });
+
+            // masterDataからカードを特定
+            const cardsOnThisDay = masterData.filter(card => {
+                const fullKey = `${card.city} (${card.id})`;
+                return targetKeys.some(tKey => tKey === fullKey || tKey.includes(card.city));
+            });
+
+            if (cardsOnThisDay.length === 0) {
+                list.innerHTML = '<div class="empty-msg">記録はありません</div>';
+                return;
+            }
+
+            // ★ ここで onclick="openDetail(...)" を含むHTMLを生成
+            cardsOnThisDay.forEach(card => {
+                const matchedKey = targetKeys.find(tKey => tKey.includes(card.city)) || "";
+
+                list.innerHTML += `
+            <div class="card-mini" onclick="openDetail('${card.id}', '${matchedKey}')" style="cursor:pointer;">
+                <img src="${card.url}" alt="${card.city}">
+                <div class="card-mini-info">
+                    <div>${card.city}</div>
+                </div>
+            </div>
+            `;
+            });
+        }
+
+        function openDetail(cardId, matchedKey) {
+            const card = masterData.find(c => c.id === cardId);
+            const stat = userStats[matchedKey];
+            if (!card || !stat) return;
+
+            document.getElementById('modalImg').src = card.url;
+            document.getElementById('modalTitle').textContent = card.city;
+            document.getElementById('modalSub').textContent = `${card.pref} / ${card.edition}`;
+            document.getElementById('modalMemo').textContent = stat.memo || "（思い出メモはありません）";
+            document.getElementById('modalDate').textContent = `取得日: ${stat.date.replace(/-/g, '.')}`;
+
+            document.getElementById('modal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
+        function changeMonth(diff) {
+            currentDisplayDate.setMonth(currentDisplayDate.getMonth() + diff);
+            renderCalendar();
+        }
+    </script>
+
+
+</body>
+
+</html>
