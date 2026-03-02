@@ -183,33 +183,71 @@
         }
 
         async function uploadToDrive() {
-
-            const FOLDER_ID = '1AK9Gn9plYo_LgaaTSNsw4emd-nlbJHdV'; // 事前に作成したフォルダのID
             const data = localStorage.getItem('manhole_collection');
+            if (!data || data === "{}") return;
 
-            const metadata = {
-                name: `manhole_backup_${new Date().toISOString().split('T')[0]}.json`,
-                mimeType: 'application/json',
-                parents: [FOLDER_ID] // ← ここで保存先のフォルダを指定
-            };
-
-            const file = new Blob([data], { type: 'application/json' });
-            const formData = new FormData();
-            formData.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
-            formData.append('file', file);
+            const fileName = "manhole_backup_master.json"; // 固定の名前にします
+            const statusEl = document.getElementById('backupStatus');
 
             try {
-                const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
-                    method: 'POST',
-                    headers: new Headers({ 'Authorization': 'Bearer ' + accessToken }),
-                    body: formData
-                });
+                // 1. まず同じ名前のファイルがドライブにあるか検索
+                const searchRes = await fetch(
+                    `https://www.googleapis.com/drive/v3/files?q=name='${fileName}' and trashed=false`,
+                    {
+                        headers: { 'Authorization': 'Bearer ' + accessToken }
+                    }
+                );
+                const searchResult = await searchRes.json();
+                const existingFile = searchResult.files && searchResult.files.length > 0 ? searchResult.files[0] : null;
+
+                let response;
+                if (existingFile) {
+                    // 2. すでにファイルがある場合は「上書き (PATCH)」
+                    console.log("既存ファイルを発見。上書きします: " + existingFile.id);
+                    response = await fetch(
+                        `https://www.googleapis.com/upload/drive/v3/files/${existingFile.id}?uploadType=media`,
+                        {
+                            method: 'PATCH',
+                            headers: {
+                                'Authorization': 'Bearer ' + accessToken,
+                                'Content-Type': 'application/json'
+                            },
+                            body: data
+                        }
+                    );
+                } else {
+                    // 3. ファイルがない場合は「新規作成 (POST)」
+                    console.log("ファイルがないため、新規作成します");
+                    const metadata = {
+                        name: fileName,
+                        mimeType: 'application/json'
+                    };
+                    const formData = new FormData();
+                    formData.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+                    formData.append('file', new Blob([data], { type: 'application/json' }));
+
+                    response = await fetch(
+                        'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',
+                        {
+                            method: 'POST',
+                            headers: { 'Authorization': 'Bearer ' + accessToken },
+                            body: formData
+                        }
+                    );
+                }
+
                 const result = await response.json();
-                console.log('Backup Success:', result);
+                if (result.id) {
+                    if (statusEl) {
+                        statusEl.innerHTML = `<span style="color: #28a745;">✅ ドライブ同期完了 (${new Date().toLocaleTimeString()})</span>`;
+                    }
+                }
             } catch (err) {
-                console.error('Backup Failed:', err);
+                console.error('Backup Error:', err);
+                if (statusEl) statusEl.innerHTML = `<span style="color: #dc3545;">❌ 同期失敗</span>`;
             }
-        }    </script>
+        }
+    </script>
 </body>
 
 </html>
