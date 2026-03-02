@@ -89,6 +89,13 @@
     <div class="container">
         <h1>Manhole Card Lab</h1>
         <p class="subtitle">マンホールカードのデザインをAIで解析・楽しむポータルサイト</p>
+        <div id="backupSection" style="margin: 10px 0; text-align: center;">
+            <button id="authBtn" onclick="handleAuthClick()"
+                style="background: #4285F4; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold;">
+                Googleドライブ バックアップを有効にする
+            </button>
+            <div id="backupStatus" style="font-size: 11px; color: #888; margin-top: 5px;"></div>
+        </div>
 
         <div class="menu-grid">
             <a href="collection.html" class="menu-card">
@@ -151,14 +158,18 @@
                 callback: (response) => {
                     if (response.access_token) {
                         accessToken = response.access_token;
-                        uploadToDrive(); // 認証成功したらアップロード開始
+                        // ログイン成功したらボタンを隠してアップロード
+                        document.getElementById('authBtn').style.display = 'none';
+                        document.getElementById('backupStatus').textContent = "認証済み：バックアップ中...";
+                        uploadToDrive();
                     }
                 },
             });
+        }
 
-            // すでにログイン済みなら自動でバックアップ開始
-            // 初回はボタン等で tokenClient.requestAccessToken() を叩く必要があります
-            autoBackup();
+        // ボタンが押された時にログイン画面を出す
+        function handleAuthClick() {
+            tokenClient.requestAccessToken();
         }
 
         function autoBackup() {
