@@ -612,6 +612,44 @@
             currentDisplayDate.setMonth(currentDisplayDate.getMonth() + diff);
             renderCalendar();
         }
+
+        // スワイプ操作の初期化
+        document.addEventListener('DOMContentLoaded', () => {
+            // クラス名から要素を取得
+            const calendarArea = document.querySelector('.calendar-container');
+
+            if (calendarArea) {
+                let startX, startY;
+
+                // 指が触れた時
+                calendarArea.addEventListener('touchstart', e => {
+                    startX = e.touches[0].pageX;
+                    startY = e.touches[0].pageY;
+                }, { passive: true });
+
+                // 指が離れた時
+                calendarArea.addEventListener('touchend', e => {
+                    let endX = e.changedTouches[0].pageX;
+                    let endY = e.changedTouches[0].pageY;
+
+                    let diffX = endX - startX;
+                    let diffY = endY - startY;
+
+                    // 判定条件：
+                    // 1. 縦の動き(diffY)よりも横の動き(diffX)が大きい（誤作動防止）
+                    // 2. 横に70px以上動いている
+                    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 70) {
+                        if (diffX > 0) {
+                            // 右スワイプ（指を右へ）＝ 前の月へ
+                            changeMonth(-1);
+                        } else {
+                            // 左スワイプ（指を左へ）＝ 次の月へ
+                            changeMonth(1);
+                        }
+                    }
+                }, { passive: true });
+            }
+        });
     </script>
 
 
