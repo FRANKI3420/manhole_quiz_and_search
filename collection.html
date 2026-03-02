@@ -476,6 +476,105 @@
         .bar-complete {
             box-shadow: 0 0 10px rgba(255, 193, 7, 0.6);
         }
+
+        /* 地方ごとの外枠 */
+        .region-container {
+            margin-bottom: 10px;
+            border: 1px solid #444;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .region-header {
+            background: #333;
+            padding: 12px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            /* 縦並びにする */
+            gap: 8px;
+            /* 要素間の隙間 */
+        }
+
+        .region-info {
+            display: flex;
+            flex-direction: column;
+            /* 名前と％を縦に並べる */
+            align-items: flex-start;
+            /* 左寄せ */
+            gap: 2px;
+        }
+
+        .region-name-row {
+            font-size: 14px;
+            font-weight: bold;
+            color: #fff;
+            display: flex;
+            align-items: center;
+        }
+
+        .region-percentage-row {
+            font-size: 12px;
+            color: var(--accent);
+            /* 取得率はアクセントカラーで強調 */
+            font-weight: normal;
+        }
+
+        /* 地方バーを少し太くして見やすく */
+        .region-gauge-bg {
+            background: #1a1a1a;
+            height: 12px;
+            border-radius: 6px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        /* 地方バーの背景（少し太め） */
+        .region-gauge-bg {
+            background: #222;
+            height: 10px;
+            border-radius: 5px;
+        }
+
+        /* 地方の中身（県リスト） */
+        .region-content {
+            display: none;
+            /* 初期状態は閉じる */
+            padding: 10px;
+            background: #222;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 12px;
+        }
+
+        /* 開いている時の表示 */
+        .region-container.open .region-content {
+            display: grid;
+        }
+
+        .region-container.open .arrow {
+            transform: rotate(90deg);
+        }
+
+        .arrow {
+            transition: transform 0.3s;
+            display: inline-block;
+            font-size: 10px;
+            margin-left: 5px;
+        }
+
+        /* 統計アイテムにホバー・タップ時の反応を追加 */
+        .pref-item {
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .pref-item:active {
+            background: #333;
+            /* タップした瞬間に少し暗くする */
+            transform: scale(0.98);
+        }
     </style>
 </head>
 
@@ -497,23 +596,42 @@
                 <span>都道府県別 制覇率</span>
                 <small id="totalProgressText" style="color:#888;"></small>
             </div>
-            <div id="prefStatsGrid" class="pref-grid">
+            <div id="prefStatsGrid" class="pref-grid"></div>
+        </div>
+
+        <div id="searchSection"
+            style="margin: 15px 0; padding: 12px; background: #1a1a1a; border-radius: 10px; border: 1px solid #333;">
+            <div style="font-size: 11px; color: #4dabff; margin-bottom: 6px; font-weight: bold;">🔍 市町村名で自由検索</div>
+            <div style="position: relative; width: 100%;">
+                <input type="text" id="searchInput" placeholder="例：神戸市、流域下水道..." oninput="handleSearchInput()"
+                    style="width: 100%; padding: 12px 40px 12px 12px; background: #222; color: white; border: 2px solid #4dabff; border-radius: 8px; box-sizing: border-box; font-size: 16px; outline: none;">
+
+                <span id="clearSearchBtn" onclick="clearSearch()"
+                    style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); 
+                               width: 24px; height: 24px; background: #444; color: #fff; 
+                               border-radius: 50%; display: none; align-items: center; 
+                               justify-content: center; cursor: pointer; font-size: 14px; font-weight: bold; z-index: 5;">✕</span>
+            </div>
+            <div style="font-size: 10px; color: #666; margin-top: 5px;">※入力すると下のフィルターはリセットされます</div>
+        </div>
+
+        <div style="text-align: center; color: #444; font-size: 12px; margin: 10px 0;">OR</div>
+
+        <div id="filterSection"
+            style="margin: 0 0 15px 0; padding: 12px; background: #1a1a1a; border-radius: 10px; border: 1px solid #333;">
+            <div style="font-size: 11px; color: #888; margin-bottom: 6px; font-weight: bold;">📂 条件で絞り込む</div>
+            <div class="select-group" id="filterGroup">
+                <select id="prefFilter" onchange="handleFilterChange()">
+                    <option value="">都道府県を選択</option>
+                </select>
+                <select id="editionFilter" onchange="handleFilterChange()">
+                    <option value="">弾数を選択</option>
+                </select>
             </div>
         </div>
-        <div style="margin: 10px 0;">
-            <input type="text" id="searchInput" placeholder="市町村名で検索..." oninput="renderCollection()"
-                style="width: 100%; padding: 12px; background: #222; color: white; border: 1px solid #444; border-radius: 8px; box-sizing: border-box; font-size: 16px;">
-        </div>
-        <div class="select-group">
-            <select id="prefFilter" onchange="renderCollection()">
-                <option value="">都道府県で絞り込む</option>
-            </select>
-            <select id="editionFilter" onchange="renderCollection()">
-                <option value="">弾数で絞り込む</option>
-            </select>
-        </div>
-        <div style="margin-top: 15px; display: flex; flex-direction: column; gap: 12px; align-items: center;">
-            <a href="calender.html" style="
+    </div>
+    <div style="margin-top: 15px; display: flex; flex-direction: column; gap: 12px; align-items: center;">
+        <a href="calender.html" style="
                                     display: inline-block;
                                     width: 80%;
                                     padding: 10px;
@@ -527,36 +645,36 @@
                                     font-weight: bold;
                                 ">📅 取得記録をカレンダーで見る</a>
 
-            <a href="index.html" style="color: #888; text-decoration: none; font-size: 13px;">← メニューに戻る</a>
+        <a href="index.html" style="color: #888; text-decoration: none; font-size: 13px;">← メニューに戻る</a>
+    </div>
+    <div id="filterStats"
+        style="padding: 10px; background: #222; text-align: center; font-size: 13px; color: #4dabff; border-bottom: 1px solid #333; display: none;">
+        表示中: <span id="currentFilteredCount">0</span>枚 （取得済み: <span id="currentCollectedInFilter">0</span>枚）
+    </div>
+    <div id="selectionModeArea" style="text-align: center; margin: 10px 0; display:none;">
+        <button id="selectModeBtn" class="btn-utility" onclick="toggleSelectionMode()"
+            style="background: #444; color: white; width: 45%;">選択モード開始</button>
+        <button id="executeBulkBtn" class="btn-main" onclick="executeSelectedCollect()"
+            style="display:none; background: #28a745; width: 45%; margin:0; padding: 8px;">選択分を登録</button>
+    </div>
+    <div id="bulkActionArea" style="display:none; margin: 10px 0;">
+        <div id="bulkDateArea"
+            style="display: none; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px; background: #2a2a2a; padding: 8px; border-radius: 8px;">
+            <label style="font-size: 12px; color: #4dabff; font-weight: bold;">一括登録日:</label>
+            <input type="date" id="bulkDateInput"
+                style="padding: 5px; border-radius: 4px; border: 1px solid #444; background: #333; color: #fff; font-size: 14px;">
         </div>
-        <div id="filterStats"
-            style="padding: 10px; background: #222; text-align: center; font-size: 13px; color: #4dabff; border-bottom: 1px solid #333; display: none;">
-            表示中: <span id="currentFilteredCount">0</span>枚 （取得済み: <span id="currentCollectedInFilter">0</span>枚）
-        </div>
-        <div id="selectionModeArea" style="text-align: center; margin: 10px 0; display:none;">
-            <button id="selectModeBtn" class="btn-utility" onclick="toggleSelectionMode()"
-                style="background: #444; color: white; width: 45%;">選択モード開始</button>
-            <button id="executeBulkBtn" class="btn-main" onclick="executeSelectedCollect()"
-                style="display:none; background: #28a745; width: 45%; margin:0; padding: 8px;">選択分を登録</button>
-        </div>
-        <div id="bulkActionArea" style="display:none; margin: 10px 0;">
-            <div id="bulkDateArea"
-                style="display: none; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px; background: #2a2a2a; padding: 8px; border-radius: 8px;">
-                <label style="font-size: 12px; color: #4dabff; font-weight: bold;">一括登録日:</label>
-                <input type="date" id="bulkDateInput"
-                    style="padding: 5px; border-radius: 4px; border: 1px solid #444; background: #333; color: #fff; font-size: 14px;">
-            </div>
 
-            <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 10px;">
-                <button id="selectAllBtn" class="btn-utility" onclick="selectAllFiltered()"
-                    style="flex: 1; display: none; background: #444;">
-                    表示中をすべて選択
-                </button>
-                <button id="bulkCollectBtn" class="btn-main" style="flex: 2;">
-                    カードを選択して登録
-                </button>
-            </div>
+        <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 10px;">
+            <button id="selectAllBtn" class="btn-utility" onclick="selectAllFiltered()"
+                style="flex: 1; display: none; background: #444;">
+                表示中をすべて選択
+            </button>
+            <button id="bulkCollectBtn" class="btn-main" style="flex: 2;">
+                カードを選択して登録
+            </button>
         </div>
+    </div>
 
     </div>
 
@@ -701,31 +819,91 @@
             updateBulkButtonUI();
         }
 
-        // メイン描画（ここでのみ画像リクエストが発生）
+        // 文字入力があった時の処理（修正）
+        function handleSearchInput() {
+            const searchInput = document.getElementById('searchInput');
+            const clearBtn = document.getElementById('clearSearchBtn');
+            const searchVal = searchInput.value;
+
+            // 「×」ボタンの表示制御
+            if (searchVal.length > 0) {
+                clearBtn.style.display = 'flex';
+
+                // フィルターをリセットして視覚的に無効化
+                document.getElementById('prefFilter').value = "";
+                document.getElementById('editionFilter').value = "";
+                document.getElementById('filterGroup').style.opacity = "0.3";
+                document.getElementById('filterGroup').style.pointerEvents = "none";
+            } else {
+                clearBtn.style.display = 'none';
+                document.getElementById('filterGroup').style.opacity = "1";
+                document.getElementById('filterGroup').style.pointerEvents = "auto";
+            }
+            renderCollection();
+        }
+
+        // 検索窓を空にする関数
+        function clearSearch() {
+            const searchInput = document.getElementById('searchInput');
+            searchInput.value = "";
+            // handleSearchInputを呼んで表示を更新
+            handleSearchInput();
+            // フォーカスを戻す（任意）
+            searchInput.focus();
+        }
+
+        // フィルターが選ばれた時：検索窓をリセットして実行
+        function handleFilterChange() {
+            const pref = document.getElementById('prefFilter').value;
+            const ed = document.getElementById('editionFilter').value;
+
+            if (pref !== "" || ed !== "") {
+                document.getElementById('searchInput').value = "";
+                document.getElementById('filterGroup').style.opacity = "1";
+                document.getElementById('filterGroup').style.pointerEvents = "auto";
+            }
+            renderCollection();
+        }
+
+        // renderCollectionの条件分岐を修正
         function renderCollection() {
             const pref = document.getElementById('prefFilter').value;
             const ed = document.getElementById('editionFilter').value;
+            const searchText = document.getElementById('searchInput').value.trim();
             const listDiv = document.getElementById('collectionList');
             const bulkArea = document.getElementById('bulkActionArea');
             const statsDiv = document.getElementById('filterStats');
-            const searchText = document.getElementById('searchInput').value.trim(); // ★追加
 
-            // ★ 検索条件のロジックを更新
-            // 検索文字がある場合は、都道府県・弾数が未選択でも表示するように変更
-            if (!pref && !ed && !searchText) {
-                listDiv.innerHTML = '<div class="empty-state">都道府県・弾数を選択するか、市町村名を入力してください</div>';
+            let filtered = [];
+
+            // 独立判定ロジック
+            if (searchText !== "") {
+                // 文字列検索が優先
+                filtered = masterData.filter(d =>
+                    d.city.toLowerCase().includes(searchText.toLowerCase())
+                );
+            } else if (pref || ed) {
+                // フィルターが選択されている場合
+                filtered = masterData.filter(d => {
+                    const pMatch = !pref || d.pref === pref;
+                    const eMatch = !ed || d.edition === ed;
+                    return pMatch && eMatch;
+                });
+            } else {
+                // 初期状態
+                listDiv.innerHTML = '<div class="empty-state">検索ワードを入力するか、<br>条件から絞り込んでください</div>';
                 bulkArea.style.display = 'none';
                 if (statsDiv) statsDiv.style.display = 'none';
                 return;
             }
 
-            let filtered = masterData.filter(d => {
-                const pMatch = !pref || d.pref === pref;
-                const eMatch = !ed || d.edition === ed;
-                // ★ 市町村名に検索文字が含まれているか判定（大文字小文字を区別しない）
-                const sMatch = !searchText || d.city.toLowerCase().includes(searchText.toLowerCase());
-                return pMatch && eMatch && sMatch;
-            });
+            // let filtered = masterData.filter(d => {
+            //     const pMatch = !pref || d.pref === pref;
+            //     const eMatch = !ed || d.edition === ed;
+            //     // ★ 市町村名に検索文字が含まれているか判定（大文字小文字を区別しない）
+            //     const sMatch = !searchText || d.city.toLowerCase().includes(searchText.toLowerCase());
+            //     return pMatch && eMatch && sMatch;
+            // });
 
             // フィルター内統計
             if (statsDiv) {
@@ -938,70 +1116,109 @@
         }
 
         function updatePrefStats() {
-            const grid = document.getElementById('prefStatsGrid');
-            const totalText = document.getElementById('totalProgressText');
+            const grid = document.getElementById('prefStatsGrid'); // 実際にはContainer全体を書き換え
             if (!grid || masterData.length === 0) return;
 
-            // 日本の標準的な都道府県順（北海道〜沖縄）
-            const prefOrder = [
-                "世界", "その他", "北海道", "青森県", "岩手県", "宮城県", "秋田県", "山形県", "福島県",
-                "茨城県", "栃木県", "群馬県", "埼玉県", "千葉県", "東京都", "神奈川県",
-                "新潟県", "富山県", "石川県", "福井県", "山梨県", "長野県", "岐阜県",
-                "静岡県", "愛知県", "三重県", "滋賀県", "京都府", "大阪府", "兵庫県",
-                "奈良県", "和歌山県", "鳥取県", "島根県", "岡山県", "広島県", "山口県",
-                "徳島県", "香川県", "愛媛県", "高知県", "福岡県", "佐賀県", "長崎県",
-                "熊本県", "大分県", "宮崎県", "鹿児島県", "沖縄県"
-            ];
+            // 地方と都道府県の定義
+            const regions = {
+                "その他": ["世界", "その他"],
+                "北海道・東北": ["北海道", "青森県", "岩手県", "宮城県", "秋田県", "山形県", "福島県"],
+                "関東": ["茨城県", "栃木県", "群馬県", "埼玉県", "千葉県", "東京都", "神奈川県"],
+                "中部": ["新潟県", "富山県", "石川県", "福井県", "山梨県", "長野県", "岐阜県", "静岡県", "愛知県"],
+                "近畿": ["三重県", "滋賀県", "京都府", "大阪府", "兵庫県", "奈良県", "和歌山県"],
+                "中国・四国": ["鳥取県", "島根県", "岡山県", "広島県", "山口県", "徳島県", "香川県", "愛媛県", "高知県"],
+                "九州・沖縄": ["福岡県", "佐賀県", "長崎県", "熊本県", "大分県", "宮崎県", "鹿児島県", "沖縄県"]
+            };
 
-            const stats = {};
+            // 1. 各都道府県の統計を算出
+            const prefStats = {};
             masterData.forEach(card => {
-                if (!stats[card.pref]) stats[card.pref] = { total: 0, collected: 0 };
-                stats[card.pref].total++;
+                if (!prefStats[card.pref]) prefStats[card.pref] = { total: 0, collected: 0 };
+                prefStats[card.pref].total++;
                 const fullKey = `${card.city} (${card.id})`;
                 if (userStats[fullKey]?.collected || userStats[card.city]?.collected) {
-                    stats[card.pref].collected++;
+                    prefStats[card.pref].collected++;
                 }
             });
 
-            // 全体進捗の表示
-            const allTotal = masterData.length;
-            const allCollected = Object.values(userStats).filter(s => s.collected).length;
-            totalText.textContent = `全体: ${allCollected} / ${allTotal} (${Math.floor((allCollected / allTotal) * 100) || 0}%)`;
+            let html = '';
 
-            // 都道府県順に並び替え（データが存在するものだけ抽出）
-            const sortedPrefs = prefOrder.filter(p => stats[p]);
+            // 2. 地方ごとに集計してHTML作成
+            for (const [regionName, prefs] of Object.entries(regions)) {
+                let rTotal = 0;
+                let rCollected = 0;
+                let prefHtml = '';
 
-            grid.innerHTML = sortedPrefs.map(pref => {
-                const { total, collected } = stats[pref];
-                const percent = Math.floor((collected / total) * 100);
+                prefs.forEach(pref => {
+                    const s = prefStats[pref];
+                    if (!s) return;
+                    rTotal += s.total;
+                    rCollected += s.collected;
 
-                // ★ 取得率に応じたグラデーション色を計算
-                // 0% (赤っぽい) -> 50% (黄色) -> 99% (緑っぽい)
-                let barColor;
-                if (collected === total) {
-                    barColor = '#ffc107'; // 100%は金
-                } else {
-                    // HSL色空間を使って、色相(Hue)を 0(赤)から120(緑)まで変化させる
+                    const percent = Math.floor((s.collected / s.total) * 100);
                     const hue = Math.floor(percent * 1.2);
-                    barColor = `hsl(${hue}, 70%, 50%)`;
-                }
+                    const color = s.collected === s.total ? '#ffc107' : `hsl(${hue}, 70%, 50%)`;
 
-                const completeClass = collected === total ? 'bar-complete' : '';
+                    prefHtml += `
+    <div class="pref-item" onclick="selectPrefFromStats('${pref}')" style="cursor: pointer;">
+        <div class="pref-info"><span>${pref}</span><span>${s.collected}/${s.total}</span></div>
+        <div class="bar-bg"><div class="bar-fill" style="width:${percent}%; background-color:${color};"></div></div>
+    </div>`;
+                });
 
-                return `
-            <div class="pref-item">
-                <div class="pref-info">
-                    <span>${pref}</span>
-                    <span>${collected}/${total}</span>
-                </div>
-                <div class="bar-bg">
-                    <div class="bar-fill ${completeClass}" 
-                         style="width: ${percent}%; background-color: ${barColor};">
+                const rPercent = Math.floor((rCollected / rTotal) * 100);
+                const rColor = rCollected === rTotal ? '#ffc107' : `hsl(${Math.floor(rPercent * 1.2)}, 70%, 50%)`;
+
+                html += `
+            <div class="region-container" id="reg-${regionName}">
+                <div class="region-header" onclick="this.parentElement.classList.toggle('open')">
+                    <div class="region-info">
+                        <div class="region-name-row">
+                            <span class="arrow">▶</span> ${regionName}
+                        </div>
+                        <div class="region-percentage-row">
+                            取得率: ${rPercent}% (${rCollected} / ${rTotal})
+                        </div>
+                    </div>
+                    <div class="region-gauge-bg">
+                        <div class="bar-fill" style="width:${rPercent}%; background-color:${rColor};"></div>
                     </div>
                 </div>
-            </div>
-        `;
-            }).join('');
+                <div class="region-content">${prefHtml}</div>
+            </div>`;
+            }
+
+            grid.innerHTML = html;
+        }
+
+        // 統計エリアの県をタップした時の連動処理
+        function selectPrefFromStats(prefName) {
+            const pSel = document.getElementById('prefFilter');
+            const sInput = document.getElementById('searchInput');
+            const cBtn = document.getElementById('clearSearchBtn');
+            const fGroup = document.getElementById('filterGroup');
+
+            // 1. 検索窓をリセット（検索とフィルターの競合を防ぐため）
+            if (sInput) sInput.value = "";
+            if (cBtn) cBtn.style.display = 'none';
+
+            // 2. セレクトボックスの値をタップされた県に変更
+            if (pSel) pSel.value = prefName;
+
+            // 3. フィルターグループの無効化（半透明）を解除
+            if (fGroup) {
+                fGroup.style.opacity = "1";
+                fGroup.style.pointerEvents = "auto";
+            }
+
+            // 4. 一覧を再描画
+            renderCollection();
+
+            // 5. ユーザーが分かりやすいよう、フィルター位置までスクロール
+            const filterSec = document.getElementById('filterSection');
+            if (filterSec) {
+                filterSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
         }
 
     </script>

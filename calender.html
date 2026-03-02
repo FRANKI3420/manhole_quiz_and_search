@@ -138,22 +138,44 @@
         }
 
         /* モーダルの箱：少し縦に余裕を持たせる */
+        /* モーダルの箱を調整 */
         .modal-content {
             background: #2a2a2a;
-            padding: 30px 20px 20px;
-            /* 上の余白を30pxに増やしてボタン位置を確保 */
+            padding: 20px;
             border-radius: 15px;
             width: 90%;
             max-width: 400px;
+            max-height: 90vh;
+            /* 画面の高さの90%までに制限 */
+            overflow-y: auto;
+            /* 縦にはみ出したらスクロールさせる */
             text-align: center;
             position: relative;
             box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            /* 中身を縦に並べる */
+        }
+
+        /* 画像のサイズを少し抑える */
+        #modalImg {
+            width: 100%;
+            max-height: 40vh;
+            /* 画像は画面の40%まで */
+            object-fit: contain;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        #modalActionArea {
+            width: 100%;
+            padding-top: 10px;
         }
 
         /* ×ボタン：画像に被らないよう、絶対配置で右上に固定 */
         .close-btn {
             position: absolute;
-            top: 5px;
+            top: 0px;
             /* 上端からの距離 */
             right: 10px;
             /* 右端からの距離 */
@@ -163,6 +185,7 @@
             z-index: 1010;
             /* 画像より上に表示 */
             padding: 5px;
+            color: red;
             /* タップしやすくする */
         }
 
@@ -261,6 +284,51 @@
             color: var(--accent);
             font-size: 16px;
         }
+
+        /* 編集・保存ボタンのスタイル */
+        .edit-btn,
+        .search-btn {
+            margin-top: 15px;
+            padding: 10px 20px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: 0.3s;
+            width: 100%;
+            /* スマホで見やすいよう幅いっぱい */
+            display: block;
+        }
+
+        .edit-btn {
+            background: var(--accent);
+            color: white;
+        }
+
+        .search-btn {
+            background: #444;
+            color: #eee;
+            text-decoration: none;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .edit-btn:hover,
+        .search-btn:hover {
+            opacity: 0.8;
+        }
+
+        /* メモ入力エリア */
+        #modalMemo {
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #444;
+            min-height: 80px;
+            font-family: inherit;
+            resize: none;
+            /* 自由に広げられないように固定 */
+        }
     </style>
 </head>
 
@@ -274,30 +342,38 @@
     <div class="calendar-container">
         <div class="cal-header">
             <button onclick="changeMonth(-1)"
-                style="background:none; border:none; color:white; cursor:pointer;">◀</button>
-            <div id="monthYear"></div>
+                style="background:none; border:none; color:white; cursor:pointer; padding:10px;">◀</button>
+
+            <div style="display: flex; gap: 5px; align-items: center;">
+                <select id="yearSelect" onchange="jumpToDate()"
+                    style="background:#333; color:white; border:1px solid #555; border-radius:4px; padding:2px 5px;"></select>
+                <span>年</span>
+                <select id="monthSelect" onchange="jumpToDate()"
+                    style="background:#333; color:white; border:1px solid #555; border-radius:4px; padding:2px 5px;"></select>
+                <span>月</span>
+            </div>
+
             <button onclick="changeMonth(1)"
-                style="background:none; border:none; color:white; cursor:pointer;">▶</button>
+                style="background:none; border:none; color:white; cursor:pointer; padding:10px;">▶</button>
         </div>
+
         <div id="monthlyTotal" class="monthly-stats"></div>
-        <div class="cal-grid" id="calendarGrid">
-        </div>
+        <div class="cal-grid" id="calendarGrid"></div>
     </div>
 
     <div id="resultArea">
         <div id="selectedDateTitle" class="result-title">日付を選択してください</div>
         <div id="cardList" class="card-list"></div>
     </div>
-
     <div id="modal" class="modal-overlay" onclick="if(event.target==this)closeModal()">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal()">&times;</span>
             <img id="modalImg" src="" alt="">
             <h3 id="modalTitle" style="margin:10px 0 5px;"></h3>
             <p id="modalSub" style="color:#888; font-size:12px; margin-bottom:15px;"></p>
-            <div id="modalMemo"
-                style="background:#1a1a1a; padding:15px; border-radius:8px; text-align:left; font-size:14px; color:#ddd; line-height:1.6;">
-            </div>
+
+            <div id="modalMainContent"></div>
+
             <div id="modalDate" style="margin-top:10px; font-size:12px; color:var(--accent);"></div>
         </div>
     </div>
@@ -310,50 +386,83 @@
         // 初期読み込み
         async function init() {
             try {
+                console.log("JSON読み込み開始...");
+                // パスが正しいか確認してください（index.htmlと同じ階層にmaster_data.jsonがある前提）
                 const res = await fetch('master_data.json');
-                if (!res.ok) throw new Error("JSON読み込み失敗");
+
+                if (!res.ok) {
+                    throw new Error(`HTTPエラー! ステータス: ${res.status}`);
+                }
+
                 masterData = await res.json();
+                console.log("JSON読み込み成功:", masterData.length, "件");
+
                 renderCalendar();
             } catch (e) {
-                console.error(e);
-                alert("データの読み込みに失敗しました。");
+                console.error("エラー詳細:", e);
+                alert("データの読み込みに失敗しました。ファイルが同じフォルダにあるか確認してください。");
             }
         }
 
-        init();
+        // ページ読み込み完了後に実行
+        window.onload = init;
 
         function renderCalendar() {
             const grid = document.getElementById('calendarGrid');
-            const monthYearDisplay = document.getElementById('monthYear');
-            const totalDisplay = document.getElementById('monthlyTotal'); // ★追加
+            const totalDisplay = document.getElementById('monthlyTotal');
+            const yearSelect = document.getElementById('yearSelect');
+            const monthSelect = document.getElementById('monthSelect');
+
+            if (!grid || !yearSelect || !monthSelect) return;
+
             grid.innerHTML = '';
 
             const year = currentDisplayDate.getFullYear();
             const month = currentDisplayDate.getMonth();
-            monthYearDisplay.textContent = `${year}年 ${month + 1}月`;
 
-            // --- 曜日表示はそのまま ---
+            // --- 年セレクトボックスの生成 (2020年から現在の5年後まで) ---
+            yearSelect.innerHTML = '';
+            for (let y = 2020; y <= new Date().getFullYear() + 5; y++) {
+                const opt = document.createElement('option');
+                opt.value = y;
+                opt.textContent = y;
+                if (y === year) opt.selected = true;
+                yearSelect.appendChild(opt);
+            }
+
+            // --- 月セレクトボックスの生成 ---
+            monthSelect.innerHTML = '';
+            for (let m = 0; m < 12; m++) {
+                const opt = document.createElement('option');
+                opt.value = m;
+                opt.textContent = m + 1;
+                if (m === month) opt.selected = true;
+                monthSelect.appendChild(opt);
+            }
+
+            // 曜日ラベル
             ['日', '月', '火', '水', '木', '金', '土'].forEach(d => {
                 grid.innerHTML += `<div class="day-label">${d}</div>`;
             });
 
             const firstDay = new Date(year, month, 1).getDay();
             const lastDate = new Date(year, month + 1, 0).getDate();
+
+            // 空白埋め
             for (let i = 0; i < firstDay; i++) grid.innerHTML += `<div></div>`;
 
-            let monthTotalCount = 0; // ★月間合計用
+            let monthTotalCount = 0;
 
             for (let date = 1; date <= lastDate; date++) {
                 const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
 
-                // ★ その日の取得枚数をカウント
+                // userStatsからその日のデータを抽出
                 const dayCards = Object.values(userStats).filter(stat =>
                     stat.collected && stat.date === dateStr
                 );
                 const count = dayCards.length;
-                monthTotalCount += count; // 月間合計に加算
+                monthTotalCount += count;
 
-                // ★ 枚数に応じてクラスを決定
                 let levelClass = '';
                 if (count >= 6) levelClass = 'level-3';
                 else if (count >= 3) levelClass = 'level-2';
@@ -366,10 +475,22 @@
                 grid.appendChild(dayEl);
             }
 
-            // ★ 月間合計を表示
             totalDisplay.innerHTML = `今月の取得数: <b>${monthTotalCount}</b> 枚`;
         }
 
+        function jumpToDate() {
+            const y = parseInt(document.getElementById('yearSelect').value);
+            const m = parseInt(document.getElementById('monthSelect').value);
+            currentDisplayDate = new Date(y, m, 1);
+            renderCalendar();
+        }
+
+        function changeMonth(diff) {
+            currentDisplayDate.setMonth(currentDisplayDate.getMonth() + diff);
+            renderCalendar();
+        }
+
+        // （showCardsForDate 以下の関数は以前と同じなので省略せずそのまま使ってください）
         function showCardsForDate(dateStr, element) {
             document.querySelectorAll('.day').forEach(d => d.classList.remove('selected-day'));
             element.classList.add('selected-day');
@@ -412,19 +533,76 @@
             });
         }
 
+        // goToSearchPageが参照する変数をグローバル（関数の外）に用意
+        let currentCity = "";
+
         function openDetail(cardId, matchedKey) {
             const card = masterData.find(c => c.id === cardId);
             const stat = userStats[matchedKey];
             if (!card || !stat) return;
 
+            currentCity = card.city;
+
+            // 基本情報
             document.getElementById('modalImg').src = card.url;
             document.getElementById('modalTitle').textContent = card.city;
             document.getElementById('modalSub').textContent = `${card.pref} / ${card.edition}`;
-            document.getElementById('modalMemo').textContent = stat.memo || "（思い出メモはありません）";
             document.getElementById('modalDate').textContent = `取得日: ${stat.date.replace(/-/g, '.')}`;
+
+            // メモとボタンをまとめて生成（重なり防止）
+            const mainContent = document.getElementById('modalMainContent');
+            mainContent.innerHTML = `
+        <div style="background:#1a1a1a; padding:10px; border-radius:8px; margin-bottom:15px;">
+            <textarea id="editMemoInput" 
+                style="width:100%; min-height:40px; background:transparent; color:#ddd; border:none; outline:none; font-size:14px; font-family:inherit; line-height:1.6; resize:none;"
+                placeholder="思い出メモを入力...">${stat.memo || ""}</textarea>
+        </div>
+
+        <button class="edit-btn" onclick="saveMemo('${matchedKey}')" 
+            style="width:100%; background:var(--accent); color:white; padding:10px; border:none; border-radius:6px; font-weight:bold; cursor:pointer; margin-bottom:20px;">
+            メモを保存する
+        </button>
+
+        <div style="border-top: 1px solid #444; padding-top: 15px;">
+            <button id="customSearchBtn" onclick="goToSearchPage()"
+                style="width: 100%; background: #444; color: #fff; padding: 10px; font-size: 13px; border-radius: 6px; border: none; cursor: pointer; display: block;">
+                🔍 画像で判定・検索
+            </button>
+        </div>
+    `;
 
             document.getElementById('modal').style.display = 'flex';
         }
+
+        // ご提示の関数をそのまま使用（またはスクリプト内に配置）
+        function goToSearchPage() {
+            if (!currentCity) return;
+            const d = masterData.find(x => x.city === currentCity);
+            if (!d || !d.url) return;
+            // _blank（別タブ）で開く設定
+            window.open(`search.html?img=${encodeURIComponent(d.url)}&city=${encodeURIComponent(d.city)}`, '_blank');
+        }
+        // メモを保存する関数
+        function saveMemo(matchedKey) {
+            const btn = event.target; // 押されたボタンを取得
+            const newMemo = document.getElementById('editMemoInput').value;
+
+            // ローカルストレージを更新
+            if (!userStats[matchedKey]) userStats[matchedKey] = {};
+            userStats[matchedKey].memo = newMemo;
+            localStorage.setItem('manhole_collection', JSON.stringify(userStats));
+
+            // 保存完了の視覚効果
+            const originalText = btn.textContent;
+            btn.textContent = "✅ 保存完了";
+            btn.style.background = "#28a745"; // 緑色に
+
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.style.background = "var(--accent)"; // 元の色に
+            }, 2000);
+        }
+
 
         function closeModal() {
             document.getElementById('modal').style.display = 'none';
