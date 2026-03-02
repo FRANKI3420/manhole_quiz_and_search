@@ -127,6 +127,78 @@
         </div>
     </div>
 
+    <script>
+        // Google Drive APIの設定
+        const CLIENT_ID = '391072316314-pk817l25cfhrk55g0t1u5ust1puv528v.apps.googleusercontent.com';
+        const SCOPES = 'https://www.googleapis.com/auth/drive.file'; // ファイル作成権限
+
+        let tokenClient;
+        let accessToken = null;
+
+        // ページ読み込み時に自動実行
+        window.onload = () => {
+            // Googleの認証ライブラリをロード
+            const script = document.createElement('script');
+            script.src = "https://accounts.google.com/gsi/client";
+            script.onload = initializeGapi;
+            document.body.appendChild(script);
+        };
+
+        function initializeGapi() {
+            tokenClient = google.accounts.oauth2.initTokenClient({
+                client_id: CLIENT_ID,
+                scope: SCOPES,
+                callback: (response) => {
+                    if (response.access_token) {
+                        accessToken = response.access_token;
+                        uploadToDrive(); // 認証成功したらアップロード開始
+                    }
+                },
+            });
+
+            // すでにログイン済みなら自動でバックアップ開始
+            // 初回はボタン等で tokenClient.requestAccessToken() を叩く必要があります
+            autoBackup();
+        }
+
+        function autoBackup() {
+            // ログイン済みかチェック（簡易的）
+            if (!accessToken) {
+                console.log("バックアップには一度ログインが必要です");
+                // 初回のみ「バックアップを有効にする」ボタンを表示して押させる運用がベター
+                return;
+            }
+            uploadToDrive();
+        }
+
+        async function uploadToDrive() {
+
+            const FOLDER_ID = '1AK9Gn9plYo_LgaaTSNsw4emd-nlbJHdV'; // 事前に作成したフォルダのID
+            const data = localStorage.getItem('manhole_collection');
+
+            const metadata = {
+                name: `manhole_backup_${new Date().toISOString().split('T')[0]}.json`,
+                mimeType: 'application/json',
+                parents: [FOLDER_ID] // ← ここで保存先のフォルダを指定
+            };
+
+            const file = new Blob([data], { type: 'application/json' });
+            const formData = new FormData();
+            formData.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+                    method: 'POST',
+                    headers: new Headers({ 'Authorization': 'Bearer ' + accessToken }),
+                    body: formData
+                });
+                const result = await response.json();
+                console.log('Backup Success:', result);
+            } catch (err) {
+                console.error('Backup Failed:', err);
+            }
+        }    </script>
 </body>
 
 </html>
