@@ -137,7 +137,9 @@
     <script>
         // Google Drive APIの設定
         const CLIENT_ID = '391072316314-pk817l25cfhrk55g0t1u5ust1puv528v.apps.googleusercontent.com';
-        const SCOPES = 'https://www.googleapis.com/auth/drive.file'; // ファイル作成権限
+        // const SCOPES = 'https://www.googleapis.com/auth/drive.file'; // ファイル作成権限
+        // 1. スコープを広げる（※要再ログイン）
+        const SCOPES = 'https://www.googleapis.com/auth/drive';
 
         let tokenClient;
         let accessToken = null;
@@ -186,13 +188,17 @@
             const data = localStorage.getItem('manhole_collection');
             if (!data || data === "{}") return;
 
-            const fileName = "manhole_backup_master.json"; // 固定の名前にします
+            // --- 設定項目 ---
+            const FOLDER_ID = '1AK9Gn9plYo_LgaaTSNsw4emd-nlbJHdV';
+            const fileName = "manhole_backup_master.json";
             const statusEl = document.getElementById('backupStatus');
+            // ----------------
 
             try {
-                // 1. まず同じ名前のファイルがドライブにあるか検索
+                // 1. 指定したフォルダ内にある同名ファイルを検索
+                // qパラメータに 'フォルダID' in parents を追加します
                 const searchRes = await fetch(
-                    `https://www.googleapis.com/drive/v3/files?q=name='${fileName}' and trashed=false`,
+                    `https://www.googleapis.com/drive/v3/files?q=name='${fileName}' and '${FOLDER_ID}' in parents and trashed=false`,
                     {
                         headers: { 'Authorization': 'Bearer ' + accessToken }
                     }
@@ -203,7 +209,8 @@
                 let response;
                 if (existingFile) {
                     // 2. すでにファイルがある場合は「上書き (PATCH)」
-                    console.log("既存ファイルを発見。上書きします: " + existingFile.id);
+                    // PATCHは場所を変えないので、そのままID指定で中身を更新
+                    console.log("指定フォルダ内に既存ファイルを発見。上書きします: " + existingFile.id);
                     response = await fetch(
                         `https://www.googleapis.com/upload/drive/v3/files/${existingFile.id}?uploadType=media`,
                         {
@@ -216,12 +223,14 @@
                         }
                     );
                 } else {
-                    // 3. ファイルがない場合は「新規作成 (POST)」
-                    console.log("ファイルがないため、新規作成します");
+                    // 3. ファイルがない場合は、指定フォルダ内に「新規作成 (POST)」
+                    console.log("指定フォルダ内にファイルがないため、新規作成します");
                     const metadata = {
                         name: fileName,
-                        mimeType: 'application/json'
+                        mimeType: 'application/json',
+                        parents: [FOLDER_ID] // ← ここで親フォルダを指定
                     };
+
                     const formData = new FormData();
                     formData.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
                     formData.append('file', new Blob([data], { type: 'application/json' }));
@@ -239,12 +248,15 @@
                 const result = await response.json();
                 if (result.id) {
                     if (statusEl) {
-                        statusEl.innerHTML = `<span style="color: #28a745;">✅ ドライブ同期完了 (${new Date().toLocaleTimeString()})</span>`;
+                        statusEl.innerHTML = `<span style="color: #28a745;">✅ 指定フォルダへ同期完了 (${new Date().toLocaleTimeString()})</span>`;
                     }
+                } else if (result.error) {
+                    // エラーがある場合は詳細を表示
+                    throw new Error(result.error.message);
                 }
             } catch (err) {
                 console.error('Backup Error:', err);
-                if (statusEl) statusEl.innerHTML = `<span style="color: #dc3545;">❌ 同期失敗</span>`;
+                if (statusEl) statusEl.innerHTML = `<span style="color: #dc3545;">❌ 同期失敗: ${err.message}</span>`;
             }
         }
     </script>
