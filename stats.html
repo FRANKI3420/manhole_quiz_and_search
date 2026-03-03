@@ -11,6 +11,12 @@
             --card-bg: #2a2a2a;
             --accent: #4dabff;
             --text: #eee;
+            --bar-bg: #111;
+        }
+
+        /* 全要素に適用：パディングによるサイズ膨張（見切れ）を防止 */
+        * {
+            box-sizing: border-box;
         }
 
         body {
@@ -19,8 +25,10 @@
             font-family: sans-serif;
             margin: 0;
             padding: 15px;
+            line-height: 1.5;
         }
 
+        /* ナビゲーション */
         .nav {
             margin-bottom: 20px;
             display: flex;
@@ -32,56 +40,179 @@
             background: #444;
             color: white;
             border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
+            padding: 10px 18px;
+            /* 少し大きく */
+            border-radius: 6px;
             text-decoration: none;
-            font-size: 14px;
+            font-size: 15px;
+            /* サイズアップ */
+            font-weight: bold;
         }
 
+        /* グラフ・コンテナ */
         .chart-container {
             background: var(--card-bg);
-            padding: 20px;
+            padding: 15px;
             border-radius: 12px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
             overflow-x: auto;
-            /* 横スクロール可能に */
+            width: 100%;
+            /* 見切れ防止 */
         }
 
         h2 {
-            font-size: 18px;
+            font-size: 20px;
+            /* サイズアップ */
             color: var(--accent);
-            margin-top: 0;
+            margin: 0 0 15px 0;
         }
 
+        /* 統計ボックス */
         .stats-summary {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
+            gap: 12px;
             margin-bottom: 20px;
         }
 
         .stat-box {
             background: #333;
-            padding: 10px;
+            padding: 12px;
             border-radius: 8px;
             text-align: center;
         }
 
         .stat-box div {
-            font-size: 12px;
-            color: #888;
+            font-size: 13px;
+            color: #aaa;
+            margin-bottom: 4px;
         }
 
         .stat-box b {
-            font-size: 20px;
+            font-size: 22px;
+            /* 数字を強調 */
             color: var(--accent);
         }
 
-        /* グラフ描画エリア */
-        #historyChart {
-            background: #222;
+        /* 地方・都道府県リストの親 */
+        #prefStatsContainer {
+            background: transparent;
+            /* 重なりを防ぐため透過 */
+            margin-top: 20px;
+        }
+
+        .stats-title {
+            font-size: 16px;
+            /* サイズアップ */
+            font-weight: bold;
+            color: var(--accent);
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* 1. 地方コンテナ */
+        .region-container {
+            margin-bottom: 15px;
+            border: 1px solid #444;
+            border-radius: 10px;
+            background: var(--card-bg);
+            overflow: hidden;
+            width: 100%;
+        }
+
+        /* 2. 地方ヘッダー */
+        .region-header {
+            background: #333;
+            padding: 15px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .region-name-row {
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+            font-size: 16px;
+            /* 地方名を見やすく */
+            color: #fff;
+        }
+
+        .region-percentage-row {
+            font-size: 13px;
+            color: #ccc;
+        }
+
+        /* 3. プログレスバー（見切れ防止の要） */
+        .region-gauge-bg,
+        .bar-bg {
+            background: var(--bar-bg);
+            height: 10px;
+            /* 少し太くして視認性アップ */
             border-radius: 5px;
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+            /* 子要素の基準に */
+        }
+
+        .bar-fill {
+            height: 100%;
             display: block;
+            transition: width 0.8s ease-out;
+            border-radius: 5px;
+        }
+
+        /* 4. 県別リスト（オープン時） */
+        .region-content {
+            display: none;
+            padding: 20px 15px;
+            background: #1e1e1e;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 15px;
+            border-top: 1px solid #444;
+        }
+
+        .region-container.open .region-content {
+            display: grid !important;
+        }
+
+        /* 5. 各県のアイテム */
+        .pref-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .pref-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            /* 県名を見やすく */
+            color: #eee;
+        }
+
+        /* 6. 矢印 */
+        .arrow {
+            display: inline-block;
+            transition: transform 0.3s;
+            margin-right: 10px;
+            font-size: 14px;
+            color: var(--accent);
+        }
+
+        .region-container.open .arrow {
+            transform: rotate(90deg);
+        }
+
+        /* 選択中の都道府県を強調 */
+        .pref-item.active-filter {
+            background: rgba(77, 171, 255, 0.2);
+            border: 1px solid var(--accent);
+            border-radius: 6px;
         }
     </style>
 </head>
@@ -90,10 +221,26 @@
 
     <div class="nav">
         <a href="calender.html" class="back-btn">← カレンダー</a>
-        <h2 style="margin:0;">取得数推移</h2>
+        <h2 style="margin:0;">取得統計</h2>
         <a href="collection.html" class="back-btn">図鑑 →</a>
     </div>
 
+    <div id="prefStatsContainer">
+        <div class="stats-title">
+            <span>都道府県別 制覇率</span>
+            <small id="totalProgressText" style="color:#888;"></small>
+        </div>
+        <div id="prefStatsGrid" class="pref-grid"></div>
+    </div>
+
+    <div class="chart-header"
+        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <h2 id="chartTitle" style="margin: 0;">全国の収集推移</h2>
+        <button id="resetFilterBtn" onclick="selectPrefFromStats(currentFilterPref)"
+            style="display: none; background: #444; color: #fff; border: 1px solid #666; padding: 5px 12px; border-radius: 20px; font-size: 12px; cursor: pointer;">
+            全記録を表示
+        </button>
+    </div>
     <div class="stats-summary">
         <div class="stat-box">
             <div>累計取得枚数</div>
@@ -116,23 +263,53 @@
         const userStats = JSON.parse(localStorage.getItem('manhole_collection')) || {};
         let monthPositions = []; // スクロール検知用
 
+        let currentFilterPref = null; // nullなら全国、文字列（"東京都"など）ならその県のみ
+
         function initChart() {
             const canvas = document.getElementById('historyChart');
             const ctx = canvas.getContext('2d');
 
-            const collectedDates = Object.values(userStats)
-                .filter(s => s.collected && s.date)
-                .map(s => s.date)
-                .sort();
+            // --- 【修正】フィルタリングロジックの追加 ---
+            const dataMap = {};
+            const yearDataMap = {};
+            let grandTotal = 0;
+            let validDates = [];
 
-            if (collectedDates.length === 0) {
-                document.querySelector('.chart-container').innerHTML = "記録がまだありません。";
+            // userStatsのキー（"千代田区 (13-101)"など）と値をペアで回す
+            Object.entries(userStats).forEach(([key, stat]) => {
+                if (stat.collected && stat.date) {
+                    // 県別フィルタが有効な場合、masterDataからそのカードの県を確認
+                    if (currentFilterPref) {
+                        const card = masterData.find(m => `${m.city} (${m.id})` === key || m.city === key);
+                        if (!card || card.pref !== currentFilterPref) return; // 一致しなければスキップ
+                    }
+
+                    const monthKey = stat.date.substring(0, 7);
+                    const yearKey = stat.date.substring(0, 4);
+
+                    dataMap[monthKey] = (dataMap[monthKey] || 0) + 1;
+                    yearDataMap[yearKey] = (yearDataMap[yearKey] || 0) + 1;
+                    grandTotal++;
+                    validDates.push(stat.date);
+                }
+            });
+
+            if (validDates.length === 0) {
+                // フィルタの結果、データが0になった時の表示
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = "#888";
+                ctx.textAlign = "center";
+                ctx.fillText(currentFilterPref ? `${currentFilterPref}のデータはありません` : "記録がありません", canvas.width / 2, canvas.height / 2);
+                document.getElementById('totalCount').textContent = 0;
+                document.getElementById('avgCount').textContent = 0;
                 return;
             }
 
-            const firstDate = new Date(collectedDates[0]);
+            // --- 月リストの作成（全国と県別で期間を合わせるならそのまま、その県だけに絞るならvalidDatesを使う） ---
+            // ここでは「最初の取得から今月まで」の軸を維持します
+            const sortedDates = validDates.sort();
+            const firstDate = new Date(sortedDates[0]);
             const now = new Date();
-
             const months = [];
             let d = new Date(firstDate.getFullYear(), firstDate.getMonth(), 1);
             while (d <= now) {
@@ -140,25 +317,41 @@
                 d.setMonth(d.getMonth() + 1);
             }
 
-            const dataMap = {};
-            const yearDataMap = {};
-            let grandTotal = 0;
-
-            Object.values(userStats).forEach(stat => {
-                if (stat.collected && stat.date) {
-                    const monthKey = stat.date.substring(0, 7);
-                    const yearKey = stat.date.substring(0, 4);
-                    dataMap[monthKey] = (dataMap[monthKey] || 0) + 1;
-                    yearDataMap[yearKey] = (yearDataMap[yearKey] || 0) + 1;
-                    grandTotal++;
-                }
-            });
-
             const counts = months.map(m => dataMap[m] || 0);
             const maxCount = Math.max(...counts, 1);
 
+            // 統計表示の更新
+            // --- 統計表示の更新セクション ---
+            // --- 統計表示の更新セクション ---
+            const resetBtn = document.getElementById('resetFilterBtn');
+            const avgBox = document.getElementById('avgCount').closest('.stat-box');
+            const titleElem = document.getElementById('chartTitle');
+
+            if (currentFilterPref) {
+                // 【都道府県を選択中】
+                titleElem.textContent = `${currentFilterPref}の収集推移`;
+                resetBtn.style.display = "block";
+
+                // 「月平均」のみ無効化（半透明）
+                avgBox.style.opacity = "0.2";
+                avgBox.style.pointerEvents = "none";
+                document.getElementById('avgCount').textContent = "-";
+            } else {
+                // 【全国表示】
+                titleElem.textContent = "全国の収集推移";
+                resetBtn.style.display = "none";
+
+                // 「月平均」を通常表示に戻す
+                avgBox.style.opacity = "1";
+                avgBox.style.pointerEvents = "auto";
+                const avg = months.length > 0 ? (grandTotal / months.length).toFixed(1) : 0;
+                document.getElementById('avgCount').textContent = avg;
+            }
+
+            // 【常に更新】累計と表示中の年の合計
             document.getElementById('totalCount').textContent = grandTotal;
-            document.getElementById('avgCount').textContent = (grandTotal / months.length).toFixed(1);
+            const currentYear = document.getElementById('targetYearDisplay').textContent;
+            document.getElementById('yearTotalCount').textContent = yearDataMap[currentYear] || 0;
 
             const barSpacing = 60;
             canvas.width = months.length * barSpacing + 120;
@@ -174,6 +367,32 @@
             monthPositions = []; // リセット
             let lastYear = "";
 
+            // --- 背景のグリッド（横線）を描画 ---
+            ctx.save();
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.05)"; // 非常に薄い白
+            ctx.lineWidth = 1;
+
+            // 目盛りを何枚ごとに入れるか（最大値によって調整）
+            // 例：maxCountが10なら2枚ごと、50なら10枚ごとなど
+            const gridStep = maxCount > 10 ? 5 : 2;
+
+            for (let i = 0; i <= maxCount; i += gridStep) {
+                const h = (i / maxCount) * chartH;
+                const y = canvas.height - padding - h;
+
+                ctx.beginPath();
+                ctx.moveTo(padding - 20, y); // 少し左側から開始
+                ctx.lineTo(canvas.width - padding + 20, y); // 右端まで
+                ctx.stroke();
+
+                // 左端にうっすら目盛りの数字を入れる（任意）
+                ctx.fillStyle = "rgba(255, 255, 255, 0.2)";
+                ctx.font = "10px sans-serif";
+                ctx.textAlign = "right";
+                ctx.fillText(i, padding - 25, y + 4);
+            }
+            ctx.restore();
+
             months.forEach((m, i) => {
                 const year = m.split('-')[0];
                 const x = padding + i * stepX;
@@ -181,47 +400,103 @@
                 // スクロール判定用に各月の中心X座標を保存
                 monthPositions.push({ x: x + barW / 2, year: year, fullMonth: m });
                 // --- 背景の塗り分け（コントラスト強化） ---
+                // --- 背景の年別グラデーション描画 ---
                 if (year !== lastYear) {
+                    // 1. その年が何ヶ月分あるか計算（背景の幅を決めるため）
+                    const monthsInYear = months.filter(mon => mon.startsWith(year)).length;
+                    const bgWidth = monthsInYear * stepX;
+
+                    // 2. グラデーションの作成（上から下へ、または斜めに）
+                    // 例：上部が少し明るく、下部が背景に溶け込むような色
+                    const bgGrad = ctx.createLinearGradient(x, 0, x, canvas.height);
+
                     if (parseInt(year) % 2 === 0) {
-                        ctx.fillStyle = 'rgba(255, 255, 255, 0.08)'; // 少し濃く
-                        let monthsInYear = months.filter(mon => mon.startsWith(year)).length;
-                        ctx.fillRect(x - (stepX - barW) / 2, 0, monthsInYear * stepX, canvas.height);
+                        // 偶数年：落ち着いたネイビー系のグラデーション
+                        bgGrad.addColorStop(0, 'rgba(77, 171, 255, 0.12)'); // 上部：アクセントカラーの薄塗り
+                        bgGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');         // 下部：透明に溶ける
+                    } else {
+                        // 奇数年：少し暖かみのある、または別のトーン
+                        bgGrad.addColorStop(0, 'rgba(255, 255, 255, 0.05)'); // 上部：微かな白
+                        bgGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');          // 下部：透明
                     }
 
-                    ctx.fillStyle = "#4dabff";
-                    ctx.font = 'bold 18px sans-serif';
+                    // 3. 背景の塗りつぶし
+                    ctx.fillStyle = bgGrad;
+                    // 棒の間隔（stepX）の半分だけ左にずらして、月から月の間をきれいに埋める
+                    ctx.fillRect(x - (stepX - barW) / 2, 0, bgWidth, canvas.height);
+
+                    // 4. 年ラベル（2025年など）のデザイン
+                    ctx.fillStyle = "rgba(77, 171, 255, 0.8)";
+                    ctx.font = 'bold 20px sans-serif';
+                    ctx.textAlign = 'left';
                     ctx.fillText(year + '年', x, 35);
 
-                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
-                    ctx.lineWidth = 2;
+                    // 5. 境界線のデザイン（点線や細い線）
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+                    ctx.lineWidth = 1;
+                    ctx.setLineDash([5, 5]); // 点線にする
                     ctx.beginPath();
                     ctx.moveTo(x - (stepX - barW) / 2, 45);
-                    ctx.lineTo(x - (stepX - barW) / 2, canvas.height - 45);
+                    ctx.lineTo(x - (stepX - barW) / 2, canvas.height - 50);
                     ctx.stroke();
+                    ctx.setLineDash([]); // 点線をリセット
 
                     lastYear = year;
                 }
 
+                // --- 1. 軸ラベル（〇月）の描画：データが0でも常に表示 ---
+                ctx.save();
+                ctx.fillStyle = "#aaa"; // グレーで見やすく
+                ctx.font = '11px sans-serif';
+                ctx.textAlign = 'center';
+                // y座標は canvas.height - 40 あたりに固定
+                ctx.fillText(parseInt(m.split('-')[1]) + '月', x + barW / 2, canvas.height - 40);
+                ctx.restore();
+
+                // --- 2. 棒グラフと枚数の描画：データがある時のみ ---
                 const val = counts[i];
                 const h = (val / maxCount) * chartH;
                 const y = canvas.height - padding - h;
 
-                ctx.fillStyle = val > 0 ? "#4dabff" : "#3a3a3a";
-                if (h > 0) {
-                    ctx.beginPath();
-                    ctx.roundRect(x, y, barW, h, [6, 6, 0, 0]);
-                    ctx.fill();
-                }
-
-                ctx.fillStyle = "#aaa";
-                ctx.font = '11px sans-serif';
-                ctx.textAlign = 'center';
-                ctx.fillText(parseInt(m.split('-')[1]) + '月', x + barW / 2, canvas.height - 40);
-
                 if (val > 0) {
-                    ctx.fillStyle = "#fff";
-                    ctx.font = 'bold 12px sans-serif';
-                    ctx.fillText(val, x + barW / 2, y - 10);
+                    ctx.save();
+
+                    // グラデーションと光彩の設定
+                    const grad = ctx.createLinearGradient(0, y + h, 0, y);
+                    if (currentFilterPref) {
+                        grad.addColorStop(0, '#2a82d2');
+                        grad.addColorStop(1, '#81c7ff');
+                        ctx.shadowColor = 'rgba(77, 171, 255, 0.8)';
+                        ctx.shadowBlur = 15;
+                    } else {
+                        grad.addColorStop(0, '#333');
+                        grad.addColorStop(1, '#4dabff');
+                        ctx.shadowBlur = 0;
+                    }
+
+                    // 棒を描画
+                    ctx.fillStyle = grad;
+                    ctx.beginPath();
+                    ctx.roundRect(x, y, barW, h, [8, 8, 0, 0]);
+                    ctx.fill();
+
+                    // テキスト用にシャドウをオフ
+                    ctx.shadowBlur = 0;
+                    ctx.shadowColor = 'transparent';
+
+                    // 棒の上の枚数を表示
+                    ctx.fillStyle = "#ffffff";
+                    ctx.font = 'bold 13px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(val, x + barW / 2, y - 12);
+
+                    ctx.restore();
+                } else {
+                    // データが0の月：薄い土台だけ表示（お好みで）
+                    ctx.fillStyle = "rgba(255, 255, 255, 0.05)";
+                    ctx.beginPath();
+                    ctx.roundRect(x, canvas.height - padding - 2, barW, 2, [1, 1, 0, 0]);
+                    ctx.fill();
                 }
             });
 
@@ -265,9 +540,127 @@
                 document.getElementById('targetYearDisplay').textContent = latestYear;
                 document.getElementById('yearTotalCount').textContent = yearDataMap[latestYear] || 0;
             }, 150);
+
+            updatePrefStats();
+        }
+
+        // --- 1. 都道府県クリック時の関数 ---
+        function selectPrefFromStats(prefName) {
+            // 同じ県をもう一度タップしたら「全国」に戻す（トグル機能）
+            if (currentFilterPref === prefName) {
+                currentFilterPref = null;
+                console.log("フィルタ解除: 全国を表示");
+            } else {
+                currentFilterPref = prefName;
+                console.log("フィルタ適用:", prefName);
+            }
+
+            // グラフタイトルの更新（もしあれば）
+            const titleElem = document.querySelector('h2'); // グラフの上のタイトル
+            if (titleElem) {
+                titleElem.textContent = currentFilterPref ? `${currentFilterPref}の収集推移` : "全国の収集推移";
+            }
+
+            // グラフを再描画
+            initChart();
+
+            const chartElement = document.querySelector('.chart-container');
+            if (chartElement) {
+                // 要素の場所を計算して、少し余白（20px）を持ってスクロール
+                const offset = chartElement.getBoundingClientRect().top + window.pageYOffset - 20;
+                window.scrollTo({
+                    top: offset,
+                    behavior: 'smooth'
+                });
+            }
         }
 
         window.onload = initChart;
+
+        let masterData = [];
+        // 初期ロード
+        fetch('master_data.json').then(res => res.json()).then(data => {
+            masterData = data;
+            updatePrefStats();
+        });
+
+
+        function updatePrefStats() {
+            const grid = document.getElementById('prefStatsGrid'); // 実際にはContainer全体を書き換え
+            if (!grid || masterData.length === 0) return;
+
+            // 地方と都道府県の定義
+            const regions = {
+                "その他": ["世界", "その他"],
+                "北海道・東北": ["北海道", "青森県", "岩手県", "宮城県", "秋田県", "山形県", "福島県"],
+                "関東": ["茨城県", "栃木県", "群馬県", "埼玉県", "千葉県", "東京都", "神奈川県"],
+                "中部": ["新潟県", "富山県", "石川県", "福井県", "山梨県", "長野県", "岐阜県", "静岡県", "愛知県"],
+                "近畿": ["三重県", "滋賀県", "京都府", "大阪府", "兵庫県", "奈良県", "和歌山県"],
+                "中国・四国": ["鳥取県", "島根県", "岡山県", "広島県", "山口県", "徳島県", "香川県", "愛媛県", "高知県"],
+                "九州・沖縄": ["福岡県", "佐賀県", "長崎県", "熊本県", "大分県", "宮崎県", "鹿児島県", "沖縄県"]
+            };
+
+            // 1. 各都道府県の統計を算出
+            const prefStats = {};
+            masterData.forEach(card => {
+                if (!prefStats[card.pref]) prefStats[card.pref] = { total: 0, collected: 0 };
+                prefStats[card.pref].total++;
+                const fullKey = `${card.city} (${card.id})`;
+                if (userStats[fullKey]?.collected || userStats[card.city]?.collected) {
+                    prefStats[card.pref].collected++;
+                }
+            });
+
+            let html = '';
+
+            // 2. 地方ごとに集計してHTML作成
+            for (const [regionName, prefs] of Object.entries(regions)) {
+                let rTotal = 0;
+                let rCollected = 0;
+                let prefHtml = '';
+
+                prefs.forEach(pref => {
+                    const s = prefStats[pref];
+                    if (!s) return;
+                    rTotal += s.total;
+                    rCollected += s.collected;
+
+                    const percent = Math.floor((s.collected / s.total) * 100);
+                    const hue = Math.floor(percent * 1.2);
+                    const color = s.collected === s.total ? '#ffc107' : `hsl(${hue}, 70%, 50%)`;
+                    const isActive = pref === currentFilterPref ? 'active-filter' : '';
+                    prefHtml += `
+    <div class="pref-item ${isActive}" onclick="selectPrefFromStats('${pref}')">
+        <div class="pref-info"><span>${pref}</span><span>${s.collected}/${s.total}</span></div>
+        <div class="bar-bg"><div class="bar-fill" style="width:${percent}%; background-color:${color};"></div></div>
+    </div>`;
+                });
+
+                const rPercent = Math.floor((rCollected / rTotal) * 100);
+                const rColor = rCollected === rTotal ? '#ffc107' : `hsl(${Math.floor(rPercent * 1.2)}, 70%, 50%)`;
+
+                html += `
+            <div class="region-container" id="reg-${regionName}">
+                <div class="region-header" onclick="this.parentElement.classList.toggle('open')">
+                    <div class="region-info">
+                        <div class="region-name-row">
+                            <span class="arrow">▶</span> ${regionName}
+                        </div>
+                        <div class="region-percentage-row">
+                            取得率: ${rPercent}% (${rCollected} / ${rTotal})
+                        </div>
+                    </div>
+                    <div class="region-gauge-bg">
+                        <div class="bar-fill" style="width:${rPercent}%; background-color:${rColor};"></div>
+                    </div>
+                </div>
+                <div class="region-content">${prefHtml}</div>
+            </div>`;
+            }
+
+            grid.innerHTML = html;
+        }
+
 
     </script>
 </body>

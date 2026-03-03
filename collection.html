@@ -336,12 +336,6 @@
             /* 画像がなくても高さを確保 */
         }
 
-        /* 選択中（緑枠＋暗くする） */
-        /* .card-container.selecting-active {
-            outline: 4px solid #28a745 !important;
-            outline-offset: -4px;
-        } */
-
         /* 選択モード中に重なる半透明の膜 */
         .card-container.selecting-active::after {
             content: "選択中";
@@ -590,6 +584,49 @@
         <div class="stats-text"></div>
     </header>
 
+    <div style="margin-top: 15px; display: flex; flex-direction: column; gap: 12px; align-items: center;">
+        <a href="calender.html" style="
+                                        display: inline-block;
+                                        width: 80%;
+                                        padding: 10px;
+                                        background: #333;
+                                        color: #4dabff;
+                                        text-decoration: none;
+                                        font-size: 14px;
+                                        border: 1px solid #4dabff;
+                                        border-radius: 8px;
+                                        text-align: center;
+                                        font-weight: bold;
+                                    ">📅 取得記録をカレンダーで見る</a>
+        <a href="stats.html" style="
+                                        display: inline-block;
+                                        width: 80%;
+                                        padding: 10px;
+                                        background: #333;
+                                        color: #4dabff;
+                                        text-decoration: none;
+                                        font-size: 14px;
+                                        border: 1px solid #4dabff;
+                                        border-radius: 8px;
+                                        text-align: center;
+                                        font-weight: bold;
+                                    ">📊 取得数統計を見る</a>
+
+        <a href="index.html" style="
+                                                display: inline-block;
+                                                width: 80%;
+                                                padding: 10px;
+                                                background: #333;
+                                                color: #4dabff;
+                                                text-decoration: none;
+                                                font-size: 14px;
+                                                border: 1px solid #4dabff;
+                                                border-radius: 8px;
+                                                text-align: center;
+                                                font-weight: bold;
+                                            ">メニューに戻る</a>
+    </div>
+
     <div class="control-panel">
         <div id="prefStatsContainer">
             <div class="stats-title">
@@ -630,36 +667,7 @@
             </div>
         </div>
     </div>
-    <div style="margin-top: 15px; display: flex; flex-direction: column; gap: 12px; align-items: center;">
-        <a href="calender.html" style="
-                                    display: inline-block;
-                                    width: 80%;
-                                    padding: 10px;
-                                    background: #333;
-                                    color: #4dabff;
-                                    text-decoration: none;
-                                    font-size: 14px;
-                                    border: 1px solid #4dabff;
-                                    border-radius: 8px;
-                                    text-align: center;
-                                    font-weight: bold;
-                                ">📅 取得記録をカレンダーで見る</a>
-        <a href="stats.html" style="
-                                    display: inline-block;
-                                    width: 80%;
-                                    padding: 10px;
-                                    background: #333;
-                                    color: #4dabff;
-                                    text-decoration: none;
-                                    font-size: 14px;
-                                    border: 1px solid #4dabff;
-                                    border-radius: 8px;
-                                    text-align: center;
-                                    font-weight: bold;
-                                ">📊 取得数統計を見る</a>
 
-        <a href="index.html" style="color: #888; text-decoration: none; font-size: 13px;">← メニューに戻る</a>
-    </div>
     <div id="filterStats"
         style="padding: 10px; background: #222; text-align: center; font-size: 13px; color: #4dabff; border-bottom: 1px solid #333; display: none;">
         表示中: <span id="currentFilteredCount">0</span>枚 （取得済み: <span id="currentCollectedInFilter">0</span>枚）
