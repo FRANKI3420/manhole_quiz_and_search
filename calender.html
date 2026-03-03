@@ -336,6 +336,7 @@
 
     <div class="nav">
         <a href="collection.html" class="back-btn">← 図鑑に戻る</a>
+        <a href="stats.html" class="back-btn">統計 →</a>
         <!-- <div id="currentMonthDisplay" style="font-weight: bold;">2024年 1月</div> -->
     </div>
 
@@ -362,7 +363,12 @@
     </div>
 
     <div id="resultArea">
+        <div id="prefStatsArea" style="margin: 10px 0 20px; display: none;">
+            <div style="font-size: 12px; color: #888; margin-bottom: 8px;">この月の都道府県別内訳:</div>
+            <div id="prefBadgeList" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
+        </div>
         <div id="selectedDateTitle" class="result-title">日付を選択してください</div>
+
         <div id="cardList" class="card-list"></div>
     </div>
     <div id="modal" class="modal-overlay" onclick="if(event.target==this)closeModal()">
@@ -382,12 +388,12 @@
         let masterData = [];
         let userStats = JSON.parse(localStorage.getItem('manhole_collection')) || {};
         let currentDisplayDate = new Date();
+        let currentYear, currentMonth;
 
         // 初期読み込み
         async function init() {
             try {
                 console.log("JSON読み込み開始...");
-                // パスが正しいか確認してください（index.htmlと同じ階層にmaster_data.jsonがある前提）
                 const res = await fetch('master_data.json');
 
                 if (!res.ok) {
@@ -397,13 +403,31 @@
                 masterData = await res.json();
                 console.log("JSON読み込み成功:", masterData.length, "件");
 
+                // --- ここからURLパラメータの解析を追加 ---
+                const urlParams = new URLSearchParams(window.location.search);
+                const targetParam = urlParams.get('target'); // "2024-05" などの形式
+
+                if (targetParam && targetParam.includes('-')) {
+                    const [tYear, tMonth] = targetParam.split('-');
+                    currentYear = parseInt(tYear);
+                    currentMonth = parseInt(tMonth) - 1; // JSの月は0-11のため
+                    console.log(`表示月を切り替えました: ${currentYear}年${currentMonth + 1}月`);
+                } else {
+                    // パラメータがない場合は「今日」を表示
+                    const now = new Date();
+                    currentYear = now.getFullYear();
+                    currentMonth = now.getMonth();
+                }
+                // --- 解析ここまで ---
+
                 renderCalendar();
+                // もし図鑑統計関数（updatePrefStats）がある場合はここで呼ぶ
+                if (typeof updatePrefStats === 'function') updatePrefStats();
+
             } catch (e) {
                 console.error("エラー詳細:", e);
-                alert("データの読み込みに失敗しました。ファイルが同じフォルダにあるか確認してください。");
             }
         }
-
         // ページ読み込み完了後に実行
         window.onload = init;
 
@@ -417,8 +441,8 @@
 
             grid.innerHTML = '';
 
-            const year = currentDisplayDate.getFullYear();
-            const month = currentDisplayDate.getMonth();
+            const year = currentYear;
+            const month = currentMonth;
 
             // --- 年セレクトボックスの生成 (2020年から現在の5年後まで) ---
             yearSelect.innerHTML = '';
@@ -451,17 +475,38 @@
             // 空白埋め
             for (let i = 0; i < firstDay; i++) grid.innerHTML += `<div></div>`;
 
+            // --- 都道府県集計用のロジック ---
             let monthTotalCount = 0;
+            let monthlyPrefs = {};
+
+            // userStats の全データを [キー, 値] の配列にしてループ
+            const userStatsEntries = Object.entries(userStats);
 
             for (let date = 1; date <= lastDate; date++) {
                 const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
 
-                // userStatsからその日のデータを抽出
-                const dayCards = Object.values(userStats).filter(stat =>
+                // その日の記録を「キー」を含めて抽出
+                const dayEntries = userStatsEntries.filter(([key, stat]) =>
                     stat.collected && stat.date === dateStr
                 );
-                const count = dayCards.length;
-                monthTotalCount += count;
+
+                dayEntries.forEach(([key, stat]) => {
+                    // key には "千代田区 (13-101-A001)" などが入っているはず
+                    const card = masterData.find(c => {
+                        const fullKey = `${c.city} (${c.id})`;
+                        // キー名(key) または 保存されたid(stat.id) で比較
+                        return key === fullKey || key === c.city || stat.id === fullKey;
+                    });
+
+                    if (card && card.pref) {
+                        monthlyPrefs[card.pref] = (monthlyPrefs[card.pref] || 0) + 1;
+                    } else {
+                        console.warn("マッチ失敗。キー:", key, " stat.id:", stat.id);
+                    }
+                });
+
+                const count = dayEntries.length;
+                monthTotalCount += dayEntries.length;
 
                 let levelClass = '';
                 if (count >= 6) levelClass = 'level-3';
@@ -476,6 +521,41 @@
             }
 
             totalDisplay.innerHTML = `今月の取得数: <b>${monthTotalCount}</b> 枚`;
+            renderPrefStats(monthlyPrefs);
+        }
+
+        // ★追加：バッジを描画する関数
+        function renderPrefStats(stats) {
+            const area = document.getElementById('prefStatsArea');
+            const list = document.getElementById('prefBadgeList');
+
+            if (Object.keys(stats).length === 0) {
+                area.style.display = 'none';
+                return;
+            }
+
+            area.style.display = 'block';
+            list.innerHTML = '';
+
+            // 枚数が多い順に並び替え
+            const sortedPrefs = Object.entries(stats).sort((a, b) => b[1] - a[1]);
+
+            sortedPrefs.forEach(([pref, count]) => {
+                const badge = document.createElement('div');
+                badge.style.cssText = `
+            background: #333;
+            border: 1px solid #555;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            color: #eee;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        `;
+                badge.innerHTML = `${pref} <b style="color:var(--accent)">${count}</b>`;
+                list.appendChild(badge);
+            });
         }
 
         function jumpToDate() {
@@ -635,9 +715,6 @@
                     let diffX = endX - startX;
                     let diffY = endY - startY;
 
-                    // 判定条件：
-                    // 1. 縦の動き(diffY)よりも横の動き(diffX)が大きい（誤作動防止）
-                    // 2. 横に70px以上動いている
                     if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 70) {
                         if (diffX > 0) {
                             // 右スワイプ（指を右へ）＝ 前の月へ

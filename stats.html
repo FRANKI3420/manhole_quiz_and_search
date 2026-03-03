@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>活動統計 - マンホール図鑑</title>
+    <style>
+        :root {
+            --bg: #1a1a1a;
+            --card-bg: #2a2a2a;
+            --accent: #4dabff;
+            --text: #eee;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: sans-serif;
+            margin: 0;
+            padding: 15px;
+        }
+
+        .nav {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .back-btn {
+            background: #444;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .chart-container {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            overflow-x: auto;
+            /* 横スクロール可能に */
+        }
+
+        h2 {
+            font-size: 18px;
+            color: var(--accent);
+            margin-top: 0;
+        }
+
+        .stats-summary {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .stat-box {
+            background: #333;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-box div {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .stat-box b {
+            font-size: 20px;
+            color: var(--accent);
+        }
+
+        /* グラフ描画エリア */
+        #historyChart {
+            background: #222;
+            border-radius: 5px;
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="nav">
+        <a href="calender.html" class="back-btn">← カレンダー</a>
+        <h2 style="margin:0;">取得数推移</h2>
+        <a href="collection.html" class="back-btn">図鑑 →</a>
+    </div>
+
+    <div class="stats-summary">
+        <div class="stat-box">
+            <div>累計取得枚数</div>
+            <b id="totalCount">0</b>
+        </div>
+        <div class="stat-box">
+            <div><span id="targetYearDisplay">2026</span>年の合計</div>
+            <b id="yearTotalCount">0</b>
+        </div>
+        <div class="stat-box" style="grid-column: span 2;">
+            <div>月平均 (全期間)</div>
+            <b id="avgCount">0.0</b>
+        </div>
+    </div>
+    <div class="chart-container">
+        <canvas id="historyChart" width="1200" height="300"></canvas>
+    </div>
+
+    <script>
+        const userStats = JSON.parse(localStorage.getItem('manhole_collection')) || {};
+        let monthPositions = []; // スクロール検知用
+
+        function initChart() {
+            const canvas = document.getElementById('historyChart');
+            const ctx = canvas.getContext('2d');
+
+            const collectedDates = Object.values(userStats)
+                .filter(s => s.collected && s.date)
+                .map(s => s.date)
+                .sort();
+
+            if (collectedDates.length === 0) {
+                document.querySelector('.chart-container').innerHTML = "記録がまだありません。";
+                return;
+            }
+
+            const firstDate = new Date(collectedDates[0]);
+            const now = new Date();
+
+            const months = [];
+            let d = new Date(firstDate.getFullYear(), firstDate.getMonth(), 1);
+            while (d <= now) {
+                months.push(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`);
+                d.setMonth(d.getMonth() + 1);
+            }
+
+            const dataMap = {};
+            const yearDataMap = {};
+            let grandTotal = 0;
+
+            Object.values(userStats).forEach(stat => {
+                if (stat.collected && stat.date) {
+                    const monthKey = stat.date.substring(0, 7);
+                    const yearKey = stat.date.substring(0, 4);
+                    dataMap[monthKey] = (dataMap[monthKey] || 0) + 1;
+                    yearDataMap[yearKey] = (yearDataMap[yearKey] || 0) + 1;
+                    grandTotal++;
+                }
+            });
+
+            const counts = months.map(m => dataMap[m] || 0);
+            const maxCount = Math.max(...counts, 1);
+
+            document.getElementById('totalCount').textContent = grandTotal;
+            document.getElementById('avgCount').textContent = (grandTotal / months.length).toFixed(1);
+
+            const barSpacing = 60;
+            canvas.width = months.length * barSpacing + 120;
+
+            const padding = 70;
+            const chartW = canvas.width - padding * 2;
+            const chartH = canvas.height - padding * 2;
+            const stepX = chartW / months.length;
+            const barW = stepX * 0.7;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            monthPositions = []; // リセット
+            let lastYear = "";
+
+            months.forEach((m, i) => {
+                const year = m.split('-')[0];
+                const x = padding + i * stepX;
+
+                // スクロール判定用に各月の中心X座標を保存
+                monthPositions.push({ x: x + barW / 2, year: year, fullMonth: m });
+                // --- 背景の塗り分け（コントラスト強化） ---
+                if (year !== lastYear) {
+                    if (parseInt(year) % 2 === 0) {
+                        ctx.fillStyle = 'rgba(255, 255, 255, 0.08)'; // 少し濃く
+                        let monthsInYear = months.filter(mon => mon.startsWith(year)).length;
+                        ctx.fillRect(x - (stepX - barW) / 2, 0, monthsInYear * stepX, canvas.height);
+                    }
+
+                    ctx.fillStyle = "#4dabff";
+                    ctx.font = 'bold 18px sans-serif';
+                    ctx.fillText(year + '年', x, 35);
+
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(x - (stepX - barW) / 2, 45);
+                    ctx.lineTo(x - (stepX - barW) / 2, canvas.height - 45);
+                    ctx.stroke();
+
+                    lastYear = year;
+                }
+
+                const val = counts[i];
+                const h = (val / maxCount) * chartH;
+                const y = canvas.height - padding - h;
+
+                ctx.fillStyle = val > 0 ? "#4dabff" : "#3a3a3a";
+                if (h > 0) {
+                    ctx.beginPath();
+                    ctx.roundRect(x, y, barW, h, [6, 6, 0, 0]);
+                    ctx.fill();
+                }
+
+                ctx.fillStyle = "#aaa";
+                ctx.font = '11px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(parseInt(m.split('-')[1]) + '月', x + barW / 2, canvas.height - 40);
+
+                if (val > 0) {
+                    ctx.fillStyle = "#fff";
+                    ctx.font = 'bold 12px sans-serif';
+                    ctx.fillText(val, x + barW / 2, y - 10);
+                }
+            });
+
+            canvas.onclick = (e) => {
+                const rect = canvas.getBoundingClientRect();
+                // 画面上のクリック位置を、Canvas内部の座標スケールに変換
+                const scaleX = canvas.width / rect.width;
+                const clickX = (e.clientX - rect.left) * scaleX;
+
+                // クリックした位置(X)に最も近い月データを特定
+                // 許容範囲を30pxとして、タップした棒を探す
+                const target = monthPositions.find(p => Math.abs(p.x - clickX) < 30);
+
+                if (target) {
+                    console.log("ジャンプします:", target.fullMonth);
+                    // ファイル名を calender.html に修正
+                    window.location.href = `calender.html?target=${target.fullMonth}`;
+                } else {
+                    console.log("棒のない場所がタップされました");
+                }
+            };
+
+            // スクロールイベントの登録
+            const container = document.querySelector('.chart-container');
+            container.addEventListener('scroll', () => {
+                // 画面中央にある棒の年を特定する
+                const centerX = container.scrollLeft + (container.clientWidth / 2);
+                const currentData = monthPositions.find(p => p.x > centerX) || monthPositions[monthPositions.length - 1];
+
+                if (currentData) {
+                    const y = currentData.year;
+                    document.getElementById('targetYearDisplay').textContent = y;
+                    document.getElementById('yearTotalCount').textContent = yearDataMap[y] || 0;
+                }
+            });
+
+            // 初回表示（最新の年を表示）
+            setTimeout(() => {
+                container.scrollLeft = container.scrollWidth;
+                const latestYear = months[months.length - 1].split('-')[0];
+                document.getElementById('targetYearDisplay').textContent = latestYear;
+                document.getElementById('yearTotalCount').textContent = yearDataMap[latestYear] || 0;
+            }, 150);
+        }
+
+        window.onload = initChart;
+
+    </script>
+</body>
+
+</html>
