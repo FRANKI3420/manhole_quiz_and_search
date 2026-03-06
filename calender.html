@@ -561,12 +561,25 @@
         function jumpToDate() {
             const y = parseInt(document.getElementById('yearSelect').value);
             const m = parseInt(document.getElementById('monthSelect').value);
+
+            // ★表示用の変数を更新
+            currentYear = y;
+            currentMonth = m;
+
+            // 日付オブジェクトも同期させておく（スワイプ時にズレないように）
             currentDisplayDate = new Date(y, m, 1);
+
             renderCalendar();
         }
-
         function changeMonth(diff) {
+            // 1. 日付オブジェクトを更新
             currentDisplayDate.setMonth(currentDisplayDate.getMonth() + diff);
+
+            // 2. ★描画に使っている変数も一緒に更新する
+            currentYear = currentDisplayDate.getFullYear();
+            currentMonth = currentDisplayDate.getMonth();
+
+            // 3. 再描画
             renderCalendar();
         }
 
@@ -688,10 +701,10 @@
             document.getElementById('modal').style.display = 'none';
         }
 
-        function changeMonth(diff) {
-            currentDisplayDate.setMonth(currentDisplayDate.getMonth() + diff);
-            renderCalendar();
-        }
+        // function changeMonth(diff) {
+        //     currentDisplayDate.setMonth(currentDisplayDate.getMonth() + diff);
+        //     renderCalendar();
+        // }
 
         // スワイプ操作の初期化
         document.addEventListener('DOMContentLoaded', () => {
