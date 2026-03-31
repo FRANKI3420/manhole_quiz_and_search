@@ -1,6 +1,5 @@
 import pandas as pd
 from bs4 import BeautifulSoup
-import os
 
 def parse_manhole_html(file_path):
     try:
@@ -18,12 +17,8 @@ def parse_manhole_html(file_path):
         tds = row.find_all('td')
         
         if len(tds) >= 3:
-            # --- 修正ポイントここから ---
-            # get_text(separator=" ") で <br> をスペースに変換し、
-            # .split() と " ".join() で連続する改行や空白を1つのスペースにまとめます
             raw_city_text = tds[0].get_text(separator=" ")
             city_info = " ".join(raw_city_text.split()).strip()
-            # --- 修正ポイントここまで ---
             
             img_tag = tds[1].find('img')
             img_url = img_tag['src'] if img_tag else "なし"
