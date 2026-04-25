@@ -14,12 +14,31 @@ def bulk_circle_crop_with_clean(input_folder, output_folder, center_x, center_y,
     # --------------------------------------------
 
     # 1. フォルダ内のファイル一覧を取得
-    files = [f for f in os.listdir(input_folder) if f.lower().endswith(('.jpg', '.jpeg', '.png'))]
-    total_files = len(files)
+    all_entries = os.listdir(input_folder)
     
-    if total_files == 0:
-        print(f"警告: {input_folder} に画像が見つかりません。Step 3が成功しているか確認してください。")
-        return
+    # 対象となる画像ファイル
+    image_extensions = ('.jpg', '.jpeg', '.png')
+    files = [f for f in all_entries if f.lower().endswith(image_extensions)]
+    
+    # 【追加】対象外のファイル（ファイルであり、かつ画像拡張子を持たないもの）
+    skipped_files = [
+        f for f in all_entries 
+        if os.path.isfile(os.path.join(input_folder, f)) and not f.lower().endswith(image_extensions)
+    ]
+
+    total_files = len(files)
+    total_skipped = len(skipped_files)
+
+    print(f"--- 統計情報 ---")
+    print(f"入力フォルダ内の全ファイル数: {len(all_entries)} 件")
+    print(f"うち、切り抜き対象(画像): {total_files} 件")
+    print(f"うち、対象外(スキップ): {total_skipped} 件")
+    
+    if total_skipped > 0:
+        print("\n--- 対象外ファイル名一覧 ---")
+        for f in skipped_files:
+            print(f"  - {f}")
+    print(f"----------------\n")
 
     print(f"合計 {total_files} 枚の切り抜き処理を開始します...")
 
