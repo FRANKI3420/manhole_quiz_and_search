@@ -1,53 +1,71 @@
 import pandas as pd
+import os
+import re
 
 def merge_and_rename_manhole():
-    # 1. 各CSVを読み込み
-    # 既存データ
+    if not os.path.exists("manhole_list.csv"):
+        print("エラー: manhole_list.csv (既存データ) が見つかりません。")
+        return
+
     df_base = pd.read_csv("manhole_list.csv", encoding="utf-8-sig")
-    # 追加データ
     df_add = pd.read_csv("manhole_list_add.csv", encoding="utf-8-sig")
 
-    # 2. 追加データ側に「(B001)」が含まれる市町村のリストを作成
-    # 都道府県と市町村の組み合わせで判定するためセットにする
+    # 1. B001が存在する市町村を特定して A001 へ書き換える準備
     b001_targets = set()
     for _, row in df_add.iterrows():
         if "(B001)" in str(row['市町村']):
-            # "(B001)" を除いた純粋な市町村名を取得（例：札幌市）
             base_city_name = row['市町村'].replace("(B001)", "").strip()
             b001_targets.add((row['都道府県'], base_city_name))
 
-    print(f"B001検知: {len(b001_targets)} 件の市町村を A001 へ書き換えます。")
-
-    # 3. 既存データ(df_base)の書き換えロジック
     def update_city_name(row):
-        pref = row['都道府県']
-        city = row['市町村']
-        
-        # すでに (A001) などが付いている場合はスキップ
-        if "(" in str(city):
-            return city
-            
-        # 「都道府県」と「市町村名」が一致し、かつB001が存在する場合
-        if (pref, city) in b001_targets:
-            return f"{city} (A001)"
-        
-        return city
+        if "(" in str(row['市町村']): return row['市町村']
+        if (row['都道府県'], row['市町村']) in b001_targets:
+            return f"{row['市町村']} (A001)"
+        return row['市町村']
 
     df_base['市町村'] = df_base.apply(update_city_name, axis=1)
 
-    # 4. データの結合 (縦に連結)
-    # ignore_index=True でインデックスを振り直す
+    # 2. データの結合
     df_combined = pd.concat([df_base, df_add], ignore_index=True)
-
-    # 5. 重複削除 (念のため、都道府県・市町村・弾数が完全に一致するものは排除)
     df_combined = df_combined.drop_duplicates(subset=['都道府県', '市町村', '弾数'])
 
-    # 6. 保存
-    output_file = "manhole_list.csv"
-    df_combined.to_csv(output_file, index=False, encoding="utf-8-sig")
+    # 3. 【新機能】並び替え用の作業列を作成
+    # 都道府県コード（JIS順）を定義
+    pref_order = {
+        "北海道": 1, "青森県": 2, "岩手県": 3, "宮城県": 4, "秋田県": 5, "山形県": 6, "福島県": 7,
+        "茨城県": 8, "栃木県": 9, "群馬県": 10, "埼玉県": 11, "千葉県": 12, "東京都": 13, "神奈川県": 14,
+        "新潟県": 15, "富山県": 16, "石川県": 17, "福井県": 18, "山梨県": 19, "長野県": 20, "岐阜県": 21,
+        "静岡県": 22, "愛知県": 23, "三重県": 24, "滋賀県": 25, "京都府": 26, "大阪府": 27, "兵庫県": 28,
+        "奈良県": 29, "和歌山県": 30, "鳥取県": 31, "島根県": 32, "岡山県": 33, "広島県": 34, "山口県": 35,
+        "徳島県": 36, "香川県": 37, "愛媛県": 38, "高知県": 39, "福岡県": 40, "佐賀県": 41, "長崎県": 42,
+        "熊本県": 43, "大分県": 44, "宮崎県": 45, "慶応義塾": 46, "鹿児島県": 46, "沖縄県": 47
+    }
+
+    def get_sort_keys(row):
+        city = str(row['市町村'])
+        # カッコ内の枝番（A001など）を抽出
+        match = re.search(r'\((.+)\)', city)
+        branch = match.group(1) if match else "000" # 無印は 000 とする
+        # カッコを除いた純粋な市町村名
+        pure_city = re.sub(r'\(.+\)', '', city).strip()
+        
+        return pd.Series([
+            pref_order.get(row['都道府県'], 99), # 都道府県順
+            pure_city,                          # 市町村名順
+            branch                              # 枝番順 (A001 < B001)
+        ])
+
+    # 作業用列を追加してソート
+    df_combined[['_pref_rank', '_city_name', '_branch']] = df_combined.apply(get_sort_keys, axis=1)
     
-    print(f"結合完了: {output_file} に保存しました。")
-    print(f"総件数: {len(df_combined)} 件")
+    # 複数キーでソートを実行
+    df_combined = df_combined.sort_values(['_pref_rank', '_city_name', '_branch']).reset_index(drop=True)
+
+    # 4. 作業列を削除して保存
+    df_combined = df_combined.drop(columns=['_pref_rank', '_city_name', '_branch'])
+    
+    df_combined.to_csv("manhole_list.csv", index=False, encoding="utf-8-sig")
+    print(f"Step 2 完了: 適切にソートして {len(df_combined)} 件保存しました。")
 
 if __name__ == "__main__":
     merge_and_rename_manhole()
