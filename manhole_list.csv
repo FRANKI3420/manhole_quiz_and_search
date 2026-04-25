@@ -1,4 +1,4 @@
-﻿都道府県,市町村,画像URL,弾数
+都道府県,市町村,画像URL,弾数
 北海道,上ノ国町,http://www.gk-p.jp/wp-content/uploads/mhc/01-362-A-01.jpg,第13弾
 北海道,上士幌町,http://www.gk-p.jp/wp-content/uploads/mhc/01-633-A-01.jpg,第27弾
 北海道,上富良野町,http://www.gk-p.jp/wp-content/uploads/mhc/01-460-A-01.jpg,第15弾
@@ -8,7 +8,7 @@
 北海道,剣淵町,http://www.gk-p.jp/wp-content/uploads/mhc/01-465-A-01.jpg,第5弾
 北海道,北広島市 (A001),http://www.gk-p.jp/wp-content/uploads/mhc/01-234-A-01.jpg,第06弾
 北海道,北広島市 (B001),http://www.gk-p.jp/wp-content/uploads/mhc/01-234-B-01.jpg,第21弾
-北海道,北斗市,http://www.gk-p.jp/wp-content/uploads/mhc/01-236-A-01.jpg,第8弾
+北海道,北斗市,http://www.gk-p.jp/wp-content/uploads/mhc/01-236-A-01.jpg,第08弾
 北海道,北見市 (A001),http://www.gk-p.jp/wp-content/uploads/mhc/01-208-A-01.jpg,第02弾
 北海道,北見市 (B001),http://www.gk-p.jp/wp-content/uploads/mhc/01-208-B-01.jpg,第10弾
 北海道,千歳市,http://www.gk-p.jp/wp-content/uploads/mhc/01-224-A-01.jpg,第18弾
@@ -163,6 +163,7 @@
 福島県,いわき市 (B001),http://www.gk-p.jp/wp-content/uploads/mhc/07-204-A01.jpg,第17弾
 福島県,いわき市 (C001),http://www.gk-p.jp/wp-content/uploads/mhc/07-204-C-01.jpg,第19弾
 福島県,いわき市 (D001),http://www.gk-p.jp/wp-content/uploads/mhc/07-204-D-01.jpg,第25弾
+福島県,いわき市 (E001),http://www.gk-p.jp/wp-content/uploads/mhc/07-204-E-01.jpg,第28弾
 福島県,三春町,http://www.gk-p.jp/wp-content/uploads/mhc/07-521-A-01.jpg,第18弾
 福島県,二本松市,http://www.gk-p.jp/wp-content/uploads/mhc/07-210-A-01.jpg,第5弾
 福島県,伊達市,http://www.gk-p.jp/wp-content/uploads/mhc/07-213-A-01.jpg,第21弾
@@ -469,6 +470,7 @@
 東京都,檜原村,http://www.gk-p.jp/wp-content/uploads/mhc/13-307-A-01.jpg,第13弾
 東京都,武蔵野市 (A001),http://www.gk-p.jp/wp-content/uploads/mhc/13-203-A-01.jpg,第22弾
 東京都,武蔵野市 (B001),http://www.gk-p.jp/wp-content/uploads/mhc/13-203-B-01.jpg,第24弾
+東京都,武蔵野市 (C001),http://www.gk-p.jp/wp-content/uploads/mhc/13-203-C-01.jpg,第27弾
 東京都,清瀬市,http://www.gk-p.jp/wp-content/uploads/mhc/13-221-A01.jpg,第15弾
 東京都,狛江市 (A001),http://www.gk-p.jp/wp-content/uploads/mhc/13-219-A-01.jpg,第06弾
 東京都,狛江市 (B001),http://www.gk-p.jp/wp-content/uploads/mhc/13-219-B02.jpg,第15弾
@@ -854,7 +856,7 @@
 京都府,宇治市,http://www.gk-p.jp/wp-content/uploads/mhc/26-204-A-01.jpg,第6弾
 京都府,宇治田原町,http://www.gk-p.jp/wp-content/uploads/mhc/26-344-A-01.jpg,第2弾
 京都府,綾部市,http://www.gk-p.jp/wp-content/uploads/mhc/26-203-A-01.jpg,第15弾
-京都府,舞鶴市 (A001),http://www.gk-p.jp/wp-content/uploads/mhc/26-202-A-01.jpg,第 8弾
+京都府,舞鶴市 (A001),http://www.gk-p.jp/wp-content/uploads/mhc/26-202-A-01.jpg,第8弾
 京都府,舞鶴市 (B001),http://www.gk-p.jp/wp-content/uploads/mhc/26-202-B-01.jpg,第12弾
 京都府,舞鶴市 (C001),http://www.gk-p.jp/wp-content/uploads/mhc/26-202-C-01.jpg,第13弾
 京都府,長岡京市 (A001),http://www.gk-p.jp/wp-content/uploads/mhc/26-209-A-01.jpg,第05弾

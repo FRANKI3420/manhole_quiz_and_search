@@ -1,70 +1,54 @@
-# マンホールカード・ラボ (Manhole Card Lab)
+# マンホールカード類似検索システム：データ更新パイプライン
 
-マンホールカードのデザインをAIで解析し、類似デザインの検索や、切り抜き画像を使ったクイズを楽しめるWebシステムです。
+このプロジェクトは、最新のマンホールカード情報を取得し、画像加工、AI解析、検索インデックス作成までを一気通貫で行うためのデータパイプラインです。
 
-## 📁 ディレクトリ構成とファイル説明
 
-### 🌐 フロントエンド (Web公開用)
-GitHub Pages等でホスティングし、ブラウザからアクセスするファイル群です。
-* **`index.html`**
-    - ポータル画面。類似検索かクイズかのモード選択を行います。
-* **`search.html`**
-    - 類似デザイン検索画面。1,100枚以上のカードから似たデザインをAIが即座に提案します。
-* **`quiz.html`**
-    - マンホール蓋クイズ。蓋のデザインだけで自治体を当てる、マニア向けの10択クイズです。
-* **`master_data.json`**
-    - 全カードの基本情報（自治体、都道府県、弾数、画像URL）を格納したデータベース。
-* **`similarity_index.json`**
-    - 特徴抽出によって計算された、各カードごとの類似カードTOP10リスト。
 
----
+## 📋 ファイル構成と役割
 
-### 🐍 データ収集・加工スクリプト (Python)
-ローカル環境でデータを準備・解析するためのツール群です。
+### 1. データ整備フェーズ
+| ファイル名 | 役割 | 詳細 |
+| :--- | :--- | :--- |
+| **`step0_same_check.py`** | **データ整合性検証** | CSV内の重複やファイル名の衝突を事前に検知し、データ欠損を防止する。 |
+| **`step2_merge_manhole_csv.py`** | **結合・リネーム** | 既存リストに新規分を合体。B001登場に伴うA001への自動リネームとJIS順ソートを実行。 |
 
-#### 1. データ取得
-* **`getCardInfo.py`**
-    - Webサイト等からマンホールカードの情報を収集するスクレイピング用スクリプト。
-* **`dl_image.py`**
-    - 管理リスト（CSV）内のURLを元に、カード画像をローカルに一括ダウンロードします。
+### 2. 画像処理フェーズ
+| ファイル名 | 役割 | 詳細 |
+| :--- | :--- | :--- |
+| **`step3_dl_image_add.py`** | **画像同期 (DL)** | CSVに基づき差分画像のみDL。名前が変わった古い画像は自動削除してクリーンアップ。 |
+| **`step4_crop_to_circle_add.py`** | **円形切り抜き** | `manhole_images` から新規分のみを円形に加工。透過PNGとして `manhole_crops` へ保存。 |
 
-#### 2. 画像処理
-* **`test_single_crop.py`**
-    - 切り抜き位置（中心座標・半径）を調整するためのテスト用プレビュー出力スクリプト。
-* **`crop_to_circle.py`**
-    - `manhole_images` 内の全画像を、テストで決定した座標に基づいて円形に一括切り抜きします。
-
-#### 3. 解析・データ変換
-* **`build_search_index.py`**
-    - 特徴抽出モデル（MobileNetV2）を使用し、全画像のベクトル化および類似度計算を行い、検索用インデックスを生成します。
-* **`convert_csv_to_master_json.py`**
-    - CSVデータをWeb用のJSON形式に変換。弾数の表記ゆれ（第1弾 vs 第01弾）の自動補正機能を含みます。
-
-#### 4. ユーティリティ
-* **`check_files.py`**
-    - 画像の有無やJSONとの整合性を確認するためのメンテナンス用ツール。
+### 3. Webアプリ・AI解析フェーズ
+| ファイル名 | 役割 | 詳細 |
+| :--- | :--- | :--- |
+| **`step5_convert_csv_to_master_json.py`** | **JSON変換** | 最終CSVをWebアプリ用JSONに変換。弾数のゼロ埋め（第1弾→第01弾）などの正規化を実施。 |
+| **`step6_build_search_index_color_pared.py`** | **AI解析・パレット生成** | AI（ViT）による類似検索インデックス作成と、主要5色のカラーパレット抽出。 |
 
 ---
 
-### 📂 データ・環境
-* **`manhole_images/`**
-    - ダウンロードしたオリジナルのカード画像（JPG/PNG）を格納するディレクトリ。
-* **`manhole_crops/`**
-    - クイズや検索に使用する、円形に切り抜かれた蓋のみの画像（PNG）を格納。
-* **`manhole_list.csv`**
-    - すべてのカード情報のマスタとなる管理リスト。
-* **`venv/`**
-    - Pythonの仮想環境ディレクトリ。
+## 🛠 フォルダ構成
+- `manhole_images/`: オリジナル画像（JPG/PNG）
+- `manhole_crops/`: 加工済み画像（円形透過PNG）
+- `manhole_list.csv`: マスターデータリスト
+- `master_data.json`: Webアプリ用メインデータ
+- `similarity_index.json`: 類似カード紐付けデータ
 
 ---
 
-## 🚀 開発・更新ワークフロー
+## 🚀 標準運用フロー
 
-1. **データ収集**: `runGetCardInfo.sh` で情報を取得し、`dl_image.py` で画像を保存。
-2. **画像加工**: `test_single_crop.py` で座標を決定し、`crop_to_circle.py` で一括切り抜き。
-3. **AI解析**: `build_search_index.py` を実行し、類似度データベースを生成。
-4. **JSON変換**: `convert_csv_to_master_json.py` でフロントエンド用データを最新化。
-5. **デプロイ**: HTML, JSON, および `manhole_crops` フォルダを GitHub Pages にアップロード。
+新しい弾が追加された際は、以下の順にコマンドを実行してください。
+
+1. **新規リスト作成**: HTML解析等で `manhole_list_add.csv` を用意
+2. **整合性チェック**: `python3 step0_same_check.py`
+3. **CSV更新**: `python3 step2_merge_manhole_csv.py`
+4. **画像DL**: `python3 step3_dl_image_add.py`
+5. **画像加工**: `python3 step4_crop_to_circle_add.py`
+6. **JSON生成**: `python3 step5_convert_csv_to_master_json.py`
+7. **AI解析**: `python3 step6_build_search_index_color_pared.py`
 
 ---
-&copy; 2026 Manhole Card Fan Project
+
+## 📝 運用上の注意
+- **差分処理**: Step 4 は差分処理モードです。切り抜き設定（座標等）を変更して全件やり直したい場合は、`manhole_crops/` フォルダを一度削除してから実行してください。
+- **依存関係**: Step 6 の実行には `torch`, `timm`, `opencv-python`, `scikit-learn` が必要です。

@@ -584,47 +584,45 @@
         <div class="stats-text"></div>
     </header>
 
-    <div style="margin-top: 15px; display: flex; flex-direction: column; gap: 12px; align-items: center;">
+    <div style="margin-top: 15px; display: flex; flex-direction: row; gap: 8px; justify-content: center; width: 100%;">
         <a href="calender.html" style="
-                                        display: inline-block;
-                                        width: 80%;
-                                        padding: 10px;
-                                        background: #333;
-                                        color: #4dabff;
-                                        text-decoration: none;
-                                        font-size: 14px;
-                                        border: 1px solid #4dabff;
-                                        border-radius: 8px;
-                                        text-align: center;
-                                        font-weight: bold;
-                                    ">📅 取得記録をカレンダーで見る</a>
+        flex: 1;
+        padding: 10px 4px;
+        background: #333;
+        color: #4dabff;
+        text-decoration: none;
+        font-size: 12px;
+        border: 1px solid #4dabff;
+        border-radius: 8px;
+        text-align: center;
+        font-weight: bold;
+    ">📅 カレンダー</a>
+
         <a href="stats.html" style="
-                                        display: inline-block;
-                                        width: 80%;
-                                        padding: 10px;
-                                        background: #333;
-                                        color: #4dabff;
-                                        text-decoration: none;
-                                        font-size: 14px;
-                                        border: 1px solid #4dabff;
-                                        border-radius: 8px;
-                                        text-align: center;
-                                        font-weight: bold;
-                                    ">📊 取得数統計を見る</a>
+        flex: 1;
+        padding: 10px 4px;
+        background: #333;
+        color: #4dabff;
+        text-decoration: none;
+        font-size: 12px;
+        border: 1px solid #4dabff;
+        border-radius: 8px;
+        text-align: center;
+        font-weight: bold;
+    ">📊 統計</a>
 
         <a href="index.html" style="
-                                                display: inline-block;
-                                                width: 80%;
-                                                padding: 10px;
-                                                background: #333;
-                                                color: #4dabff;
-                                                text-decoration: none;
-                                                font-size: 14px;
-                                                border: 1px solid #4dabff;
-                                                border-radius: 8px;
-                                                text-align: center;
-                                                font-weight: bold;
-                                            ">メニューに戻る</a>
+        flex: 1;
+        padding: 10px 4px;
+        background: #333;
+        color: #4dabff;
+        text-decoration: none;
+        font-size: 12px;
+        border: 1px solid #4dabff;
+        border-radius: 8px;
+        text-align: center;
+        font-weight: bold;
+    ">🏠 メニュー</a>
     </div>
 
     <div class="control-panel">
@@ -635,6 +633,9 @@
             </div>
             <div id="prefStatsGrid" class="pref-grid"></div>
         </div>
+
+        <div id="editionStatsGrid"></div>
+
 
         <div id="searchSection"
             style="margin: 15px 0; padding: 12px; background: #1a1a1a; border-radius: 10px; border: 1px solid #333;">
@@ -764,6 +765,7 @@
             updateStats();
             initFilters();
             updatePrefStats();
+            updateEditionStats();
         });
 
         // 全体統計の更新
@@ -917,14 +919,6 @@
                 if (statsDiv) statsDiv.style.display = 'none';
                 return;
             }
-
-            // let filtered = masterData.filter(d => {
-            //     const pMatch = !pref || d.pref === pref;
-            //     const eMatch = !ed || d.edition === ed;
-            //     // ★ 市町村名に検索文字が含まれているか判定（大文字小文字を区別しない）
-            //     const sMatch = !searchText || d.city.toLowerCase().includes(searchText.toLowerCase());
-            //     return pMatch && eMatch && sMatch;
-            // });
 
             // フィルター内統計
             if (statsDiv) {
@@ -1101,6 +1095,7 @@
             renderCollection();
             closeModal();
             updatePrefStats(); // ★追加：都道府県別統計も更新
+            updateEditionStats(); // ★追加：弾数別統計も更新
         }
 
         function closeModal() { document.getElementById('modal').style.display = 'none'; }
@@ -1134,6 +1129,115 @@
                 } catch (e) { alert('形式エラー'); }
             };
             reader.readAsText(file);
+        }
+
+        // --- 弾数統計の更新 ---
+        function updateEditionStats() {
+            const grid = document.getElementById('editionStatsGrid');
+            if (!grid || masterData.length === 0) return;
+
+            const edStats = {};
+            let maxEdNum = 0; // 最大弾数を保持する変数
+
+            // 1. 統計算出と最大弾数の特定
+            masterData.forEach(card => {
+                const edNum = parseInt(card.edition.replace(/[^0-9]/g, ''));
+                if (isNaN(edNum)) return;
+
+                if (edNum > maxEdNum) maxEdNum = edNum; // 最大値を更新
+
+                const edStr = card.edition;
+                if (!edStats[edStr]) {
+                    edStats[edStr] = { total: 0, collected: 0, num: edNum };
+                }
+                edStats[edStr].total++;
+                if (userStats[card.city]?.collected) {
+                    edStats[edStr].collected++;
+                }
+            });
+
+            const sortedEditions = Object.keys(edStats).sort((a, b) => edStats[a].num - edStats[b].num);
+
+            // 2. 5弾ずつグループ化（最大弾数に合わせてラベルを調整）
+            const groups = {};
+            sortedEditions.forEach(edStr => {
+                const num = edStats[edStr].num;
+                const groupIndex = Math.floor((num - 1) / 5);
+                const start = groupIndex * 5 + 1;
+
+                // 通常は +4 (例: 1+4=5) だが、最大弾数を超えないようにする
+                let end = (groupIndex + 1) * 5;
+                if (end > maxEdNum) end = maxEdNum;
+
+                // 「第1弾 〜 第5弾」 または 「第26弾 〜 第28弾」 となる
+                const groupName = start === end ? `第${start}弾` : `第${start}弾 〜 第${end}弾`;
+
+                if (!groups[groupName]) groups[groupName] = [];
+                groups[groupName].push(edStr);
+            });
+
+            let html = '<h3 style="margin: 20px 0 10px 10px; font-size: 14px; border-left: 4px solid #4dabff; padding-left: 8px;">弾数別進捗</h3>';
+
+            // 3. グループの表示（数値順）
+            Object.keys(groups).sort((a, b) => {
+                return parseInt(a.replace(/[^0-9]/g, '')) - parseInt(b.replace(/[^0-9]/g, ''));
+            }).forEach(groupName => {
+                const eds = groups[groupName];
+                let gTotal = 0;
+                let gCollected = 0;
+                let edHtml = '';
+
+                eds.forEach(edStr => {
+                    const s = edStats[edStr];
+                    gTotal += s.total;
+                    gCollected += s.collected;
+
+                    const percent = Math.floor((s.collected / s.total) * 100);
+                    const hue = Math.floor(percent * 1.2);
+                    const color = s.collected === s.total ? '#ffc107' : `hsl(${hue}, 70%, 50%)`;
+
+                    edHtml += `
+                <div class="pref-item" onclick="selectEditionFromStats('${edStr}')" style="cursor: pointer;">
+                    <div class="pref-info"><span>${edStr}</span><span>${s.collected}/${s.total}</span></div>
+                    <div class="bar-bg"><div class="bar-fill" style="width:${percent}%; background-color:${color};"></div></div>
+                </div>`;
+                });
+
+                const gPercent = Math.floor((gCollected / gTotal) * 100);
+                const gColor = gCollected === gTotal ? '#ffc107' : `hsl(${Math.floor(gPercent * 1.2)}, 70%, 50%)`;
+
+                html += `
+            <div class="region-container" id="ed-group-${groupName}">
+                <div class="region-header" onclick="this.parentElement.classList.toggle('open')">
+                    <div class="region-info">
+                        <div class="region-name-row">
+                            <span class="arrow">▶</span> ${groupName}
+                        </div>
+                        <div class="region-percentage-row">
+                            取得率: ${gPercent}% (${gCollected} / ${gTotal})
+                        </div>
+                    </div>
+                    <div class="region-gauge-bg">
+                        <div class="bar-fill" style="width:${gPercent}%; background-color:${gColor};"></div>
+                    </div>
+                </div>
+                <div class="region-content">${edHtml}</div>
+            </div>`;
+            });
+
+            grid.innerHTML = html;
+        }
+
+        // 統計から弾数をタップした時のフィルタ連動
+        function selectEditionFromStats(edName) {
+            const eSel = document.getElementById('editionFilter');
+            const sInput = document.getElementById('searchInput');
+            if (sInput) sInput.value = "";
+            if (eSel) eSel.value = edName;
+            handleFilterChange(); // 既存のフィルタ変更処理を呼ぶ
+
+            const filterSec = document.getElementById('filterSection');
+            if (filterSec) filterSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
         function updatePrefStats() {
