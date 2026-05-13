@@ -583,7 +583,8 @@
             renderCalendar();
         }
 
-        // （showCardsForDate 以下の関数は以前と同じなので省略せずそのまま使ってください）
+        // --- showCardsForDate 関数の修正箇所 ---
+
         function showCardsForDate(dateStr, element) {
             document.querySelectorAll('.day').forEach(d => d.classList.remove('selected-day'));
             element.classList.add('selected-day');
@@ -595,15 +596,17 @@
             const [y, m, d] = dateStr.split('-');
             title.textContent = `${y}年${m}月${d}日 の取得`;
 
-            // 日付に一致するキーを取得
+            // 1. その日に取得したキー（"市区町村 (ID)" の形式）をすべて取得
             const targetKeys = Object.keys(userStats).filter(key => {
                 return userStats[key].collected && userStats[key].date === dateStr;
             });
 
-            // masterDataからカードを特定
+            // 2. masterDataからカードを特定
             const cardsOnThisDay = masterData.filter(card => {
                 const fullKey = `${card.city} (${card.id})`;
-                return targetKeys.some(tKey => tKey === fullKey || tKey.includes(card.city));
+
+                // 【ここを修正】includes ではなく、配列の中に「完全一致」するキーがあるか調べる
+                return targetKeys.some(tKey => tKey === fullKey || tKey === card.city);
             });
 
             if (cardsOnThisDay.length === 0) {
@@ -611,9 +614,11 @@
                 return;
             }
 
-            // ★ ここで onclick="openDetail(...)" を含むHTMLを生成
+            // 3. 表示処理（ここは変更なし）
             cardsOnThisDay.forEach(card => {
-                const matchedKey = targetKeys.find(tKey => tKey.includes(card.city)) || "";
+                // matchedKey を探す際も完全一致で探す
+                const fullKey = `${card.city} (${card.id})`;
+                const matchedKey = targetKeys.find(tKey => tKey === fullKey || tKey === card.city) || fullKey;
 
                 list.innerHTML += `
             <div class="card-mini" onclick="openDetail('${card.id}', '${matchedKey}')" style="cursor:pointer;">
@@ -622,10 +627,9 @@
                     <div>${card.city}</div>
                 </div>
             </div>
-            `;
+        `;
             });
         }
-
         // goToSearchPageが参照する変数をグローバル（関数の外）に用意
         let currentCity = "";
 
@@ -700,11 +704,6 @@
         function closeModal() {
             document.getElementById('modal').style.display = 'none';
         }
-
-        // function changeMonth(diff) {
-        //     currentDisplayDate.setMonth(currentDisplayDate.getMonth() + diff);
-        //     renderCalendar();
-        // }
 
         // スワイプ操作の初期化
         document.addEventListener('DOMContentLoaded', () => {
