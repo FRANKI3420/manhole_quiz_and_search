@@ -569,6 +569,26 @@
             /* タップした瞬間に少し暗くする */
             transform: scale(0.98);
         }
+
+        /* 紙吹雪のスタイル */
+        .confetti {
+            position: fixed;
+            width: 8px;
+            height: 8px;
+            background-color: var(--accent);
+            top: -10px;
+            user-select: none;
+            pointer-events: none;
+            z-index: 9999;
+            border-radius: 2px;
+            animation: fall linear forwards;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(720deg);
+            }
+        }
     </style>
 </head>
 
@@ -817,27 +837,40 @@
         // 全体統計の更新
         function updateStats() {
             const total = masterData.length;
-            const collectedCards = Object.values(userStats).filter(s => s.collected);
-            const collectedCount = collectedCards.length;
-            const datedCount = collectedCards.filter(s => s.date && s.date !== "").length;
+            const collectedCards = masterData.filter(card => {
+                const fullKey = `${card.city} (${card.id})`;
+                // ID付きキー、または市区町村名のみのキー、どちらかで取得済みかチェック
+                const stat = userStats[fullKey] || userStats[card.city];
+                return stat && stat.collected;
+            });
 
+            const collectedCount = collectedCards.length;
+
+            // 日付が登録されているものを抽出
+            const datedCount = collectedCards.filter(card => {
+                const fullKey = `${card.city} (${card.id})`;
+                const stat = userStats[fullKey] || userStats[card.city];
+                return stat && stat.date && stat.date !== "";
+            }).length;
+
+            // --- 以下、計算と表示処理 ---
             const collectRate = total > 0 ? Math.round((collectedCount / total) * 100) : 0;
             const dateRate = collectedCount > 0 ? Math.round((datedCount / collectedCount) * 100) : 0;
 
             const statsText = document.querySelector('.stats-text');
             if (statsText) {
                 statsText.innerHTML = `
-                        <div style="display:flex; flex-direction:column; align-items:center; gap:2px;">
-                            <div>
-                                <span style="color: #4dabff; font-size: 1.1em;">${collectedCount}</span> / <span>${total}</span> 
-                                <small>収集</small>
-                                <span class="rate-badge" style="margin-left:8px;">収集率: ${collectRate}%</span>
-                            </div>
-                            <div style="font-size: 11px; color: #ffc107; margin-top: 2px;">
-                                日付登録済み: ${datedCount}枚 (登録率: ${dateRate}%)
-                            </div>
-                        </div>
-                    `;
+            <div style="display:flex; flex-direction:column; align-items:center; gap:2px;">
+                <div>
+                    <span style="color: #4dabff; font-size: 1.1em;">${collectedCount}</span> / <span>${total}</span> 
+                    <small>収集</small>
+                    <span class="rate-badge" style="margin-left:8px;">収集率: ${collectRate}%</span>
+                </div>
+                <div style="font-size: 11px; color: #ffc107; margin-top: 2px;">
+                    日付登録済み: ${datedCount}枚 (登録率: ${dateRate}%)
+                </div>
+            </div>
+        `;
             }
             document.getElementById('totalProgress').style.width = collectRate + '%';
             document.getElementById('dateProgress').style.width = dateRate + '%';
@@ -1164,16 +1197,24 @@
             document.getElementById('modal').style.display = 'flex';
         }
 
-        // 取得・更新ボタンを押したとき
         function toggleCollect() {
             const dateVal = document.getElementById('collectDate').value;
-            const memoVal = document.getElementById('memoInput').value; // ★メモを取得
+            const memoVal = document.getElementById('memoInput').value;
+
+            // ★ 1. 保存前に「既に持っているか」をチェックしておく
+            const isAlreadyCollected = userStats[currentCity] && userStats[currentCity].collected;
 
             userStats[currentCity] = {
                 collected: true,
                 date: dateVal,
-                memo: memoVal // ★メモを保存
+                memo: memoVal
             };
+
+            // ★ 2. 今回初めて「取得」になった場合だけ紙吹雪を降らせる
+            if (!isAlreadyCollected) {
+                celebrate();
+            }
+
             saveAndRefresh();
         }
 
@@ -1188,7 +1229,7 @@
             localStorage.setItem('manhole_collection', JSON.stringify(userStats));
             updateStats();
             renderCollection();
-            closeModal();
+            setTimeout(() => closeModal(), 600);
             updatePrefStats(); // ★追加：都道府県別統計も更新
             updateEditionStats(); // ★追加：弾数別統計も更新
         }
@@ -1443,6 +1484,27 @@
                 filterSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         }
+
+        function celebrate() {
+            const colors = ['#4dabff', '#ffc107', '#28a745', '#ffffff'];
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+
+                // ランダムな設定
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDuration = (Math.random() * 2 + 1) + 's';
+                confetti.style.opacity = Math.random();
+                confetti.style.width = confetti.style.height = (Math.random() * 10 + 5) + 'px';
+
+                document.body.appendChild(confetti);
+
+                // アニメーション終了後に削除
+                setTimeout(() => confetti.remove(), 3000);
+            }
+        }
+
 
     </script>
 </body>
