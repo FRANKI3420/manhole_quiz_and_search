@@ -161,9 +161,10 @@
 
         .bar-fill {
             height: 100%;
-            display: block;
-            transition: width 0.8s ease-out;
-            border-radius: 5px;
+            border-radius: 8px;
+            transition: width 0.3s ease;
+            background-color: #555 !important;
+            /* デフォルトはグレー */
         }
 
         /* 4. 県別リスト（オープン時） */
@@ -214,6 +215,80 @@
             border: 1px solid var(--accent);
             border-radius: 6px;
         }
+
+        /* 日本地図のコンテナ */
+        .map-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background: #1e1e1e;
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid #333;
+        }
+
+        /* SVG内の各都道府県（path要素）の基本スタイル */
+        .map-pref {
+            fill: #333333;
+            /* 初期状態（未取得）はダークグレー */
+            stroke: #1e1e1e;
+            /* 都道府県の境界線 */
+            stroke-width: 1;
+            transition: fill 0.3s ease, opacity 0.2s;
+            cursor: pointer;
+        }
+
+        /* マウスを乗せたときに少し明るくする */
+        .map-pref:hover {
+            opacity: 0.8;
+        }
+
+        /* 都道府県名ポップアップ（簡易的なツールチップ表示用スタイル） */
+        .map-container svg text {
+            fill: #fff;
+            font-size: 10px;
+            font-weight: bold;
+            pointer-events: none;
+            /* テキストがマウスイベントを邪魔しないように */
+        }
+
+        /* コンプリートした都道府県（黄金グラデーション） */
+        .map-pref.complete {
+            fill: url(#goldGradient) !important;
+            /* JavaScriptからこのグラデーションを指定します */
+            filter: drop-shadow(0px 0px 8px rgba(255, 215, 0, 0.9));
+            /* ★周りを金色に光らせる */
+            stroke: #fff;
+            /* 境界線を白にして輪郭をクッキリさせる */
+            stroke-width: 1.5;
+            z-index: 2;
+            /* 手前に出す */
+        }
+
+        /* 既存の map-pref の hover を少し調整（コンプリート時は透過させない） */
+        .map-pref:not(.complete):hover {
+            opacity: 0.8;
+        }
+
+        .map-pref.complete:hover {
+            filter: drop-shadow(0px 0px 15px rgba(255, 223, 0, 1));
+            /* ホバーでさらに輝く */
+        }
+
+        /* 弾数のコンプリート要素にも光彩を適用 */
+        .pref-item.complete,
+        .region-container.complete {
+            filter: drop-shadow(0px 0px 6px rgba(255, 215, 0, 0.6));
+            border-color: rgba(255, 215, 0, 0.4) !important;
+        }
+
+        /* ★100%コンプリート時のデザインをCSSで完全に固定する */
+        .bar-fill.gold-complete {
+            background-color: #ffc107 !important;
+            /* グラデーションが効かない時の保険（鮮やかな黄色） */
+            background: linear-gradient(135deg, #ffe066 0%, #f5b041 50%, #b7791f 100%) !important;
+            /* CSSネイティブの美しい金グラデーション */
+            box-shadow: 0 0 8px rgba(245, 176, 65, 0.5);
+        }
     </style>
 </head>
 
@@ -225,6 +300,76 @@
         <a href="collection.html" class="back-btn">図鑑 →</a>
     </div>
 
+    <div class="map-container">
+        <div style="text-align: center; margin-bottom: 10px; font-weight: bold; color: #aaa; font-size: 14px;">
+            🗺️ 獲得エリアマップ
+        </div>
+        <svg viewBox="-50 0 550 400" width="100%" height="100%">
+            <defs>
+                <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#fff3a1" /> /* 明るい金 */
+                    <stop offset="50%" stop-color="#ffd700" /> /* ゴールド */
+                    <stop offset="100%" stop-color="#b8860b" /> /* 深みのある金 */
+                </linearGradient>
+            </defs>
+
+            <path id="map-北海道" class="map-pref" d="M 380 20 h 50 v 40 h -50 z" onclick="selectPrefFromStats('北海道')" />
+            <path id="map-青森県" class="map-pref" d="M 380 70 h 50 v 30 h -50 z" onclick="selectPrefFromStats('青森県')" />
+            <path id="map-秋田県" class="map-pref" d="M 380 105 h 22 v 30 h -22 z" onclick="selectPrefFromStats('秋田県')" />
+            <path id="map-岩手県" class="map-pref" d="M 405 105 h 25 v 30 h -25 z" onclick="selectPrefFromStats('岩手県')" />
+            <path id="map-山形県" class="map-pref" d="M 380 140 h 22 v 30 h -22 z" onclick="selectPrefFromStats('山形県')" />
+            <path id="map-福島県" class="map-pref" d="M 405 140 h 25 v 30 h -25 z" onclick="selectPrefFromStats('福島県')" />
+
+            <path id="map-群馬県" class="map-pref" d="M 350 175 h 25 v 25 h -25 z" onclick="selectPrefFromStats('群馬県')" />
+            <path id="map-栃木県" class="map-pref" d="M 380 175 h 25 v 25 h -25 z" onclick="selectPrefFromStats('栃木県')" />
+            <path id="map-茨城県" class="map-pref" d="M 410 175 h 25 v 55 h -25 z" onclick="selectPrefFromStats('茨城県')" />
+            <path id="map-埼玉県" class="map-pref" d="M 350 205 h 25 v 25 h -25 z" onclick="selectPrefFromStats('埼玉県')" />
+            <path id="map-千葉県" class="map-pref" d="M 380 205 h 25 v 55 h -25 z" onclick="selectPrefFromStats('千葉県')" />
+            <path id="map-東京都" class="map-pref" d="M 350 235 h 25 v 25 h -25 z" onclick="selectPrefFromStats('東京都')" />
+            <path id="map-神奈川県" class="map-pref" d="M 350 265 h 55 v 25 h -55 z"
+                onclick="selectPrefFromStats('神奈川県')" />
+
+            <path id="map-新潟県" class="map-pref" d="M 320 140 h 55 v 30 h -55 z" onclick="selectPrefFromStats('新潟県')" />
+            <path id="map-富山県" class="map-pref" d="M 290 175 h 25 v 25 h -25 z" onclick="selectPrefFromStats('富山県')" />
+            <path id="map-石川県" class="map-pref" d="M 260 175 h 25 v 25 h -25 z" onclick="selectPrefFromStats('石川県')" />
+            <path id="map-福井県" class="map-pref" d="M 230 205 h 25 v 25 h -25 z" onclick="selectPrefFromStats('福井県')" />
+            <path id="map-長野県" class="map-pref" d="M 320 175 h 25 v 55 h -25 z" onclick="selectPrefFromStats('長野県')" />
+            <path id="map-山梨県" class="map-pref" d="M 320 235 h 25 v 25 h -25 z" onclick="selectPrefFromStats('山梨県')" />
+            <path id="map-岐阜県" class="map-pref" d="M 260 205 h 55 v 25 h -55 z" onclick="selectPrefFromStats('岐阜県')" />
+            <path id="map-静岡県" class="map-pref" d="M 290 265 h 55 v 25 h -55 z" onclick="selectPrefFromStats('静岡県')" />
+            <path id="map-愛知県" class="map-pref" d="M 260 235 h 55 v 25 h -55 z" onclick="selectPrefFromStats('愛知県')" />
+
+            <path id="map-滋賀県" class="map-pref" d="M 200 205 h 25 v 25 h -25 z" onclick="selectPrefFromStats('滋賀県')" />
+            <path id="map-三重県" class="map-pref" d="M 200 235 h 25 v 55 h -25 z" onclick="selectPrefFromStats('三重県')" />
+            <path id="map-京都府" class="map-pref" d="M 170 205 h 25 v 25 h -25 z" onclick="selectPrefFromStats('京都府')" />
+            <path id="map-兵庫県" class="map-pref" d="M 140 205 h 25 v 55 h -25 z" onclick="selectPrefFromStats('兵庫県')" />
+            <path id="map-大阪府" class="map-pref" d="M 170 235 h 25 v 25 h -25 z" onclick="selectPrefFromStats('大阪府')" />
+            <path id="map-奈良県" class="map-pref" d="M 170 265 h 25 v 25 h -25 z" onclick="selectPrefFromStats('奈良県')" />
+            <path id="map-和歌山県" class="map-pref" d="M 170 295 h 55 v 25 h -55 z"
+                onclick="selectPrefFromStats('和歌山県')" />
+
+            <path id="map-鳥取県" class="map-pref" d="M 110 205 h 25 v 25 h -25 z" onclick="selectPrefFromStats('鳥取県')" />
+            <path id="map-島根県" class="map-pref" d="M 80 205 h 30 v 25 h -30 z" onclick="selectPrefFromStats('島根県')" />
+            <path id="map-岡山県" class="map-pref" d="M 110 235 h 25 v 25 h -25 z" onclick="selectPrefFromStats('岡山県')" />
+            <path id="map-広島県" class="map-pref" d="M 80 235 h 30 v 25 h -30 z" onclick="selectPrefFromStats('広島県')" />
+            <path id="map-山口県" class="map-pref" d="M 50 220 h 25 v 40 h -25 z" onclick="selectPrefFromStats('山口県')" />
+            <path id="map-香川県" class="map-pref" d="M 110 275 h 25 v 20 h -25 z" onclick="selectPrefFromStats('香川県')" />
+            <path id="map-愛媛県" class="map-pref" d="M 80 275 h 30 v 20 h -30 z" onclick="selectPrefFromStats('愛媛県')" />
+            <path id="map-徳島県" class="map-pref" d="M 110 300 h 25 v 25 h -25 z" onclick="selectPrefFromStats('徳島県')" />
+            <path id="map-高知県" class="map-pref" d="M 80 300 h 30 v 25 h -30 z" onclick="selectPrefFromStats('高知県')" />
+
+            <path id="map-福岡県" class="map-pref" d="M 20 275 h 25 v 25 h -25 z" onclick="selectPrefFromStats('福岡県')" />
+            <path id="map-佐賀県" class="map-pref" d="M -5 275 h 20 v 25 h -20 z" onclick="selectPrefFromStats('佐賀県')" />
+            <path id="map-長崎県" class="map-pref" d="M -30 275 h 20 v 40 h -20 z" onclick="selectPrefFromStats('長崎県')" />
+            <path id="map-大分県" class="map-pref" d="M 20 305 h 25 v 25 h -25 z" onclick="selectPrefFromStats('大分県')" />
+            <path id="map-熊本県" class="map-pref" d="M -5 305 h 20 v 35 h -20 z" onclick="selectPrefFromStats('熊本県')" />
+            <path id="map-宮崎県" class="map-pref" d="M 20 335 h 25 v 35 h -25 z" onclick="selectPrefFromStats('宮崎県')" />
+            <path id="map-鹿児島県" class="map-pref" d="M -15 345 h 30 v 35 h -30 z"
+                onclick="selectPrefFromStats('鹿児島県')" />
+            <path id="map-沖縄県" class="map-pref" d="M -30 390 h 40 v 10 h -40 z" onclick="selectPrefFromStats('沖縄県')" />
+        </svg>
+    </div>
+
     <div id="prefStatsContainer">
         <div class="stats-title">
             <span>都道府県別 制覇率</span>
@@ -233,10 +378,18 @@
         <div id="prefStatsGrid" class="pref-grid"></div>
     </div>
 
+    <div id="editionStatsContainer" class="stats-container"
+        style="background: #1e1e1e; padding: 15px; border-radius: 12px; border: 1px solid #333; margin-top: 20px;">
+        <div class="stats-title" style="margin-bottom: 15px;">
+            <span>弾数別 制覇率</span>
+        </div>
+        <div id="editionStatsGrid"></div>
+    </div>
+
     <div class="chart-header"
         style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
         <h2 id="chartTitle" style="margin: 0;">全国の収集推移</h2>
-        <button id="resetFilterBtn" onclick="selectPrefFromStats(currentFilterPref)"
+        <button id="resetFilterBtn" onclick="resetAllFilters()"
             style="display: none; background: #444; color: #fff; border: 1px solid #666; padding: 5px 12px; border-radius: 20px; font-size: 12px; cursor: pointer;">
             全記録を表示
         </button>
@@ -259,33 +412,46 @@
         <canvas id="historyChart" width="1200" height="300"></canvas>
     </div>
 
+
+
     <script>
         const userStats = JSON.parse(localStorage.getItem('manhole_collection')) || {};
         let monthPositions = []; // スクロール検知用
 
         let currentFilterPref = null; // nullなら全国、文字列（"東京都"など）ならその県のみ
+        let currentFilterEdition = null; // nullなら全弾、文字列（"第1弾"など）ならその弾のみ
 
         function initChart() {
             const canvas = document.getElementById('historyChart');
             const ctx = canvas.getContext('2d');
 
-            // --- 【修正】フィルタリングロジックの追加 ---
+            // --- 【修正】マスタデータをベースにした安全な集計ロジック ---
             const dataMap = {};
             const yearDataMap = {};
             let grandTotal = 0;
             let validDates = [];
 
-            // userStatsのキー（"千代田区 (13-101)"など）と値をペアで回す
-            Object.entries(userStats).forEach(([key, stat]) => {
-                if (stat.collected && stat.date) {
-                    // 県別フィルタが有効な場合、masterDataからそのカードの県を確認
-                    if (currentFilterPref) {
-                        const card = masterData.find(m => `${m.city} (${m.id})` === key || m.city === key);
-                        if (!card || card.pref !== currentFilterPref) return; // 一致しなければスキップ
+            // 重複カウントを防ぐため、masterData（全カードマスタ）をベースに回す
+            masterData.forEach(card => {
+                const fullKey = `${card.city} (${card.id})`;
+                // 正しいID付きキー、または古い市区町村名のみのキーのどちらかでデータを取得
+                const stat = userStats[fullKey] || userStats[card.city];
+
+                // 取得済みであり、かつ日付が入力されている場合のみカウント
+                if (stat && stat.collected && stat.date) {
+
+                    // 都道府県フィルタが有効な場合、一致しなければスキップ
+                    if (currentFilterPref && card.pref !== currentFilterPref) {
+                        return;
                     }
 
-                    const monthKey = stat.date.substring(0, 7);
-                    const yearKey = stat.date.substring(0, 4);
+                    // ★【追加】弾数フィルタが有効な場合、一致しなければスキップ
+                    if (currentFilterEdition && card.edition !== currentFilterEdition) {
+                        return;
+                    }
+
+                    const monthKey = stat.date.substring(0, 7); // "YYYY-MM"
+                    const yearKey = stat.date.substring(0, 4);  // "YYYY"
 
                     dataMap[monthKey] = (dataMap[monthKey] || 0) + 1;
                     yearDataMap[yearKey] = (yearDataMap[yearKey] || 0) + 1;
@@ -299,14 +465,26 @@
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 ctx.fillStyle = "#888";
                 ctx.textAlign = "center";
-                ctx.fillText(currentFilterPref ? `${currentFilterPref}のデータはありません` : "記録がありません", canvas.width / 2, canvas.height / 2);
+                ctx.font = "14px sans-serif";
+
+                // ★【修正】弾数フィルタにも対応したデータなしテキスト
+                let noDataText = "記録がありません";
+                if (currentFilterPref && currentFilterEdition) {
+                    noDataText = `${currentFilterPref}の${currentFilterEdition}のデータはありません`;
+                } else if (currentFilterPref) {
+                    noDataText = `${currentFilterPref}のデータはありません`;
+                } else if (currentFilterEdition) {
+                    noDataText = `${currentFilterEdition}のデータはありません`;
+                }
+
+                ctx.fillText(noDataText, canvas.width / 2, canvas.height / 2);
                 document.getElementById('totalCount').textContent = 0;
-                document.getElementById('avgCount').textContent = 0;
+                document.getElementById('yearTotalCount').textContent = 0;
+                document.getElementById('avgCount').textContent = "-";
                 return;
             }
 
-            // --- 月リストの作成（全国と県別で期間を合わせるならそのまま、その県だけに絞るならvalidDatesを使う） ---
-            // ここでは「最初の取得から今月まで」の軸を維持します
+            // --- 月リストの作成 ---
             const sortedDates = validDates.sort();
             const firstDate = new Date(sortedDates[0]);
             const now = new Date();
@@ -320,17 +498,21 @@
             const counts = months.map(m => dataMap[m] || 0);
             const maxCount = Math.max(...counts, 1);
 
-            // 統計表示の更新
-            // --- 統計表示の更新セクション ---
             // --- 統計表示の更新セクション ---
             const resetBtn = document.getElementById('resetFilterBtn');
             const avgBox = document.getElementById('avgCount').closest('.stat-box');
             const titleElem = document.getElementById('chartTitle');
 
-            if (currentFilterPref) {
-                // 【都道府県を選択中】
-                titleElem.textContent = `${currentFilterPref}の収集推移`;
-                resetBtn.style.display = "block";
+            // ★【修正】都道府県、または弾数が選択されている場合の判定
+            if (currentFilterPref || currentFilterEdition) {
+                if (titleElem) {
+                    if (currentFilterPref && currentFilterEdition) {
+                        titleElem.textContent = `${currentFilterPref} (${currentFilterEdition}) の収集推移`;
+                    } else {
+                        titleElem.textContent = currentFilterPref ? `${currentFilterPref}の収集推移` : `${currentFilterEdition}の収集推移`;
+                    }
+                }
+                if (resetBtn) resetBtn.style.display = "block";
 
                 // 「月平均」のみ無効化（半透明）
                 avgBox.style.opacity = "0.2";
@@ -338,8 +520,8 @@
                 document.getElementById('avgCount').textContent = "-";
             } else {
                 // 【全国表示】
-                titleElem.textContent = "全国の収集推移";
-                resetBtn.style.display = "none";
+                if (titleElem) titleElem.textContent = "全国の収集推移";
+                if (resetBtn) resetBtn.style.display = "none";
 
                 // 「月平均」を通常表示に戻す
                 avgBox.style.opacity = "1";
@@ -369,11 +551,9 @@
 
             // --- 背景のグリッド（横線）を描画 ---
             ctx.save();
-            ctx.strokeStyle = "rgba(255, 255, 255, 0.05)"; // 非常に薄い白
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.05)";
             ctx.lineWidth = 1;
 
-            // 目盛りを何枚ごとに入れるか（最大値によって調整）
-            // 例：maxCountが10なら2枚ごと、50なら10枚ごとなど
             const gridStep = maxCount > 10 ? 5 : 2;
 
             for (let i = 0; i <= maxCount; i += gridStep) {
@@ -381,11 +561,10 @@
                 const y = canvas.height - padding - h;
 
                 ctx.beginPath();
-                ctx.moveTo(padding - 20, y); // 少し左側から開始
-                ctx.lineTo(canvas.width - padding + 20, y); // 右端まで
+                ctx.moveTo(padding - 20, y);
+                ctx.lineTo(canvas.width - padding + 20, y);
                 ctx.stroke();
 
-                // 左端にうっすら目盛りの数字を入れる（任意）
                 ctx.fillStyle = "rgba(255, 255, 255, 0.2)";
                 ctx.font = "10px sans-serif";
                 ctx.textAlign = "right";
@@ -397,63 +576,51 @@
                 const year = m.split('-')[0];
                 const x = padding + i * stepX;
 
-                // スクロール判定用に各月の中心X座標を保存
                 monthPositions.push({ x: x + barW / 2, year: year, fullMonth: m });
-                // --- 背景の塗り分け（コントラスト強化） ---
+
                 // --- 背景の年別グラデーション描画 ---
                 if (year !== lastYear) {
-                    // 1. その年が何ヶ月分あるか計算（背景の幅を決めるため）
                     const monthsInYear = months.filter(mon => mon.startsWith(year)).length;
                     const bgWidth = monthsInYear * stepX;
-
-                    // 2. グラデーションの作成（上から下へ、または斜めに）
-                    // 例：上部が少し明るく、下部が背景に溶け込むような色
                     const bgGrad = ctx.createLinearGradient(x, 0, x, canvas.height);
 
                     if (parseInt(year) % 2 === 0) {
-                        // 偶数年：落ち着いたネイビー系のグラデーション
-                        bgGrad.addColorStop(0, 'rgba(77, 171, 255, 0.12)'); // 上部：アクセントカラーの薄塗り
-                        bgGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');         // 下部：透明に溶ける
+                        bgGrad.addColorStop(0, 'rgba(77, 171, 255, 0.12)');
+                        bgGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
                     } else {
-                        // 奇数年：少し暖かみのある、または別のトーン
-                        bgGrad.addColorStop(0, 'rgba(255, 255, 255, 0.05)'); // 上部：微かな白
-                        bgGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');          // 下部：透明
+                        bgGrad.addColorStop(0, 'rgba(255, 255, 255, 0.05)');
+                        bgGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
                     }
 
-                    // 3. 背景の塗りつぶし
                     ctx.fillStyle = bgGrad;
-                    // 棒の間隔（stepX）の半分だけ左にずらして、月から月の間をきれいに埋める
                     ctx.fillRect(x - (stepX - barW) / 2, 0, bgWidth, canvas.height);
 
-                    // 4. 年ラベル（2025年など）のデザイン
                     ctx.fillStyle = "rgba(77, 171, 255, 0.8)";
                     ctx.font = 'bold 20px sans-serif';
                     ctx.textAlign = 'left';
                     ctx.fillText(year + '年', x, 35);
 
-                    // 5. 境界線のデザイン（点線や細い線）
                     ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
                     ctx.lineWidth = 1;
-                    ctx.setLineDash([5, 5]); // 点線にする
+                    ctx.setLineDash([5, 5]);
                     ctx.beginPath();
                     ctx.moveTo(x - (stepX - barW) / 2, 45);
                     ctx.lineTo(x - (stepX - barW) / 2, canvas.height - 50);
                     ctx.stroke();
-                    ctx.setLineDash([]); // 点線をリセット
+                    ctx.setLineDash([]);
 
                     lastYear = year;
                 }
 
-                // --- 1. 軸ラベル（〇月）の描画：データが0でも常に表示 ---
+                // --- 軸ラベル（〇月）の描画 ---
                 ctx.save();
-                ctx.fillStyle = "#aaa"; // グレーで見やすく
+                ctx.fillStyle = "#aaa";
                 ctx.font = '11px sans-serif';
                 ctx.textAlign = 'center';
-                // y座標は canvas.height - 40 あたりに固定
                 ctx.fillText(parseInt(m.split('-')[1]) + '月', x + barW / 2, canvas.height - 40);
                 ctx.restore();
 
-                // --- 2. 棒グラフと枚数の描画：データがある時のみ ---
+                // --- 棒グラフと枚数の描画 ---
                 const val = counts[i];
                 const h = (val / maxCount) * chartH;
                 const y = canvas.height - padding - h;
@@ -461,9 +628,9 @@
                 if (val > 0) {
                     ctx.save();
 
-                    // グラデーションと光彩の設定
                     const grad = ctx.createLinearGradient(0, y + h, 0, y);
-                    if (currentFilterPref) {
+                    // ★【修正】都道府県、または弾数フィルタがかかっているときは発光させる
+                    if (currentFilterPref || currentFilterEdition) {
                         grad.addColorStop(0, '#2a82d2');
                         grad.addColorStop(1, '#81c7ff');
                         ctx.shadowColor = 'rgba(77, 171, 255, 0.8)';
@@ -474,17 +641,14 @@
                         ctx.shadowBlur = 0;
                     }
 
-                    // 棒を描画
                     ctx.fillStyle = grad;
                     ctx.beginPath();
                     ctx.roundRect(x, y, barW, h, [8, 8, 0, 0]);
                     ctx.fill();
 
-                    // テキスト用にシャドウをオフ
                     ctx.shadowBlur = 0;
                     ctx.shadowColor = 'transparent';
 
-                    // 棒の上の枚数を表示
                     ctx.fillStyle = "#ffffff";
                     ctx.font = 'bold 13px sans-serif';
                     ctx.textAlign = 'center';
@@ -492,7 +656,6 @@
 
                     ctx.restore();
                 } else {
-                    // データが0の月：薄い土台だけ表示（お好みで）
                     ctx.fillStyle = "rgba(255, 255, 255, 0.05)";
                     ctx.beginPath();
                     ctx.roundRect(x, canvas.height - padding - 2, barW, 2, [1, 1, 0, 0]);
@@ -500,29 +663,21 @@
                 }
             });
 
+            // クリックイベント
             canvas.onclick = (e) => {
                 const rect = canvas.getBoundingClientRect();
-                // 画面上のクリック位置を、Canvas内部の座標スケールに変換
                 const scaleX = canvas.width / rect.width;
                 const clickX = (e.clientX - rect.left) * scaleX;
-
-                // クリックした位置(X)に最も近い月データを特定
-                // 許容範囲を30pxとして、タップした棒を探す
                 const target = monthPositions.find(p => Math.abs(p.x - clickX) < 30);
 
                 if (target) {
-                    console.log("ジャンプします:", target.fullMonth);
-                    // ファイル名を calender.html に修正
                     window.location.href = `calender.html?target=${target.fullMonth}`;
-                } else {
-                    console.log("棒のない場所がタップされました");
                 }
             };
 
-            // スクロールイベントの登録
+            // スクロールイベント
             const container = document.querySelector('.chart-container');
-            container.addEventListener('scroll', () => {
-                // 画面中央にある棒の年を特定する
+            container.onscroll = () => {
                 const centerX = container.scrollLeft + (container.clientWidth / 2);
                 const currentData = monthPositions.find(p => p.x > centerX) || monthPositions[monthPositions.length - 1];
 
@@ -531,17 +686,34 @@
                     document.getElementById('targetYearDisplay').textContent = y;
                     document.getElementById('yearTotalCount').textContent = yearDataMap[y] || 0;
                 }
+            };
+
+            // 初回スクロール（最新の年へ）
+            if (!container.dataset.scrolled) {
+                setTimeout(() => {
+                    container.scrollLeft = container.scrollWidth;
+                    const latestYear = months[months.length - 1].split('-')[0];
+                    document.getElementById('targetYearDisplay').textContent = latestYear;
+                    document.getElementById('yearTotalCount').textContent = yearDataMap[latestYear] || 0;
+                    container.dataset.scrolled = "true";
+                }, 150);
+            }
+        }
+
+        function resetAllFilters() {
+            // 1. 内部の状態管理変数を初期化
+            currentFilterPref = null;
+            currentFilterEdition = null;
+
+            // 2. 都道府県と弾数の一覧UIから、選択中ハイライト（active-filterクラス）をすべて外す
+            document.querySelectorAll('.pref-item').forEach(item => {
+                item.classList.remove('active-filter');
             });
 
-            // 初回表示（最新の年を表示）
-            setTimeout(() => {
-                container.scrollLeft = container.scrollWidth;
-                const latestYear = months[months.length - 1].split('-')[0];
-                document.getElementById('targetYearDisplay').textContent = latestYear;
-                document.getElementById('yearTotalCount').textContent = yearDataMap[latestYear] || 0;
-            }, 150);
+            // 3. グラフを全国・全弾のデータで再描画
+            initChart();
 
-            updatePrefStats();
+            console.log("すべてのフィルタを解除しました");
         }
 
         // --- 1. 都道府県クリック時の関数 ---
@@ -582,14 +754,56 @@
         fetch('master_data.json').then(res => res.json()).then(data => {
             masterData = data;
             updatePrefStats();
+            updateEditionStats();
         });
 
+        // =========================================================
+        // 【共通化】取得率に応じた進捗バーのスタイル判定
+        // ポケモン仕様（緑・黄・赤）＋ 進捗に応じた濃淡（パターン1）
+        // =========================================================
+        function getGaugeStyle(collected, total, percent) {
+            let itemStyle = '';
+            let completeClass = '';
 
+            if (collected === 0) {
+                // 0枚：ダークグレー
+                itemStyle = 'background-color: #333333 !important;';
+            } else if (collected === total || percent === 100) {
+                // 100%コンプリート：ゴールド
+                completeClass = 'gold-complete';
+            } else {
+                let hslColor = '';
+
+                if (percent >= 50) {
+                    // 🟢 50%以上：緑（100%に近づくほど、鮮やかで深い緑になる）
+                    const ratio = (percent - 50) / 50;            // 0.0 〜 1.0 の割合に変換
+                    const saturation = Math.floor(55 + (ratio * 25)); // 55% 〜 80% (徐々に鮮やかに)
+                    const lightness = Math.floor(50 - (ratio * 10));  // 50% 〜 40% (徐々に深く)
+                    hslColor = `hsl(130, ${saturation}%, ${lightness}%)`;
+                } else if (percent >= 20) {
+                    // 🟡 20%以上50%未満：黄（50%に近づくほど鮮やかになる）
+                    const ratio = (percent - 20) / 30;            // 0.0 〜 1.0 の割合に変換
+                    const saturation = Math.floor(70 + (ratio * 30)); // 70% 〜 100%
+                    hslColor = `hsl(48, ${saturation}%, 50%)`;
+                } else {
+                    // 🔴 20%未満：赤（0%に近づくほどくすんだ赤、20%に近づくほど鮮やかな赤）
+                    const ratio = percent / 20;                   // 0.0 〜 1.0 の割合に変換
+                    const saturation = Math.floor(55 + (ratio * 30)); // 55% 〜 85%
+                    hslColor = `hsl(0, ${saturation}%, 53%)`;
+                }
+
+                itemStyle = `background-color: ${hslColor} !important;`;
+            }
+
+            return { itemStyle, completeClass };
+        }
+        // ==========================================
+        // 2. 都道府県の統計UI更新
+        // ==========================================
         function updatePrefStats() {
-            const grid = document.getElementById('prefStatsGrid'); // 実際にはContainer全体を書き換え
+            const grid = document.getElementById('prefStatsGrid');
             if (!grid || masterData.length === 0) return;
 
-            // 地方と都道府県の定義
             const regions = {
                 "その他": ["世界", "その他"],
                 "北海道・東北": ["北海道", "青森県", "岩手県", "宮城県", "秋田県", "山形県", "福島県"],
@@ -600,7 +814,6 @@
                 "九州・沖縄": ["福岡県", "佐賀県", "長崎県", "熊本県", "大分県", "宮崎県", "鹿児島県", "沖縄県"]
             };
 
-            // 1. 各都道府県の統計を算出
             const prefStats = {};
             masterData.forEach(card => {
                 if (!prefStats[card.pref]) prefStats[card.pref] = { total: 0, collected: 0 };
@@ -613,7 +826,6 @@
 
             let html = '';
 
-            // 2. 地方ごとに集計してHTML作成
             for (const [regionName, prefs] of Object.entries(regions)) {
                 let rTotal = 0;
                 let rCollected = 0;
@@ -626,41 +838,263 @@
                     rCollected += s.collected;
 
                     const percent = Math.floor((s.collected / s.total) * 100);
-                    const hue = Math.floor(percent * 1.2);
-                    const color = s.collected === s.total ? '#ffc107' : `hsl(${hue}, 70%, 50%)`;
+
+                    // ★共通関数で子要素のスタイル判定
+                    const { itemStyle, completeClass } = getGaugeStyle(s.collected, s.total, percent);
+
                     const isActive = pref === currentFilterPref ? 'active-filter' : '';
                     prefHtml += `
-    <div class="pref-item ${isActive}" onclick="selectPrefFromStats('${pref}')">
-        <div class="pref-info"><span>${pref}</span><span>${s.collected}/${s.total}</span></div>
-        <div class="bar-bg"><div class="bar-fill" style="width:${percent}%; background-color:${color};"></div></div>
-    </div>`;
+            <div class="pref-item ${isActive}" onclick="selectPrefFromStats('${pref}')">
+                <div class="pref-info"><span>${pref}</span><span>${s.collected}/${s.total}</span></div>
+                <div class="bar-bg">
+                    <div class="bar-fill ${completeClass}" style="width: ${percent}%; ${itemStyle}"></div>
+                </div>
+            </div>`;
                 });
 
+                if (rTotal === 0) rTotal = 1;
                 const rPercent = Math.floor((rCollected / rTotal) * 100);
-                const rColor = rCollected === rTotal ? '#ffc107' : `hsl(${Math.floor(rPercent * 1.2)}, 70%, 50%)`;
+
+                // ★共通関数で地方（親ヘッダー）のスタイル判定
+                const { itemStyle: regionStyle, completeClass: rCompleteClass } = getGaugeStyle(rCollected, rTotal, rPercent);
+
+                const safeRegionId = regionName === "その他" ? "other" : regionName;
 
                 html += `
-            <div class="region-container" id="reg-${regionName}">
-                <div class="region-header" onclick="this.parentElement.classList.toggle('open')">
-                    <div class="region-info">
-                        <div class="region-name-row">
-                            <span class="arrow">▶</span> ${regionName}
-                        </div>
-                        <div class="region-percentage-row">
-                            取得率: ${rPercent}% (${rCollected} / ${rTotal})
-                        </div>
+        <div class="region-container" id="reg-${safeRegionId}">
+            <div class="region-header" onclick="this.parentElement.classList.toggle('open')">
+                <div class="region-info">
+                    <div class="region-name-row">
+                        <span class="arrow">▶</span> ${regionName}
                     </div>
-                    <div class="region-gauge-bg">
-                        <div class="bar-fill" style="width:${rPercent}%; background-color:${rColor};"></div>
+                    <div class="region-percentage-row">
+                        取得率: ${rPercent}% (${rCollected} / ${rTotal})
                     </div>
                 </div>
-                <div class="region-content">${prefHtml}</div>
-            </div>`;
+                <div class="region-gauge-bg">
+                    <div class="bar-fill ${rCompleteClass}" style="width: ${rPercent}%; ${regionStyle}"></div>
+                </div>
+            </div>
+            <div class="region-content">${prefHtml}</div>
+        </div>`;
             }
 
             grid.innerHTML = html;
+
+            // 古い星マークが残らないよう、まず一度すべて削除する
+            document.querySelectorAll('.map-star-icon').forEach(el => el.remove());
+
+            masterData.forEach(card => {
+                if (card.pref === "世界" || card.pref === "other" || card.pref === "その他") return;
+                const s = prefStats[card.pref];
+                if (!s) return;
+                const mapEl = document.getElementById(`map-${card.pref}`);
+                if (mapEl) {
+                    const percent = Math.floor((s.collected / s.total) * 100);
+
+                    // 1. 地図の塗りつぶし色判定（ポケモンHPバー風）
+                    if (s.collected === 0) {
+                        mapEl.style.fill = "#333333";
+                    } else if (s.collected === s.total) {
+                        mapEl.style.fill = "url(#goldGradient)";
+                    } else {
+                        if (percent >= 50) {
+                            const ratio = (percent - 50) / 50;
+                            const saturation = Math.floor(55 + (ratio * 25));
+                            const lightness = Math.floor(50 - (ratio * 10));
+                            mapEl.style.fill = `hsl(130, ${saturation}%, ${lightness}%)`;
+                        } else if (percent >= 20) {
+                            const ratio = (percent - 20) / 30;
+                            const saturation = Math.floor(70 + (ratio * 30));
+                            mapEl.style.fill = `hsl(48, ${saturation}%, 50%)`;
+                        } else {
+                            const ratio = percent / 20;
+                            const saturation = Math.floor(55 + (ratio * 30));
+                            mapEl.style.fill = `hsl(0, ${saturation}%, 53%)`;
+                        }
+                    }
+
+                    // 2. ★【追加】100%コンプリート時の星マーク生成ロジック
+                    if (s.collected === s.total && s.total > 0) {
+                        // 都道府県の要素の位置とサイズ（バウンディングボックス）を取得
+                        const bbox = mapEl.getBBox();
+
+                        // 四角形の中心点を計算
+                        const centerX = bbox.x + bbox.width / 2;
+                        const centerY = bbox.y + bbox.height / 2;
+
+                        // SVGのテキスト要素として星マーク（★）を作成
+                        const star = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                        star.setAttribute("class", "map-star-icon");
+                        star.setAttribute("x", centerX);
+                        // テキストの基準点が下部にあるため、少しだけ下にずらす（+4〜+5px程度が綺麗に中央にハマります）
+                        star.setAttribute("y", centerY + 4);
+                        star.setAttribute("text-anchor", "middle"); // 横方向の中央揃え
+                        star.textContent = "★";
+
+                        // ゴールドの地図上で目立つようにスタイルを設定（白ベースにゴールドの影など）
+                        star.style.cssText = `
+                    font-size: 12px;
+                    font-weight: bold;
+                   fill: red; 
+                   stroke: #000;
+                    stroke-width: 0.5px;
+                    pointer-events: none; /* 星マークが邪魔で都道府県がクリックできなくなるのを防ぐ */
+                `;
+
+                        // 地図SVG要素（mapElの親要素など）に星を追加
+                        mapEl.parentElement.appendChild(star);
+                    }
+                }
+            });
         }
 
+        // ==========================================
+        // 3. 弾数の統計UI更新
+        // ==========================================
+        function updateEditionStats() {
+            const grid = document.getElementById('editionStatsGrid');
+            if (!grid || masterData.length === 0) return;
+
+            const edStats = {};
+            let maxEdNum = 0;
+
+            masterData.forEach(card => {
+                const edNum = parseInt(card.edition.replace(/[^0-9]/g, ''));
+                if (isNaN(edNum)) return;
+                if (edNum > maxEdNum) maxEdNum = edNum;
+
+                const edStr = card.edition;
+                if (!edStats[edStr]) {
+                    edStats[edStr] = { total: 0, collected: 0, num: edNum };
+                }
+                edStats[edStr].total++;
+                if (userStats[card.city]?.collected) {
+                    edStats[edStr].collected++;
+                }
+            });
+
+            const sortedEditions = Object.keys(edStats).sort((a, b) => edStats[a].num - edStats[b].num);
+
+            const groups = {};
+            sortedEditions.forEach(edStr => {
+                const num = edStats[edStr].num;
+                const groupIndex = Math.floor((num - 1) / 5);
+                const start = groupIndex * 5 + 1;
+                let end = (groupIndex + 1) * 5;
+                if (end > maxEdNum) end = maxEdNum;
+
+                const groupName = start === end ? `第${start}弾` : `第${start}弾 〜 第${end}弾`;
+                if (!groups[groupName]) groups[groupName] = [];
+                groups[groupName].push(edStr);
+            });
+
+            let html = '';
+
+            Object.keys(groups).sort((a, b) => {
+                return parseInt(a.replace(/[^0-9]/g, '')) - parseInt(b.replace(/[^0-9]/g, ''));
+            }).forEach(groupName => {
+                const eds = groups[groupName];
+                let gTotal = 0;
+                let gCollected = 0;
+                let edHtml = '';
+
+                eds.forEach(edStr => {
+                    const s = edStats[edStr];
+                    gTotal += s.total;
+                    gCollected += s.collected;
+                    const percent = Math.floor((s.collected / s.total) * 100);
+
+                    // ★共通関数で弾数子要素のスタイル判定
+                    const { itemStyle: edItemStyle, completeClass } = getGaugeStyle(s.collected, s.total, percent);
+
+                    // ★【修正】現在選択中の弾数なら active-filter クラスを付与
+                    const isActive = (edStr === currentFilterEdition) ? 'active-filter' : '';
+
+                    edHtml += `
+            <div class="pref-item ${isActive}" onclick="selectEditionFromStats('${edStr}')" style="cursor: pointer;">
+                <div class="pref-info"><span>${edStr}</span><span>${s.collected}/${s.total}</span></div>
+                <div class="bar-bg">
+                    <div class="bar-fill ${completeClass}" style="width: ${percent}%; ${edItemStyle}"></div>
+                </div>
+            </div>`;
+                });
+
+                if (gTotal === 0) gTotal = 1;
+                const gPercent = Math.floor((gCollected / gTotal) * 100);
+
+                // ★共通関数で弾数親グループのスタイル判定
+                const { itemStyle: edGroupStyle, completeClass: gCompleteClass } = getGaugeStyle(gCollected, gTotal, gPercent);
+
+                html += `
+        <div class="region-container" id="ed-group-${groupName}">
+            <div class="region-header" onclick="this.parentElement.classList.toggle('open')">
+                <div class="region-info">
+                    <div class="region-name-row">
+                        <span class="arrow">▶</span> ${groupName}
+                    </div>
+                    <div class="region-percentage-row">
+                        取得率: ${gPercent}% (${gCollected} / ${gTotal})
+                    </div>
+                </div>
+                <div class="region-gauge-bg">
+                    <div class="bar-fill ${gCompleteClass}" style="width: ${gPercent}%; ${edGroupStyle}"></div>
+                </div>
+            </div>
+            <div class="region-content">${edHtml}</div>
+        </div>`;
+            });
+
+            grid.innerHTML = html;
+        }
+        // 統計から弾数をタップした時のフィルタ連動（グラフ絞り込み＆トグル＆スクロール）
+        function selectEditionFromStats(edStr) {
+            // 同じ弾数をもう一度タップしたら「全弾」に戻す（トグル機能）
+            if (currentFilterEdition === edStr) {
+                currentFilterEdition = null;
+                console.log("フィルタ解除: 全弾を表示");
+            } else {
+                currentFilterEdition = edStr;
+                console.log("フィルタ適用:", edStr);
+            }
+
+            // グラフタイトルの更新（都道府県の選択状態も考慮）
+            const titleElem = document.getElementById('chartTitle') || document.querySelector('h2');
+            if (titleElem) {
+                if (currentFilterPref && currentFilterEdition) {
+                    titleElem.textContent = `${currentFilterPref} (${currentFilterEdition}) の収集推移`;
+                } else if (currentFilterPref) {
+                    titleElem.textContent = `${currentFilterPref}の収集推移`;
+                } else if (currentFilterEdition) {
+                    titleElem.textContent = `${currentFilterEdition}の収集推移`;
+                } else {
+                    titleElem.textContent = "全国の収集推移";
+                }
+            }
+
+            // 弾数UI側のアクティブクラス（選択中ハイライト）の切り替え
+            document.querySelectorAll('#editionStatsGrid .pref-item').forEach(item => {
+                const itemText = item.querySelector('.pref-info span')?.textContent;
+                if (itemText === currentFilterEdition) {
+                    item.classList.add('active-filter');
+                } else {
+                    item.classList.remove('active-filter');
+                }
+            });
+
+            // グラフを再描画
+            initChart();
+
+            // グラフコンテナの位置までスムーズスクロール
+            const chartElement = document.querySelector('.chart-container');
+            if (chartElement) {
+                const offset = chartElement.getBoundingClientRect().top + window.pageYOffset - 20;
+                window.scrollTo({
+                    top: offset,
+                    behavior: 'smooth'
+                });
+            }
+        }
 
     </script>
 </body>
