@@ -54,6 +54,7 @@ def parse_manhole_html(file_path):
     df = pd.DataFrame(results)
     df.to_csv("manhole_list_add.csv", index=False, encoding="utf-8-sig")
     print(f"Step 1 完了: {len(df)} 件のデータを保存しました。")
+    print("保存先: manhole_list_add.csv")
 
 if __name__ == "__main__":
     parse_manhole_html('input_html.txt')

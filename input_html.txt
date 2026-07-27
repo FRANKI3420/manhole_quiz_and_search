@@ -1,25 +1,502 @@
-<tr><td>富良野市<br>
-(B001)</td><td><img src="http://www.gk-p.jp/wp-content/uploads/mhc/01-229-B-01" alt=""></td><td>第29弾</td><td>2026/07/31</td><td><a href="https://www.furano-cheese.jp/" target="_blank">富良野チーズ工房</a><br>
-北海道富良野市中五区	<br>
-電話:0167-23-1156			<br>
+<tr><td>美唄市<br/>
+(A001)<br/>
+</td><td><img alt="" src="http://www.gk-p.jp/wp-content/uploads/mhc/01-215-A-01.jpg
+"/></td><td>第29弾</td><td>2026/07/31</td><td><a href="https://www.city.bibai.hokkaido.jp/site/suidou/29785.html" target="_blank">美唄市役所</a><br/>
+北海道美唄市西3条南1丁目1番1号<br/>
+電話:0126-62-3131<br/>
+</td><td>8:45～17:15　<br/>
+</td><td><a href="https://www.city.bibai.hokkaido.jp/site/suidou/29785.html" target="_blank">こちら</a>からご確認ください<br/>
+</td></tr>
+<tr><td>富良野市<br/>
+(B001)</td><td><img alt="" src="http://www.gk-p.jp/wp-content/uploads/mhc/01-229-B-01"/></td><td>第29弾</td><td>2026/07/31</td><td><a href="https://www.furano-cheese.jp/" target="_blank">富良野チーズ工房</a><br/>
+北海道富良野市中五区	<br/>
+電話:0167-23-1156			<br/>
+<br/>
+（問合せ先）<br/>
+富良野市上下水道課		<br/>
+電話:0167-39-2317	<br/>
+</td><td>【4月1日～10月31日】9:00～17:00<br/>
+【11月1日～3月31日】9:00～16:00<br/>
+ただし、12/31～1/3、1月～2月は毎週月曜日はお休みです。11月は第2週に機械整備で休業予定です。	<br/>
+</td><td><a href="https://www.city.furano.hokkaido.jp/life/docs/2098100.html" target="_blank">こちら</a>からご確認ください<br/>
+</td></tr>
+<tr><td>鹿追町<br/>
+(A001)</td><td><img alt="" src="http://www.gk-p.jp/wp-content/uploads/mhc/01-634-A-01.jpg"/></td><td>第29弾</td><td>2026/07/31</td><td><font color="red">令和8年8月23日より配布を開始します</font><br/>
+①【日、月、火、金、土、祝祭日】<a href="https://www.town.shikaoi.lg.jp/sightseeing/" target="_blank">鹿追町観光インフォメーションデスク</a><br/>
+北海道河東郡鹿追町東町1丁目9<br/>
+電話:0156-66-1135<br/>
+②【水、木】<a href="https://www.town.shikaoi.lg.jp/sightseeing/" target="_blank">鹿追町役場商工観光課</a><br/>
+北海道河東郡鹿追町東町1丁目15番地1			<br/>
+電話:0156-66-4034	</td><td>①【4月～10月】9:00～17:00、【11月～3月】10:00～16:00	　<br/>
+②8:30～17:15　		<br/>
+①、②ともに、年末年始はお休みです</td><td><font color="red">令和8年8月23日より配布を開始します</font><br/>
+<a href="https://www.town.shikaoi.lg.jp/sightseeing/shikaoi_futamasu/" target="_blank">こちら</a>からご確認ください<br/>
+</td></tr>
+<tr><td>標津町<br/>
+(A001)</td><td><img alt="" src="http://www.gk-p.jp/wp-content/uploads/mhc/01-693-A-01.jpg"/></td><td>第29弾</td><td>2026/07/31</td><td><a href="https://www.shibetsutown.jp/culture/?category=37" target="_blank">生涯学習センターあすぱる</a><br/>
+北海道標津郡標津町南1条西5丁目5-3			<br/>
+電話:0153-82-2900			<br/>
+<br/>
+（問合せ先）<br/>
+標津町役場建設水道課		<br/>
+電話:0153-85-7247<br/>
+</td><td>9:00～17:30<br/>
+ただし、年末年始（12/31～1/5）はお休みです<br/>
+</td><td><a href="https://www.shibetsutown.jp/life/?content=1111" target="_blank">こちら</a>からご確認ください<br/>
+</td></tr>
+<tr><td>平川市<br/>
+(A001)</td><td><img alt="" src="http://www.gk-p.jp/wp-content/uploads/mhc/02-210-A-01.jpg"/></td><td>第29弾</td><td>2026/07/31</td><td><a href="https://hirakawa-kankou.com" target="_blank">平川市ふるさとセンター</a><br/>
+青森県平川市猿賀石林94<br/>
+電話:0172-40-2231<br/>
+<br/>
+（問合せ先）<br/>
+平川市上下水道課<br/>
+電話:0172-55-5383<br/>
+</td><td>9:00～17:00<br/>
+ただし、年末年始はお休みです<br/>
+<br/>
+</td><td><a href="https://www.city.hirakawa.lg.jp/kurashi/suidou/gesuidou/colormanhole.html" target="_blank">こちら</a>からご確認ください<br/>
+</td></tr>
+<tr><td>住田町<br/>
+(A001)</td><td><img alt="" src="http://www.gk-p.jp/wp-content/uploads/mhc/03-441-A-01.jpg"/></td><td>第29弾</td><td>2026/07/31</td><td><a href="https://jpn01.safelinks.protection.outlook.com/?url=https%3A%2F%2Fporan.sumita-gayagaya.jp%2F&amp;data=05%7C02%7Ckensetu%40sumitatown.onmicrosoft.com%7C82c2dfd729ff4313427508dee34eff72%7Ceefd5d4bf71d481bbe428abeab76e98a%7C0%7C0%7C639198125598914080%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&amp;sdata=PciM6gxrRmFRQsMrawwdTJAN7S2tF6fmGPG8jWKj3BQ%3D&amp;reserved=0&lt;https://poran.sumita-gayagaya.jp/" target="_blank">道の駅種山ケ原ぽらん</a><br/>
+岩手県気仙郡住田町世田米字子飼沢30-39<br/>
+電話:0197-38-2215<br/>
+<br/>
+（問合せ先）<br/>
+住田町役場建設課<br/>
+電話:0192-46-2115<br/>
+</td><td>【4月～10月】9:00～18:00<br/>
+【11月～3月】9:00～17:00<br/>
+ただし、年末年始はお休みです<br/>
+</td><td><a href="https://www.town.sumita.iwate.jp/docs/2026062600017/" target="_blank">こちら</a>からご確認ください<br/>
+</td></tr>
+<tr><td>天童市<br/>
+(B001)</td><td><img alt="" src="http://www.gk-p.jp/wp-content/uploads/mhc/06-210-B-01.jpg"/></td><td>第29弾</td><td>2026/07/31</td><td><a href="http://bussan-tendo.gr.jp" target="_blank">天童市将棋資料館</a><br/>
+山形県天童市本町一丁目1番1号				<br/>
+電話:023-653-1690			<br/>
+<br/>
+（問合せ先）<br/>
+天童市上下水道事業所上下水道課		<br/>
+023-654-1111（内線443）	<br/>
+</td><td>9:00～18:00（最終入館17:30）			<br/>
+ただし、第3月曜日※第3月曜日が祝日の場合は翌日、年末年始（12月29日～1月3日）はお休みです<br/>
+</td><td>マンホールカードの案内は<a href="https://www.city.tendo.yamagata.jp" target="_blank">こちら</a>からご確認ください<br/>
+</td></tr>
+<tr><td>土浦市<br/>
+(J001)</td><td><img alt="" src="http://www.gk-p.jp/wp-content/uploads/mhc/08-203-J-01.jpg"/></td><td>第29弾</td><td>2026/07/31</td><td><a href="https://www.city.tsuchiura.lg.jp/kanko-bunka-sports/jitenshanomachi/cyclist-support-spot/page011935.html" target="_blank">りんりんポート土浦</a> <br/>
+茨城県土浦市川口二丁目13番25号	<br/>
+電話:029-846-3320		</td><td>9:00～18:00			<br/>
+ただし、年末年始はお休みです<br/>
+</td><td><a href="https://www.city.tsuchiura.lg.jp/kurashi-tetsuzuki/suido-kokyogesuido/kokyogesuido/page019560.html" target="_blank">こちら</a>からご確認ください<br/>
+</td></tr>
+<tr><td>牛久市<br/>
+(B001)</td><td><img alt="" src="http://www.gk-p.jp/wp-content/uploads/mhc/08-219-B-01.jpg"/></td><td>第29弾</td><td>2026/07/31</td><td><a href="https://ushiku-chateau.com/" target="_blank">牛久シャトーショップ</a><br/>
+茨城県牛久市中央三丁目20番地1<br/>
+</td><td>10:00～18:00</td><td><a href="https://www.city.ushiku.lg.jp/city-promotion/ushiku-kohotaishi-room/collabo/ushiku-city/page014847.html" target="_blank">こちら</a>からご確認ください<br/>
+</td></tr>
+<tr><td>佐野市<br>
+(B001)</br></td><td><img alt="" src="http://www.gk-p.jp/wp-content/uploads/mhc/09-204-B-01.jpg"/></td><td>第29弾</td><td>2026/07/31</td><td><a href="https://www.cricket.or.jp/" target="_blank">佐野市国際クリケット場Tearoom at the SICG</a><br>
+（運営者:一般社団法人日本クリケット協会）<br>
+栃木県佐野市栃本町300番地1<br>
+電話:050-5799-4502<br>
+</br></br></br></br></td><td>【月・水・木・土・日】10:00～16:00（土日は18:00まで）<br>
+定休日：火・金<br>
+冬季休業：12月中旬～1月中旬 <br>
+</br></br></br></td><td><a href="https://www.city.sano.lg.jp/sp/cricket/28597.html" target="_blank">こちら</a>からご確認ください<br>
+</br></td></tr>
+<tr><td>那須烏山市<br/>
+(C001)</td><td><img alt="" src="http://www.gk-p.jp/wp-content/uploads/mhc/09-215-C-01.jpg"/></td><td>第29弾</td><td>2026/07/31</td><td><a href="https://www.nasukarasuyama.com" target="_blank">山あげ会館（那須烏山市観光協会）</a><br/>
+栃木県那須烏山市金井2-5-26				<br/>
+電話:0287-84-1977</td><td>9:00～16:00			<br/>
+ただし、毎週火曜日（祝日の場合はその翌日）、年末年始、観光協会が指定する日はお休みです<br/>
+</td><td><a href="https://www.city.nasukarasuyama.lg.jp/kurashi/public-transport-road/jr-karasuyama-line/news/page005906.html" target="_blank">こちら</a>からご確認ください<br/>
+</td></tr>
+<tr><td>下野市<br>
+(B001)</br></td><td><img alt="" src="http://www.gk-p.jp/wp-content/uploads/mhc/09-216-B-01.jpg"/></td><td>第29弾</td><td>2026/07/31</td><td>①<a href="https://www.shimotsuke-bunkazai.com/institution.php" target="_blank">下野薬師寺歴史館</a><br>
+栃木県下野市薬師寺1636<br>
+電話:0285-47-3121<br>
+②<a href="https://www.shimotsuke-bunkazai.com/institution.php" target="_blank">しもつけ風土記の丘資料館</a> <br/>
+栃木県下野市国分寺993		<br/>
+電話:0285-44-5049"			<br/>
+<br/>
+（問合せ先）<br/>
+下野市都市建設部上下水道課		<br/>
+電話:0285-32-8912	</br></br></br></td><td>9:00～16:30	<br/>
+ただし、毎週月曜日（休日の場合はその翌日）、第3火曜日（休日の場合は除く）、休日の翌日（土・日・休日の場合は除く）、年末年始はお休みです<br/>
+</td><td><a href="https://www.shimotsuke-bunkazai.com/topics.php?id=449" target="_blank">こちら</a>からご確認ください<br/>
+</td></tr>
+<tr><td>那珂川町<br/>
+(A001)</td><td><img alt="" src="http://www.gk-p.jp/wp-content/uploads/mhc/09-411-A-01.jpg"/></td><td>第29弾</td><td>2026/07/31</td><td>【平日】<a href="https://www.town.tochigi-nakagawa.lg.jp/index.html" target="_blank">那珂川町役場小川出張所</a><br/>
+栃木県那珂川町小川1065<br/>
+電話:0287-96-2111<br/>
+　　 0287-92-2002(上下水道課)<br/>
+【土日・祝日】那珂川町役場（庁舎西側、日直室）<br/>
+栃木県那珂川町馬頭555			<br/>
+電話:0287-92-1111	</td><td>9:00～17:00</td><td><a href="https://www.town.tochigi-nakagawa.lg.jp/0072/info-0000002006-0.html" target="_blank">こちら</a>からご確認ください<br/>
+</td></tr>
+<tr><td>加須市<br/>
+(C001)</td><td><img alt="" src="http://www.gk-p.jp/wp-content/uploads/mhc/11-210-C-01.jpg"/></td><td>第29弾</td><td>2026/07/31</td><td><a href="https://www.city.kazo.lg.jp/soshiki/gesui/oshirase/37040.html" target="_blank">大利根総合支所地域振興課</a> <br/>
+埼玉県加須市北下新井1679番地1			<br/>
+電話:0480-72-1111(代表）			<br/>
+<br/>
+（問合せ先）<br/>
+加須市上下水道部下水道課		<br/>
+電話:0480-65-8981</td><td>9:00～17:00<br/>
+ただし、土曜日及び祝日（日曜日を除く）はお休みです<br/>
+</td><td><a href="https://www.city.kazo.lg.jp/soshiki/gesui/oshirase/37040.html" target="_blank">こちら</a>からご確認ください<br/>
+</td></tr>
+<tr><td>越谷市<br>
+(D001)</br></td><td><img alt="" src="http://www.gk-p.jp/wp-content/uploads/mhc/11-222-D-01.jpg"/></td><td>第29弾</td><td>2026/07/31</td><td><a href="https://www.koshigaya-sightseeing.jp/information/uncategorized/%e3%82%ac%e3%83%bc%e3%83%a4%e3%81%a1%e3%82%83%e3%82%93%e3%81%ae%e8%94%b5%e5%b1%8b%e6%95%b7/" target="_blank">ガーヤちゃんの蔵屋敷</a> <br>
+埼玉県越谷市弥生町505-2			<br>
+電話:048-940-5550	<br/>
+<br/>
+（問合せ先）<br/>
+越谷市役所経済振興課		<br/>
+電話:048-967-4680</br></br></td><td>10:00～19:00　			<br/>
+ただし、年末年始（12/31～1/2）はお休みです。<br/>
+※店内整理等により営業日・営業時間は変更になる可能性があります</td><td><a href="https://www.city.koshigaya.saitama.jp/kurashi_shisei/kurashi/douro/suidogesuido/manholecard.html" target="_blank">こちら</a>からご確認ください<br/>
+<br/>
+<font color="red">※令和8年7月26日15時～18時に越谷コミュニティセンター　4階 桐の間（埼玉県越谷市南越谷1－2876－1）において、先行で配布します。詳細は<a href="https://www.city.koshigaya.saitama.jp/toiawase/sosiki2/kankyokezai/keizaisinkou/manholecard.html" target="_blank">こちら</a>からご確認ください。<br/>
+なお、通常配布は7月31日から行います。</font><br/>
+</td></tr>
+<tr><td>ふじみ野市<br/>
+(B001)</td><td><img alt="" src="http://www.gk-p.jp/wp-content/uploads/mhc/11-245-B-01.jpg"/></td><td>第29弾</td><td>2026/07/31</td><td>【平日、土日、祝日】<a href="https://www.f-bunka.jp/stella-east/accessmap/" target="_blank">ふじみ野　ステラ・イースト</a><br/>
+埼玉県ふじみ野市福岡一丁目1番8号<br/>
+【毎月第3月曜日（ふじみ野　ステラ・イースト休館日）】<a href="https://www.city.fujimino.saitama.jp/soshikiichiran/jogesuidoka/gesuidoshisetsukakari/2309.html" target="_blank">ふじみ野市上下水道課</a><br/>
+埼玉県ふじみ野市福岡一丁目1番1号（第2庁舎）	<br/>
+電話:049-220-2075</td><td>【平日、土日、祝日】9:00～17:00<br/>
+ただし、毎月第3月曜日（なお、月曜日が祝日の場合は翌日）はお休みです<br/>
+【毎月第3月曜日】9:00～17:00<br/>
+</td><td><a href="https://www.city.fujimino.saitama.jp/soshikiichiran/jogesuidoka/gesuidoshisetsukakari/2309.html" target="_blank">こちら</a>からご確認ください<br/>
+</td></tr>
+<tr><td>千葉市<br/>
+(C001)</td><td><img alt="" src="http://www.gk-p.jp/wp-content/uploads/mhc/12-100-C-01.jpg"/></td><td>第29弾</td><td>2026/07/31</td><td><a href="https://sunsetbeachpark.jp/activity/botanicamuseum/" target="_blank">BOTANICA MUSEUM</a> <br/>
+千葉県千葉市美浜区高浜7-2-4（稲毛海浜公園内）		<br/>
+電話:050-1792-5706			<br/>
+<br/>
+(問合せ先）<br/>
+千葉市建設局下水道企画部下水道営業課		<br/>
+電話:043-245-5411</td><td>【4月～9月】<br/>
+（昼）10:00～17:00（夜）18:00～22:00<br/>
+【10月～3月】<br/>
+（昼）10:00～16:00（夜）17:00～22:00			<br/>
+ただし、月曜日（祝日の場合は翌平日）はお休みです<br/>
+</td><td><a href="https://www.city.chiba.jp/kensetsu/gesuidokikaku/eigyo/manholecard.html" target="_blank">こちら</a>からご確認ください</td></tr>
+<tr><td>館山市<br/>
+(C001)</td><td><img alt="" src="http://www.gk-p.jp/wp-content/uploads/mhc/12-205-C-01.jpg"/></td><td>第29弾</td><td>2026/07/31</td><td><a href="https://tateyamacity.com/" target="_blank">館山駅西口観光案内所</a><br/>
+千葉県館山市北条1879-2			<br/>
+電話:0470-22-2000			<br/>
+<br/>
+（問合せ先）	<br/>
+館山市市民生活部下水道課		<br/>
+電話:0470-22-3674	</td><td>9:30～17:00	<br/>
+ただし、年末年始（12/29～1/3）はお休みです</td><td><a href="https://www.city.tateyama.chiba.jp/gesui/page100037.html" target="_blank">こちら</a>からご確認ください<br/>
+</td></tr>
+<tr><td>長生村<br/>
+(C001)</td><td><img alt="" src="http://www.gk-p.jp/wp-content/uploads/mhc/12-423-C-01.jpg"/></td><td>第29弾</td><td>2026/07/31</td><td>【平日】<a href="https://www.vill.chosei.chiba.jp/soshiki/16-7-0-0-0_1.html" target="_blank">長生村役場産業課</a><br/>
+千葉県長生郡長生村本郷1番地77<br/>
+電話:0475-32-2114<br/>
+【土日、祝日】<a href="https://chosei-koryu.com/" target="_blank">長生村交流センター</a> <br/>
+千葉県長生郡長生村岩沼874番地1<br/>
+電話:0475-32-3770			<br/>
+<br/>
+（問合せ先）<br/>
+長生村役場下水環境課		<br/>
+電話:0475-32-2494</td><td>9:00～16:30			<br/>
+ただし、年末年始（12/28～1/4）はお休みです<br/>
+</td><td><a href="https://www.vill.chosei.chiba.jp/0000002173.html" target="_blank">こちら</a>からご確認ください</td></tr>
+<tr><td>東京23区<br/>
+（Q101）</td><td><img alt="" src="http://www.gk-p.jp/wp-content/uploads/mhc/13-100-Q1-01.jpg"/></td><td>第29弾</td><td>2026/07/31</td><td>①<a href="https://www.city.edogawa.tokyo.jp/e_bunkazai/bunkazai/shiryoshitsu/index.html" target="_blank">江戸川区郷土資料室（しのざき文化プラザ内）</a><br/>
+東京都江戸川区篠崎町七丁目20番19号 しのざき文化プラザ3階<br/>
+電話:03-5662-7176<br/>
+②<a href="https://www.city.edogawa.tokyo.jp/e035/kuseijoho/gaiyo/shisetsuguide/bunya/bunkachiiki/c_kitakoiwa_co/index.html" target="_blank">北小岩コミュニティ会館</a><br/>
+東京都江戸川区北小岩六丁目35番17号	<br/>
+電話:03-5693-1162		<br/>
+<br/>
+（問合せ先）<br/>
+江戸川区土木部計画調整課調整係		<br/>
+電話:03-5662-1885		<br/>
+</td><td>①9:30～17:00<br/>
+ただし、祝日及び振替休日、国民の休日（祝日法上の休日）、年末年始（12/28から翌年1/4まで）、メンテナンス期間、しのざき文化プラザ休館日はお休みです<br/>
+②9:00～21:30			<br/>
+ただし、年末年始（12/28から翌年1/4まで）、その他管内消毒・設備保守等による休館日はお休みです<br/>
+</td><td><a href="https://www.city.edogawa.tokyo.jp/e065/toshikeikaku/sonota/manhole.html" target="_blank">こちら</a>からご確認ください<br/>
+<br/>
+</td></tr>
+<tr><td>東京23区<br/>
+（R101）</td><td><img alt="" src="http://www.gk-p.jp/wp-content/uploads/mhc/13-100-R1-01.jpg"/></td><td>第29弾</td><td>2026/07/31</td><td><a href="https://www.city.tokyo-nakano.lg.jp/kurashi/bunka/manabu/rekishiminzoku/index.html" target="_blank">山﨑記念中野区立歴史民俗資料館</a> <br/>
+東京都中野区江古田四丁目3番4号		<br/>
+電話:03-3319-9221			<br/>
+<br/>
+（問合せ先）<br/>
+中野区　文化振興・多文化共生推進課　シティプロモーション係		<br/>
+電話:03-3228-5467		</td><td>9:00～17:00			<br/>
+ただし、月曜日、第3日曜日、年末年始（12/29から1/3まで）はお休みです<br/>
+</td><td><a href="https://www.city.tokyo-nakano.lg.jp/kanko/city-promotion/designmanhole.html" target="_blank">こちら</a>からご確認ください</td></tr>
+<tr><td>三鷹市<br/>
+(B001)</td><td><img alt="" src="http://www.gk-p.jp/wp-content/uploads/mhc/13-204-B-01.jpg"/></td><td>第29弾</td><td>2026/07/31</td><td><a href="https://kanko.mitaka.ne.jp/" target="_blank">みたか観光BASE</a><br/>
+東京都三鷹市下連雀3-24-3-105<br/>
+電話：0422-24-9177<br/>
+</td><td>9：00～18：00<br/>
+ただし、火曜日、年末年始及び臨時休業日はお休みです<br/>
+詳細は<a href="https://kanko.mitaka.ne.jp/docs/2021092900021/" target="_blank">こちら</a>から事前にご確認ください<br/>
+</td><td><a href="https://kanko.mitaka.ne.jp/docs/2021092900021/" target="_blank">こちら</a>からご確認ください</td></tr>
+<tr><td>西東京市<br/>
+(A001)</td><td><img alt="" src="http://www.gk-p.jp/wp-content/uploads/mhc/13-229-A-01.jpg"/></td><td>第29弾</td><td>2026/07/31</td><td><font color="red">令和8年8月3日から配布を開始します</font><br/>
+<a href="https://machitenna.com/" target="_blank">まちテナ西東京</a><br/>
+東京都西東京市田無町4-1-2（田無駅改札横）<br/>
+<br/>
+（問合せ先）<br/>
+西東京市企画部企画政策課<br/>
+電話:042-460-9800<br/>
+</td><td>【平日】10:00～20:00<br/>
+【土曜】10:00～19:00<br/>
+【日曜・祝日】10:00～18:00<br/>
+ ただし、元日はお休みです<br/>
+</td><td><font color="red">令和8年8月3日から配布を開始します</font><br/>
+<a href="https://www.city.nishitokyo.lg.jp/enjoy/ekimae_hassin/08manhoru.html" target="_blank">こちら</a>からご確認ください</td></tr>
+<tr><td>長岡市<br/>
+(G001)</td><td><img alt="" src="http://www.gk-p.jp/wp-content/uploads/mhc/15-202-G-01.jpg"/></td><td>第29弾</td><td>2026/07/31</td><td><a href="https://miraie-nagaoka.jp/" target="_blank">米百俵プレイス ミライエ長岡</a> <br/>
+新潟県長岡市大手通2丁目3番地10 米百俵プレイス ミライエ長岡3階インフォメーションカウンター	<br/>
+電話:0258-86-6008<br/>
+<br/>
+<br/>
+</td><td>【平日・土曜日】9:00～21:00<br/>
+【日曜日・祝日】9:00～18:00			<br/>
+ただし、休館日：毎月第2木曜日（休日の場合は翌日）、毎月の末日（土日の場合は翌月曜日）、年末年始（12/29～1/3）はお休みです<br/>
+</td><td><a href="https://www.city.nagaoka.niigata.jp/suidou/suidou/manhole.html" target="_blank">こちら</a>からご確認ください<br/>
+</td></tr>
+<tr><td>燕市<br/>
+(E001)</td><td><img alt="" src="http://www.gk-p.jp/wp-content/uploads/mhc/15-213-E-01.jpg"/></td><td>第29弾</td><td>2026/07/31</td><td>【平日】<a href="https://www.city.tsubame.niigata.jp/" target="_blank">燕市役所 2階 下水道課</a><br/>
+新潟県燕市吉田西太田1934番地	<br/>
+電話:0256-77-8291<br/>
+【土曜日・日曜日・祝日】燕市役所　1階　夜間休日受付		<br/>
+電話:0256-92-1111<br/>
+</td><td>【平日】9:00～16:30<br/>
+【土曜日・日曜日・祝日】9:00～16:30			<br/>
+ただし、12/29～1/3はお休みです		</td><td><a href="https://www.city.tsubame.niigata.jp/kurashi/joge/1/3772.html" target="_blank">こちら</a>からご確認ください<br/>
+</td></tr>
+<tr><td>佐渡市<br/>
+(I001)</td><td><img alt="" src="http://www.gk-p.jp/wp-content/uploads/mhc/15-224-I-01.jpg"/></td><td>第29弾</td><td>2026/07/31</td><td><a href="https://www.city.sado.niigata.jp/soshiki/2021/53417.html" target="_blank">佐和田市民センター</a> <br/>
+新潟県佐渡市河原田本町394番地			<br/>
+電話:0259-57-2111<br/>
+<br/>
+（問合せ先）<br/>
+佐渡市役所上下水道課下水道総務係		<br/>
+電話:0259-67-7857		<br/>
+</td><td>8:30～17:00</td><td><a href="https://www.city.sado.niigata.jp/soshiki/2021/53417.html" target="_blank">こちら</a>からご確認ください<br/>
+</td></tr>
+<tr><td>千曲市<br/>
+(D001)<br/>
+<br/>
+</td><td><img alt="" src="http://www.gk-p.jp/wp-content/uploads/mhc/20-218-D-01.jpg"/></td><td>第29弾</td><td>2026/07/31</td><td><a href="https://www.chikuma-bunka.jp/shisetsu_goannai/kamiyamadabunkakaikan/index.html" target="_blank">千曲市上山田文化会館</a> <br/>
+長野県千曲市上山田温泉3丁目1番地1      <br/>
+電話:026-275-0500         <br/>
+<br/>
+（問合せ先）<br/>
+千曲市建設部上下水道課下水道係      <br/>
+電話:026-273-1111（内線3232）    </td><td>9:00～17:00         <br/>
+ただし、毎週月曜日（祝日を除く）、休日の翌日、12/29から1/3はお休みです<br/>
+</td><td><a href="https://www.city.chikuma.lg.jp/kanko_bunka_sports/event/all/4193.html" target="_blank">こちら</a>からご確認ください</td></tr>
+<tr><td>軽井沢町<br/>
+(B001)</td><td><img alt="" src="http://www.gk-p.jp/wp-content/uploads/mhc/20-321-B-01.jpg"/></td><td>第29弾</td><td>2026/07/31</td><td>①追分宿郷土館<br/>
+長野県軽井沢町追分1155-8<br/>
+電話:0267-45-1466<br/>
+②中軽井沢駅内観光案内所<br/>
+長野県軽井沢町長倉3337-18　くつかけテラス内<br/>
+電話:0267-45-6050<br/>
+<br/>
+（問合せ先）<br/>
+軽井沢町役場<br/>
+電話:0267-45-8592<br/>
+<br/>
+</td><td>①追分宿郷土館<br/>
+9:00～17:00<br/>
+ただし、水曜日（水曜日が祝日の場合は開館）、年末年始（12/28～1/4）はお休み<br/>
+7月15日～10月31日は無休です<br/>
+②中軽井沢駅内観光案内所<br/>
+9:00～12:00、13:00～17:00　<br/>
+ただし、12/29～1/3は、10:00～12:00、13:00～15:00<br/>
+</td><td><a href="https://www.town.karuizawa.lg.jp/page/14115.html" target="_blank">こちら</a>からご確認ください<br/>
+<br/>
+</td></tr>
+<tr><td>中津川市<br>
+(B001)</br></td><td><img alt="" src="http://www.gk-p.jp/wp-content/uploads/mhc/21-206-B-01.jpg"/></td><td>第29弾</td><td>2026/07/31</td><td><a href="https://www.city.nakatsugawa.lg.jp/tcs/hitomachi/index.html" target="_blank">中津川市ひと・まちテラス</a><br>
+岐阜県中津川市新町2-34				<br>
+電話:0573-67-7111			<br>
 <br>
 （問合せ先）<br>
-富良野市上下水道課		<br>
-電話:0167-39-2317	<br>
-</td><td>【4月1日～10月31日】9:00～17:00<br>
-【11月1日～3月31日】9:00～16:00<br>
-ただし、12/31～1/3、1月～2月は毎週月曜日はお休みです。11月は第2週に機械整備で休業予定です。	<br>
-</td><td><a href="https://www.city.furano.hokkaido.jp/life/docs/2098100.html" target="_blank">こちら</a>からご確認ください<br>
+中津川市観光課		<br/>
+電話:0573-66-1111</br></br></br></br></br></td><td>9:00～21:30			<br/>
+ただし、年末年始（12/29～1/3）、施設点検日（2月第3火曜日）はお休みです<br/>
+</td><td><a href="https://www.city.nakatsugawa.lg.jp/kanko/bunka/taishi/39776.html" target="_blank">こちら</a>からご確認ください<br/>
+<font color="red">※配布開始直後は混雑緩和のため特例として事前申込（抽選）を実施します。申込期間は令和8年7月13日～7月20日まで。詳細は<a href="https://www.city.nakatsugawa.lg.jp/kanko/bunka/taishi/39776.html" target="_blank">こちら</a>からご確認ください</font><br/>
 </td></tr>
-<tr><td>鹿追町<br>
-(A001)</td><td><img src="http://www.gk-p.jp/wp-content/uploads/mhc/01-634-A-01.jpg" alt=""></td><td>第29弾</td><td>2026/07/31</td><td><font color="red">令和8年8月23日より配布を開始します</font><br>
-①【日、月、火、金、土、祝祭日】<a href="https://www.town.shikaoi.lg.jp/sightseeing/" target="_blank">鹿追町観光インフォメーションデスク</a><br>
-北海道河東郡鹿追町東町1丁目9<br>
-電話:0156-66-1135<br>
-②【水、木】<a href="https://www.town.shikaoi.lg.jp/sightseeing/" target="_blank">鹿追町役場商工観光課</a><br>
-北海道河東郡鹿追町東町1丁目15番地1			<br>
-電話:0156-66-4034	</td><td>①【4月～10月】9:00～17:00、【11月～3月】10:00～16:00	　<br>
-②8:30～17:15　		<br>
-①、②ともに、年末年始はお休みです</td><td><font color="red">令和8年8月23日より配布を開始します</font><br>
-<a href="https://www.town.shikaoi.lg.jp/sightseeing/shikaoi_futamasu/" target="_blank">こちら</a>からご確認ください<br>
+<tr><td>八百津町<br>
+(A001)</br></td><td><img alt="" src="http://www.gk-p.jp/wp-content/uploads/mhc/21-505-A-01.jpg"/></td><td>第29弾</td><td>2026/07/31</td><td><font color="red">令和8年8月1日より配布を開始します</font><br>
+【平日】<a href="https://www.town.yaotsu.lg.jp/7629.htm" target="_blank">八百津町役場本庁舎　水道環境課</a><br>
+【休日】八百津町役場本庁舎<br>
+岐阜県加茂郡八百津町八百津3903番地2			<br>
+電話:0574-43-2111		<br>
+</br></br></br></br></br></td><td>8:30～17:15	</td><td><font color="red">令和8年8月1日より配布を開始します</font><br>
+<a href="https://www.town.yaotsu.lg.jp/7629.htm" target="_blank">こちら</a>からご確認ください<br>
+</br></br></td></tr>
+<tr><td>富士市<br/>
+(C001)</td><td><img alt="" src="http://www.gk-p.jp/wp-content/uploads/mhc/22-210-C-01.jpg"/></td><td>第29弾</td><td>2026/07/31</td><td><a href="https://www.aeontown.co.jp/fujiminami/" target="_blank">イオンタウン富士南　2階モールインフォメーション</a><br/>
+静岡県富士市鮫島118-10	<br/>
+<br/>
+<font color="red">※お問い合わせは、富士市までお願いいたします。配布場所への直接のお問い合わせはご遠慮ください</font><br/>
+（問合せ先）<br/>
+富士市役所上下水道営業課<br/>
+電話:0545-67-2829</td><td>10:00～17:00			<br/>
+ただし、休業日はお休みです<br/>
+</td><td><a href="https://www.city.fuji.shizuoka.jp/1545150000/p007434.html" target="_blank">こちら</a>からご確認ください<br/>
 </td></tr>
+<tr><td>湖西市<br/>
+(B001)</td><td><img alt="" src="http://www.gk-p.jp/wp-content/uploads/mhc/22-221-B-01.jpg"/></td><td>第29弾</td><td>2026/07/31</td><td><a href="https://www.city.kosai.shizuoka.jp/kanko_bunka_sports/kankospot/12197.html" target="_blank">道の駅　潮見坂</a> <br/>
+静岡県湖西市白須賀1896-2					<br/>
+電話:053-573-1155			<br/>
+<br/>
+（問合せ先）<br/>
+湖西市役所環境部上下水道課		<br/>
+電話:053-574-2213		</td><td>8:00～18:00	<br/>
+年中無休※臨時休業する場合があります。最新情報は道の駅潮見坂ウェブサイトをご確認ください</td><td><a href="https://www.city.kosai.shizuoka.jp/soshikiichiran/gesuidoka/12799.html" target="_blank">こちら</a>からご確認ください<br/>
+</td></tr>
+<tr><td>甲賀市<br/>
+(C001)</td><td><img alt="" src="http://www.gk-p.jp/wp-content/uploads/mhc/25-209-C-01.jpg"/></td><td>第29弾</td><td>2026/07/31</td><td><a href="https://www.real-ninjakan.com/" target="_blank">観光インフォメーションセンター甲賀流リアル忍者館</a><br/>
+滋賀県甲賀市甲南町竜法師600番地<br/>
+<br/>
+（問合せ先）<br/>
+甲賀市役所上下水道部下水道課<br/>
+電話:0748-69-2228<br/>
+</td><td>10:00～16:00<br/>
+ただし、月曜日（祝日の場合は開館）、年末年始（令和8年12月28日～令和9年1月4日）はお休みです<br/>
+</td><td><a href="https://www.city.koka.lg.jp/item/39439.htm" target="_blank">こちら</a>からご確認ください<br/>
+</td></tr>
+<tr><td>宇治田原町<br>
+(B001)</br></td><td><img alt="" src="http://www.gk-p.jp/wp-content/uploads/mhc/26-344-B-01.jpg"/></td><td>第29弾</td><td>2026/07/31</td><td>①<a href="https://www.town.ujitawara.kyoto.jp" target="_blank">宇治田原町役場上下水道課</a><br>
+京都府綴喜郡宇治田原町大字立川小字坂口18番地1（宇治田原町役場2階）<br>
+電話：0774-88-3337<br/>
+②宇治田原町総合文化センター<br/>
+京都府綴喜郡宇治田原町大字岩山小字沼尻46番地1<br/>
+電話：0774-88-5851<br/>
+</br></br></td><td>①8:30～17:15<br/>
+ただし、土日、祝日、年末年始（12/29～1/3）はお休みです<br/>
+②9:00～17:00<br/>
+ただし、火曜日、12/28～1/4はお休みです<br/>
+</td><td><a href="https://www.town.ujitawara.kyoto.jp/soshiki/jogesuidoka/seikatsu_kankyo/1/782.html" target="_blank">こちら</a>からご確認ください<br/>
+</td></tr>
+<tr><td>大東市<br>
+(B001)</br></td><td><img alt="" src="http://www.gk-p.jp/wp-content/uploads/mhc/27-218-B-01.jpg"/></td><td>第29弾</td><td>2026/07/31</td><td>【平日】<a href="https://www.city.daito.lg.jp/soshiki/39/" target="_blank">大東市上下水道局総務課</a><br/>
+【土日・祝日】大東市上下水道局宿直室			<br/>
+大阪府大東市灰塚4-1-1			<br/>
+電話:072-871-1191			<br/>
+</td><td>9:00～17:30</td><td><a href="https://www.city.daito.lg.jp/soshiki/39/40329.html" target="_blank">こちら</a>からご確認ください<br/>
+</td></tr>
+<tr><td>神戸市<br/>
+(D001)</td><td><img alt="" src="http://www.gk-p.jp/wp-content/uploads/mhc/28-100-D-01.jpg"/></td><td>第29弾</td><td>2026/07/31</td><td><a href="https://www.city.kobe.lg.jp/a64051/kenko/handicap/syakaikatdudou/barrierfree/shurui/bunka/03093.html" target="_blank">北野観光案内所</a><br/>
+神戸市中央区北野町3-10-20<br/>
+電話:078-251-8360<br/>
+</td><td>【3月～10月】9:00～18:00<br/>
+【11月～2月】9:00～17:00<br/>
+ただし、年末年始（12/31～1/1）はお休みです	<br/>
+</td><td><a href="https://kobe-wb.jp/pamphlet/card" target="_blank">こちら</a>からご確認ください<br/>
+</td></tr>
+<tr><td>浅口市<br/>
+(A001)</td><td><img alt="" src="http://www.gk-p.jp/wp-content/uploads/mhc/33-216-A-01.jpg"/></td><td>第29弾</td><td>2026/07/31</td><td>【平日】<a href="https://www.city.asakuchi.lg.jp/soshiki/19/" target="_blank">浅口市役所上下水道部下水道課（金光総合支所2階）</a><br/>
+岡山県金光町占見新田751番地<br/>
+電話:0865-42-7305<br/>
+【土日祝】<a href="https://www.city.asakuchi.lg.jp/soshiki/21/" target="_blank">浅口市役所金光総合支所宿直室</a><br/>
+岡山県金光町占見新田751番地<br/>
+電話:0865-42-7300<br/>
+</td><td>9:00～16:00<br/>
+ただし、年末年始（12/29～1/3）はお休みです<br/>
+</td><td><a href="https://www.city.asakuchi.lg.jp/page/21160.html" target="_blank">こちら</a>からご確認ください<br/>
+</td></tr>
+<tr><td>東広島市<br>
+(C001)</br></td><td><img alt="" src="http://www.gk-p.jp/wp-content/uploads/mhc/34-212-C-01.jpg"/></td><td>第29弾</td><td>2026/07/31</td><td>①【平時】<a href="https://jpn01.safelinks.protection.outlook.com/?url=https%3A%2F%2Fhigashihiroshima-kanko.jp%2Fspot%2Fsakaguradori-tourist-info%2F&amp;data=05%7C02%7Chgh200957%40city.higashihiroshima.lg.jp%7C6679458235f74fdab46b08ded9d35646%7C7a6f116510b74e51b43fbdb60acb8c70%7C1%7C0%7C639187698872164881%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&amp;sdata=8QHj0cc8kym6zSO94%2F4MSxUu1tGS1%2FMuofKGjdzEfqM%3D&amp;reserved=0" target="_blank">西条酒蔵通り観光案内所</a><br>
+広島県東広島市西条本町17-1<br>
+電話:082-421-2511<br>
+②【西条酒蔵通り観光案内所の定休日（第1・第3水曜日）及び臨時休業日（平日に限る）】<br/>
+東広島市下水道管理課<br/>
+広島県東広島市西条栄町8-29　本館7F<br/>
+電話:082-420-0957	<br/>
+</br></br></br></td><td>①10:00～16:00 <br/>
+ただし、第1・3水曜日、年末年始、10月上旬に開催される酒まつり期間中はお休みです<br/>
+②8：30～17：15<br/>
+ただし、土日祝祭日、年末年始はお休みです<br/>
+</td><td><a href="https://jpn01.safelinks.protection.outlook.com/?url=https%3A%2F%2Fwww.city.higashihiroshima.lg.jp%2Fsoshiki%2Fgesuido%2F1%2F2%2F40232.html&amp;data=05%7C02%7Chgh200957%40city.higashihiroshima.lg.jp%7C6679458235f74fdab46b08ded9d35646%7C7a6f116510b74e51b43fbdb60acb8c70%7C1%7C0%7C639187698872197115%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&amp;sdata=rXVYFmC2eS3Hvzz3Cx2qvcVVvVeM%2FFVJ%2FsiWjodSPOk%3D&amp;reserved=0 " target="_blank">こちら</a>からご確認ください<br/>
+</td></tr>
+<tr><td>長門市<br/>
+(A001)</td><td><img alt="" src="http://www.gk-p.jp/wp-content/uploads/mhc/35-211-A-01.jpg"/></td><td>第29弾</td><td>2026/07/31</td><td><a href="https://nanavi.jp/" target="_blank">長門市観光案内所　YUKUTE</a><br/>
+山口県長門市仙崎4297-6			<br/>
+電話:0837-26-0708			<br/>
+</td><td>9:00～18:00			<br/>
+ただし、年末・年始（12/31・1/1）、12月～2月は毎月第2木曜日はお休みです</td><td><a href="https://www.city.nagato.yamaguchi.jp/soshiki/19/68072.html" target="_blank">こちら</a>からご確認ください<br/>
+</td></tr>
+<tr><td>香美市<br/>
+(E001)</td><td><img alt="" src="http://www.gk-p.jp/wp-content/uploads/mhc/39-212-E-01.jpg"/></td><td>第29弾</td><td>2026/07/31</td><td><a href="https://www.city.kami.lg.jp/soshiki/34/kaminka.html" target="_blank">かみんか（愛と勇気の物語交流館）</a><br/>
+高知県香美市香北町美良布1141-1				<br/>
+電話:0887-52-9286			<br/>
+<br/>
+（問合せ先）<br/>
+香美市上下水道局		<br/>
+電話:0887-53-1086（平日8:30～17:15）</td><td>【月、金、土、日、祝日】10:00～12:00、13:00～16:00	<br/>
+休館日：火・水・木（祝日の場合は開館）。<br/>
+開館日のうち12:00～13:00は閉鎖のため配布不可。<br/>
+12月27日～1月5日は休館です。<br/>
+</td><td><a href="https://www.city.kami.lg.jp/soshiki/40/designmanholecard.html" target="_blank">こちら</a>からご確認ください<br/>
+</td></tr>
+<tr><td>直方市<br>
+(A001)</br></td><td><img alt="" src="http://www.gk-p.jp/wp-content/uploads/mhc/40-204-A-01.jpg"/></td><td>第29弾</td><td>2026/07/31</td><td>【平日】<a href="https://www.city.nogata.fukuoka.jp/" target="_blank">直方市役所下水道課</a><br>
+福岡県直方市殿町7-1<br>
+電話:0949-25-2203<br>
+【土日、祝日】<a href="https://www.city.nogata.fukuoka.jp/shisei/_1242/_2793/_12358.html" target="_blank">多世代交流スペースここっちゃ（交流エリア）</a> <br>
+福岡県直方市古町5-35<br>
+電話:0949-52-6234</br></br></br></br></br></td><td>【平日】9:00～16:30<br>
+年末年始はお休みです<br>
+【土日、祝日】10:30～16:30			<br>
+水曜日が祝日の場合と年末年始はお休みです<br>
+</br></br></br></br></td><td><a href="https://www.city.nogata.fukuoka.jp/kurashi/_1201/_1332/_17114.html" target="_blank">こちら</a>をご確認ください</td></tr>
+<tr><td>中間市<br/>
+(A001)</td><td><img alt="" src="http://www.gk-p.jp/wp-content/uploads/mhc/40-215-A-01.jpg"/></td><td>第29弾</td><td>2026/07/31</td><td>①<a href="https://www.city.nakama.lg.jp/soshiki/37/10984.html" target="_blank">中間市地域交流センター</a><br/>
+福岡県中間市大字垣生660番地1<br/>
+電話:093-245-4665<br/>
+②<a href="https://www.city.nakama.lg.jp/soshiki/8/1469.html" target="_blank">中間市役所下水道課</a><br/>
+福岡県中間市中間一丁目1番1号			<br/>
+電話:093-246-6256</td><td>①【平日（休館日を除く）・土日・祝日】9:00～18:00<br/>
+ただし、火曜日（火曜が祝日の場合は翌平日）、年末年始（12/29～1/3）はお休みです<br/>
+②【平日】8:30～17:15	<br/>
+ただし、土日・祝日、年末年始（12/29～1/3）はお休みです<br/>
+</td><td><a href="https://www.city.nakama.lg.jp/site/kankou/19807.html" target="_blank">こちら</a>からご確認ください<br/>
+</td></tr>
+<tr><td>益城町<br/>
+(B001)</td><td><img alt="" src="http://www.gk-p.jp/wp-content/uploads/mhc/43-443-B-01.jpg"/></td><td>第29弾</td><td>2026/07/31</td><td><a href="https://www.town.mashiki.lg.jp/kouryu/" target="_blank">益城町交流情報センターミナテラス</a> <br/>
+熊本県上益城郡益城町大字木山236		<br/>
+電話:096-287-8411	<br/>
+<br/>
+（問合せ先）<br/>
+益城町浄化センター		<br/>
+電話:096-286-1131	</td><td>8:30～12:00、13:00～17:00<br/>
+</td><td><a href="https://www.town.mashiki.lg.jp/default.html" target="_blank">こちら</a>からご確認ください<br/>
+</td></tr>
+<tr><td>薩摩川内市<br>
+(B001)</br></td><td><img alt="" src="http://www.gk-p.jp/wp-content/uploads/mhc/46-215-B-01.jpg"/></td><td>第29弾</td><td>2026/07/31</td><td><a href="https://koshiki.satsumasendai.gr.jp/spotlist/39470" target="_blank">下甑島観光案内所</a><br>
+鹿児島県薩摩川内市下甑町長浜913番4			<br>
+電話:0996-24-8114	<br>
+<br>
+（問合せ先）<br>
+薩摩川内市水道局下水道室	<br/>
+電話:0996-20-8503<br/>
+</br></br></br></br></br></td><td>8:00～17:30</td><td><a href="https://www.city.satsumasendai.lg.jp/soshiki/1002/1/3/4/1749.html" target="_blank">こちら</a>からご確認ください<br/>
+</td></tr>
+<tr><td>宮古島市<br/>
+(A001)</td><td><img alt="" src="http://www.gk-p.jp/wp-content/uploads/mhc/47-214-A-01.jpg"/></td><td>第29弾</td><td>2026/07/31</td><td>【平日】<a href="https://www.city.miyakojima.lg.jp/soshiki/shityo/kankyoueisei/gesuidou/" target="_blank">宮古島市 下水道課</a><br/>
+沖縄県宮古島市平良字西仲宗根565-6<br/>
+電話:0980-75-5121<br/>
+【土日】<a href="https://www.city.miyakojima.lg.jp/soshiki/kyouiku/syougaigakusyu/miraisouzou/" target="_blank">宮古島市未来創造センター</a><br/>
+沖縄県宮古島市平良字東仲宗根807<br/>
+電話:0980-72-2235</td><td>【平日】9:00～17:00<br/>
+【土日】10:00～17:30			<br/>
+ただし、祝日、閉館日、年末年始はお休みです<br/>
+</td><td>準備中です</td></tr>

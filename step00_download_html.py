@@ -26,7 +26,7 @@ for tr in soup.find_all("tr"):
 output_text = "\n".join(extracted_rows)
 
 # 6. ファイルに保存
-filename = f"manhole_cards_{target_bullet}.txt"  # プレーンなテキストとして保存
+filename = f"input_html.txt"  # プレーンなテキストとして保存
 with open(filename, mode="w", encoding="utf-8") as f:
     f.write(output_text)
 
