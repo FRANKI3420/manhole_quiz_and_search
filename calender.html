@@ -491,11 +491,10 @@
                 );
 
                 dayEntries.forEach(([key, stat]) => {
-                    // key には "千代田区 (13-101-A001)" などが入っているはず
+                    // IDまたはキーで比較
                     const card = masterData.find(c => {
                         const fullKey = `${c.city} (${c.id})`;
-                        // キー名(key) または 保存されたid(stat.id) で比較
-                        return key === fullKey || key === c.city || stat.id === fullKey;
+                        return key === fullKey || key === c.city || key === c.id || stat.id === fullKey || stat.id === c.id;
                     });
 
                     if (card && card.pref) {
@@ -524,7 +523,7 @@
             renderPrefStats(monthlyPrefs);
         }
 
-        // ★追加：バッジを描画する関数
+        // バッジを描画する関数
         function renderPrefStats(stats) {
             const area = document.getElementById('prefStatsArea');
             const list = document.getElementById('prefBadgeList');
@@ -543,16 +542,16 @@
             sortedPrefs.forEach(([pref, count]) => {
                 const badge = document.createElement('div');
                 badge.style.cssText = `
-            background: #333;
-            border: 1px solid #555;
-            padding: 4px 10px;
-            border-radius: 15px;
-            font-size: 12px;
-            color: #eee;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        `;
+                background: #333;
+                border: 1px solid #555;
+                padding: 4px 10px;
+                border-radius: 15px;
+                font-size: 12px;
+                color: #eee;
+                display: flex;
+                align-items: center;
+                gap: 5px;
+            `;
                 badge.innerHTML = `${pref} <b style="color:var(--accent)">${count}</b>`;
                 list.appendChild(badge);
             });
@@ -562,28 +561,20 @@
             const y = parseInt(document.getElementById('yearSelect').value);
             const m = parseInt(document.getElementById('monthSelect').value);
 
-            // ★表示用の変数を更新
             currentYear = y;
             currentMonth = m;
-
-            // 日付オブジェクトも同期させておく（スワイプ時にズレないように）
             currentDisplayDate = new Date(y, m, 1);
 
             renderCalendar();
         }
-        function changeMonth(diff) {
-            // 1. 日付オブジェクトを更新
-            currentDisplayDate.setMonth(currentDisplayDate.getMonth() + diff);
 
-            // 2. ★描画に使っている変数も一緒に更新する
+        function changeMonth(diff) {
+            currentDisplayDate.setMonth(currentDisplayDate.getMonth() + diff);
             currentYear = currentDisplayDate.getFullYear();
             currentMonth = currentDisplayDate.getMonth();
 
-            // 3. 再描画
             renderCalendar();
         }
-
-        // --- showCardsForDate 関数の修正箇所 ---
 
         function showCardsForDate(dateStr, element) {
             document.querySelectorAll('.day').forEach(d => d.classList.remove('selected-day'));
@@ -596,17 +587,13 @@
             const [y, m, d] = dateStr.split('-');
             title.textContent = `${y}年${m}月${d}日 の取得`;
 
-            // 1. その日に取得したキー（"市区町村 (ID)" の形式）をすべて取得
             const targetKeys = Object.keys(userStats).filter(key => {
                 return userStats[key].collected && userStats[key].date === dateStr;
             });
 
-            // 2. masterDataからカードを特定
             const cardsOnThisDay = masterData.filter(card => {
                 const fullKey = `${card.city} (${card.id})`;
-
-                // 【ここを修正】includes ではなく、配列の中に「完全一致」するキーがあるか調べる
-                return targetKeys.some(tKey => tKey === fullKey || tKey === card.city);
+                return targetKeys.some(tKey => tKey === fullKey || tKey === card.city || tKey === card.id);
             });
 
             if (cardsOnThisDay.length === 0) {
@@ -614,31 +601,31 @@
                 return;
             }
 
-            // 3. 表示処理（ここは変更なし）
             cardsOnThisDay.forEach(card => {
-                // matchedKey を探す際も完全一致で探す
                 const fullKey = `${card.city} (${card.id})`;
-                const matchedKey = targetKeys.find(tKey => tKey === fullKey || tKey === card.city) || fullKey;
+                const matchedKey = targetKeys.find(tKey => tKey === fullKey || tKey === card.city || tKey === card.id) || fullKey;
 
                 list.innerHTML += `
-            <div class="card-mini" onclick="openDetail('${card.id}', '${matchedKey}')" style="cursor:pointer;">
-                <img src="${card.url}" alt="${card.city}">
-                <div class="card-mini-info">
-                    <div>${card.city}</div>
+                <div class="card-mini" onclick="openDetail('${card.id}', '${matchedKey}')" style="cursor:pointer;">
+                    <img src="${card.url}" alt="${card.city}">
+                    <div class="card-mini-info">
+                        <div>${card.city}</div>
+                    </div>
                 </div>
-            </div>
-        `;
+            `;
             });
         }
-        // goToSearchPageが参照する変数をグローバル（関数の外）に用意
-        let currentCity = "";
+
+        // ★保持用変数を ID ベースに変更
+        let currentCardId = "";
 
         function openDetail(cardId, matchedKey) {
             const card = masterData.find(c => c.id === cardId);
             const stat = userStats[matchedKey];
             if (!card || !stat) return;
 
-            currentCity = card.city;
+            // ★ ID を保持する
+            currentCardId = card.id;
 
             // 基本情報
             document.getElementById('modalImg').src = card.url;
@@ -646,60 +633,58 @@
             document.getElementById('modalSub').textContent = `${card.pref} / ${card.edition}`;
             document.getElementById('modalDate').textContent = `取得日: ${stat.date.replace(/-/g, '.')}`;
 
-            // メモとボタンをまとめて生成（重なり防止）
+            // メモとボタンを生成
             const mainContent = document.getElementById('modalMainContent');
             mainContent.innerHTML = `
-        <div style="background:#1a1a1a; padding:10px; border-radius:8px; margin-bottom:15px;">
-            <textarea id="editMemoInput" 
-                style="width:100%; min-height:40px; background:transparent; color:#ddd; border:none; outline:none; font-size:14px; font-family:inherit; line-height:1.6; resize:none;"
-                placeholder="思い出メモを入力...">${stat.memo || ""}</textarea>
-        </div>
-
-        <button class="edit-btn" onclick="saveMemo('${matchedKey}')" 
-            style="width:100%; background:var(--accent); color:white; padding:10px; border:none; border-radius:6px; font-weight:bold; cursor:pointer; margin-bottom:20px;">
-            メモを保存する
-        </button>
-
-        <div style="border-top: 1px solid #444; padding-top: 15px;">
-            <button id="customSearchBtn" onclick="goToSearchPage()"
-                style="width: 100%; background: #444; color: #fff; padding: 10px; font-size: 13px; border-radius: 6px; border: none; cursor: pointer; display: block;">
-                🔍 画像で判定・検索
+            <div style="background:#1a1a1a; padding:10px; border-radius:8px; margin-bottom:15px;">
+                <textarea id="editMemoInput" 
+                    style="width:100%; min-height:40px; background:transparent; color:#ddd; border:none; outline:none; font-size:14px; font-family:inherit; line-height:1.6; resize:none;"
+                    placeholder="思い出メモを入力...">${stat.memo || ""}</textarea>
+            </div>
+    
+            <button class="edit-btn" onclick="saveMemo('${matchedKey}')" 
+                style="width:100%; background:var(--accent); color:white; padding:10px; border:none; border-radius:6px; font-weight:bold; cursor:pointer; margin-bottom:20px;">
+                メモを保存する
             </button>
-        </div>
-    `;
+    
+            <div style="border-top: 1px solid #444; padding-top: 15px;">
+                <button id="customSearchBtn" onclick="goToSearchPage()"
+                    style="width: 100%; background: #444; color: #fff; padding: 10px; font-size: 13px; border-radius: 6px; border: none; cursor: pointer; display: block;">
+                    🔍 画像で判定・検索
+                </button>
+            </div>
+        `;
 
             document.getElementById('modal').style.display = 'flex';
         }
 
-        // ご提示の関数をそのまま使用（またはスクリプト内に配置）
+        // ★ ID で masterData から特定するように修正
         function goToSearchPage() {
-            if (!currentCity) return;
-            const d = masterData.find(x => x.city === currentCity);
+            if (!currentCardId) return;
+            const d = masterData.find(x => x.id === currentCardId);
             if (!d || !d.url) return;
-            // _blank（別タブ）で開く設定
-            window.open(`search.html?img=${encodeURIComponent(d.url)}&city=${encodeURIComponent(d.city)}`, '_blank');
+
+            // search.html へ渡すパラメータにも id を追加
+            window.open(`search.html?img=${encodeURIComponent(d.url)}&city=${encodeURIComponent(d.city)}&id=${encodeURIComponent(d.id)}`, '_blank');
         }
-        // メモを保存する関数
+
         function saveMemo(matchedKey) {
-            const btn = event.target; // 押されたボタンを取得
+            const btn = event.target;
             const newMemo = document.getElementById('editMemoInput').value;
 
-            // ローカルストレージを更新
             if (!userStats[matchedKey]) userStats[matchedKey] = {};
             userStats[matchedKey].memo = newMemo;
             localStorage.setItem('manhole_collection', JSON.stringify(userStats));
 
-            // 保存完了の視覚効果
             const originalText = btn.textContent;
             btn.textContent = "✅ 保存完了";
-            btn.style.background = "#28a745"; // 緑色に
+            btn.style.background = "#28a745";
 
             setTimeout(() => {
                 btn.textContent = originalText;
-                btn.style.background = "var(--accent)"; // 元の色に
+                btn.style.background = "var(--accent)";
             }, 2000);
         }
-
 
         function closeModal() {
             document.getElementById('modal').style.display = 'none';
@@ -707,19 +692,16 @@
 
         // スワイプ操作の初期化
         document.addEventListener('DOMContentLoaded', () => {
-            // クラス名から要素を取得
             const calendarArea = document.querySelector('.calendar-container');
 
             if (calendarArea) {
                 let startX, startY;
 
-                // 指が触れた時
                 calendarArea.addEventListener('touchstart', e => {
                     startX = e.touches[0].pageX;
                     startY = e.touches[0].pageY;
                 }, { passive: true });
 
-                // 指が離れた時
                 calendarArea.addEventListener('touchend', e => {
                     let endX = e.changedTouches[0].pageX;
                     let endY = e.changedTouches[0].pageY;
@@ -729,10 +711,8 @@
 
                     if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 70) {
                         if (diffX > 0) {
-                            // 右スワイプ（指を右へ）＝ 前の月へ
                             changeMonth(-1);
                         } else {
-                            // 左スワイプ（指を左へ）＝ 次の月へ
                             changeMonth(1);
                         }
                     }
@@ -740,7 +720,6 @@
             }
         });
     </script>
-
 
 </body>
 

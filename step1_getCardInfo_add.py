@@ -37,14 +37,24 @@ def parse_manhole_html(file_path):
             img_url = img_tag['src'] if img_tag else "なし"
             edition = tds[2].get_text().strip()
             
-            # URLから都道府県を推測
+            # URLから都道府県と固有IDを抽出
             pref_name = "その他"
+            card_id = ""
+            
             if img_url != "なし":
+                # 都道府県の判定 (/mhc/27- などのパターン)
                 match = re.search(r'/mhc/(\d{2})-', img_url)
                 if match and match.group(1) in pref_map:
                     pref_name = pref_map[match.group(1)]
+                
+                # 固有IDの判定 (例: 27-218-A001 または 27-218-001 などを抽出)
+                # 画像パス内の「数字2桁-数字3桁-英数字3~4桁」の形式を検索します
+                id_match = re.search(r'(\d{2}-\d{3}-[A-Z0-9]+)', img_url)
+                if id_match:
+                    card_id = id_match.group(1)
 
             results.append({
+                "ID": card_id,           # 新しく追加された固有ID列
                 "都道府県": pref_name,
                 "市町村": city_info,
                 "画像URL": img_url,

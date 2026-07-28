@@ -422,8 +422,15 @@
         let currentFilterEdition = null; // nullなら全弾、文字列（"第1弾"など）ならその弾のみ
         let masterData = []; // グローバルで保持するマスタデータ
 
+        // --- 【追加】カードの収集ステータスをID優先で取得する共通関数 ---
+        function getCardStat(card) {
+            if (!card) return null;
+            const fullKey = `${card.city} (${card.id})`;
+            // 1. ID単体(card.id) -> 2. ID付き旧キー -> 3. 市区町村名のみ の順で検索
+            return userStats[card.id] || userStats[fullKey] || userStats[card.city] || null;
+        }
+
         // --- 初回ロード処理 ---
-        // window.onload = initChart; を削除し、fetch完了後にすべてを連動させて初期化します
         window.addEventListener('DOMContentLoaded', () => {
             fetch('master_data.json')
                 .then(res => res.json())
@@ -447,7 +454,6 @@
             const canvas = document.getElementById('historyChart');
             const ctx = canvas.getContext('2d');
 
-            // --- 【修正】マスタデータをベースにした安全な集計ロジック ---
             const dataMap = {};
             const yearDataMap = {};
             let grandTotal = 0;
@@ -455,9 +461,8 @@
 
             // 重複カウントを防ぐため、masterData（全カードマスタ）をベースに回す
             masterData.forEach(card => {
-                const fullKey = `${card.city} (${card.id})`;
-                // 正しいID付きキー、または古い市区町村名のみのキーのどちらかでデータを取得
-                const stat = userStats[fullKey] || userStats[card.city];
+                // ID優先でローカルストレージからステータスを取得
+                const stat = getCardStat(card);
 
                 // 取得済みであり、かつ日付が入力されている場合のみカウント
                 if (stat && stat.collected && stat.date) {
@@ -558,7 +563,6 @@
             document.getElementById('totalCount').textContent = grandTotal;
             const targetYearElem = document.getElementById('targetYearDisplay');
             let currentYear = targetYearElem ? targetYearElem.textContent : now.getFullYear().toString();
-            // もし初期化時などで空文字列になっていれば最新データの年を入れる
             if (!currentYear && months.length > 0) {
                 currentYear = months[months.length - 1].split('-')[0];
                 if (targetYearElem) targetYearElem.textContent = currentYear;
@@ -735,12 +739,10 @@
             currentFilterPref = null;
             currentFilterEdition = null;
 
-            // 都道府県と弾数両方のUIからハイライトを完全消去
             document.querySelectorAll('.pref-item').forEach(item => {
                 item.classList.remove('active-filter');
             });
 
-            // それぞれのUI統計を全国状態で再生成・再描画
             updatePrefStats();
             updateEditionStats();
             initChart();
@@ -801,8 +803,10 @@
             masterData.forEach(card => {
                 if (!prefStats[card.pref]) prefStats[card.pref] = { total: 0, collected: 0 };
                 prefStats[card.pref].total++;
-                const fullKey = `${card.city} (${card.id})`;
-                if (userStats[fullKey]?.collected || userStats[card.city]?.collected) {
+
+                // ID優先でステータス判定
+                const stat = getCardStat(card);
+                if (stat && stat.collected) {
                     prefStats[card.pref].collected++;
                 }
             });
@@ -937,7 +941,10 @@
                     edStats[edStr] = { total: 0, collected: 0, num: edNum };
                 }
                 edStats[edStr].total++;
-                if (userStats[card.city]?.collected) {
+
+                // ID優先でステータス判定
+                const stat = getCardStat(card);
+                if (stat && stat.collected) {
                     edStats[edStr].collected++;
                 }
             });
@@ -971,41 +978,41 @@
                     const s = edStats[edStr];
                     gTotal += s.total;
                     gCollected += s.collected;
-                    const percent = Math.floor((s.collected / s.total) * 100);
+
+                    const percent = s.total > 0 ? Math.floor((s.collected / s.total) * 100) : 0;
 
                     const { itemStyle: edItemStyle, completeClass } = getGaugeStyle(s.collected, s.total, percent);
                     const isActive = (edStr === currentFilterEdition) ? 'active-filter' : '';
 
                     edHtml += `
-            <div class="pref-item ${isActive}" onclick="selectEditionFromStats('${edStr}')" style="cursor: pointer;">
-                <div class="pref-info"><span>${edStr}</span><span>${s.collected}/${s.total}</span></div>
-                <div class="bar-bg">
-                    <div class="bar-fill ${completeClass}" style="width: ${percent}%; ${edItemStyle}"></div>
-                </div>
-            </div>`;
+    <div class="pref-item ${isActive}" onclick="selectEditionFromStats('${edStr}')" style="cursor: pointer;">
+        <div class="pref-info"><span>${edStr}</span><span>${s.collected}/${s.total}</span></div>
+        <div class="bar-bg">
+            <div class="bar-fill ${completeClass}" style="width: ${percent}%; ${edItemStyle}"></div>
+        </div>
+    </div>`;
                 });
 
-                if (gTotal === 0) gTotal = 1;
-                const gPercent = Math.floor((gCollected / gTotal) * 100);
+                const gPercent = gTotal > 0 ? Math.floor((gCollected / gTotal) * 100) : 0;
                 const { itemStyle: edGroupStyle, completeClass: gCompleteClass } = getGaugeStyle(gCollected, gTotal, gPercent);
 
                 html += `
-        <div class="region-container" id="ed-group-${groupName}">
-            <div class="region-header" onclick="this.parentElement.classList.toggle('open')">
-                <div class="region-info">
-                    <div class="region-name-row">
-                        <span class="arrow">▶</span> ${groupName}
-                    </div>
-                    <div class="region-percentage-row">
-                        取得率: ${gPercent}% (${gCollected} / ${gTotal})
-                    </div>
-                </div>
-                <div class="region-gauge-bg">
-                    <div class="bar-fill ${gCompleteClass}" style="width: ${gPercent}%; ${edGroupStyle}"></div>
-                </div>
+<div class="region-container" id="ed-group-${groupName}">
+    <div class="region-header" onclick="this.parentElement.classList.toggle('open')">
+        <div class="region-info">
+            <div class="region-name-row">
+                <span class="arrow">▶</span> ${groupName}
             </div>
-            <div class="region-content">${edHtml}</div>
-        </div>`;
+            <div class="region-percentage-row">
+                取得率: ${gPercent}% (${gCollected} / ${gTotal})
+            </div>
+        </div>
+        <div class="region-gauge-bg">
+            <div class="bar-fill ${gCompleteClass}" style="width: ${gPercent}%; ${edGroupStyle}"></div>
+        </div>
+    </div>
+    <div class="region-content">${edHtml}</div>
+</div>`;
             });
 
             grid.innerHTML = html;
@@ -1020,7 +1027,6 @@
                 console.log("フィルタ適用:", prefName);
             }
 
-            // ハイライト表示のリアルタイム同期のためにUIを再描画
             updatePrefStats();
             initChart();
 
@@ -1040,7 +1046,6 @@
                 console.log("フィルタ適用:", edStr);
             }
 
-            // ハイライト表示のリアルタイム同期のためにUIを再描画
             updateEditionStats();
             initChart();
 
