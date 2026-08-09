@@ -524,6 +524,7 @@
         }
 
         // バッジを描画する関数
+        // --- 1. バッジを描画する関数（クリックイベントを追加） ---
         function renderPrefStats(stats) {
             const area = document.getElementById('prefStatsArea');
             const list = document.getElementById('prefBadgeList');
@@ -541,19 +542,130 @@
 
             sortedPrefs.forEach(([pref, count]) => {
                 const badge = document.createElement('div');
+                badge.className = 'pref-badge'; // CSS装飾用クラス名（任意）
                 badge.style.cssText = `
-                background: #333;
-                border: 1px solid #555;
-                padding: 4px 10px;
-                border-radius: 15px;
-                font-size: 12px;
-                color: #eee;
-                display: flex;
-                align-items: center;
-                gap: 5px;
-            `;
+            background: #333;
+            border: 1px solid #555;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            color: #eee;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.2s;
+        `;
                 badge.innerHTML = `${pref} <b style="color:var(--accent)">${count}</b>`;
+
+                // ホバー時のエフェクト
+                badge.onmouseover = () => badge.style.background = '#444';
+                badge.onmouseout = () => badge.style.background = '#333';
+
+                // ★クリック時に該当都道府県のカード一覧を表示
+                badge.onclick = () => showCardsForPref(pref, stats);
+
                 list.appendChild(badge);
+            });
+        }
+
+        // --- 都道府県別のカードを日付ごとのセクションに分けて表示する関数 ---
+        function showCardsForPref(pref, monthlyPrefs) {
+            // 日付選択の枠線ハイライトを解除
+            document.querySelectorAll('.day').forEach(d => d.classList.remove('selected-day'));
+
+            const title = document.getElementById('selectedDateTitle');
+            const list = document.getElementById('cardList');
+            list.innerHTML = '';
+
+            // 今月（currentYear, currentMonth）のフォーマット
+            const mStr = String(currentMonth + 1).padStart(2, '0');
+            const targetMonthPrefix = `${currentYear}-${mStr}-`;
+
+            // 今月収集したレコードのキーを取得
+            const targetKeys = Object.keys(userStats).filter(key => {
+                return userStats[key].collected && userStats[key].date && userStats[key].date.startsWith(targetMonthPrefix);
+            });
+
+            // 今月の記録の中から、クリックされた都道府県に該当するカードを抽出し、日付ごとにグループ化する
+            const groupedByDate = {};
+
+            targetKeys.forEach(tKey => {
+                const stat = userStats[tKey];
+                const card = masterData.find(c => {
+                    const fullKey = `${c.city} (${c.id})`;
+                    return tKey === fullKey || tKey === c.city || tKey === c.id || stat.id === fullKey || stat.id === c.id;
+                });
+
+                // 該当都道府県のカードのみ対象
+                if (card && card.pref === pref) {
+                    const dStr = stat.date; // YYYY-MM-DD
+                    if (!groupedByDate[dStr]) {
+                        groupedByDate[dStr] = [];
+                    }
+                    groupedByDate[dStr].push({ card, matchedKey: tKey, stat });
+                }
+            });
+
+            title.textContent = `${pref} の取得（${currentYear}年${currentMonth + 1}月）`;
+
+            const sortedDates = Object.keys(groupedByDate).sort(); // 日付順に並び替え
+
+            if (sortedDates.length === 0) {
+                list.innerHTML = '<div class="empty-msg">記録はありません</div>';
+                return;
+            }
+
+            // 日付ごとのセクションを生成
+            sortedDates.forEach(dateStr => {
+                const dayNum = parseInt(dateStr.split('-')[2], 10); // "01" -> 1
+                const count = groupedByDate[dateStr].length;
+
+                const sectionHeader = document.createElement('div');
+                sectionHeader.style.cssText = `
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
+            border-left: 4px solid var(--accent, #3b82f6);
+            border-radius: 4px;
+            padding: 8px 12px;
+            margin: 20px 0 10px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        `;
+
+                sectionHeader.innerHTML = `
+            <!-- 1行目: 大きな日付表記 -->
+            <div style="display: flex; align-items: baseline; gap: 4px;">
+                <span style="font-size: 20px; font-weight: bold; color: var(--accent, #3b82f6); letter-spacing: 0.5px; line-height: 1;">${dayNum}日</span>
+            </div>
+            <!-- 2行目: 改行して配置した枚数バッジ（折り返し防止付き） -->
+            <div style="font-size: 15px; color: #aaa; background: rgba(0,0,0,0.3); padding: 2px 8px; border-radius: 10px; white-space: nowrap;">
+                ${count}枚取得
+            </div>
+        `;
+                list.appendChild(sectionHeader);
+
+                // その日に取得したカード群を表示
+                groupedByDate[dateStr].forEach(({ card, matchedKey, stat }) => {
+                    const memoText = stat.memo || '';
+
+                    const cardEl = document.createElement('div');
+                    cardEl.className = 'card-mini';
+                    cardEl.style.cursor = 'pointer';
+                    cardEl.onclick = () => openDetail(card.id, matchedKey);
+
+                    cardEl.innerHTML = `
+                <img src="${card.url}" alt="${card.city}">
+                <div class="card-mini-info" style="flex:1;">
+                    <div style="font-weight:bold; color:#ffffff; font-size:14px;">${card.city}</div>
+                    ${memoText ? `<div style="font-size:12px; color:#dddddd; margin-top:4px; line-height:1.4; white-space: pre-wrap; word-break: break-all;">📝 ${memoText}</div>` : ''}
+                </div>
+            `;
+                    list.appendChild(cardEl);
+                });
             });
         }
 
