@@ -605,12 +605,15 @@
                 const fullKey = `${card.city} (${card.id})`;
                 const matchedKey = targetKeys.find(tKey => tKey === fullKey || tKey === card.city || tKey === card.id) || fullKey;
 
+                // 対応するstatからメモを取得
+                const memoText = (userStats[matchedKey] && userStats[matchedKey].memo) ? userStats[matchedKey].memo : '';
+
                 list.innerHTML += `
                 <div class="card-mini" onclick="openDetail('${card.id}', '${matchedKey}')" style="cursor:pointer;">
                     <img src="${card.url}" alt="${card.city}">
-                    <div class="card-mini-info">
-                        <div>${card.city}</div>
-                    </div>
+                    <div class="card-mini-info" style="flex:1;">
+                        <div style="font-weight:bold;">${card.city}</div>
+${memoText ? `<div style="font-size:12px; color:#bbbbbb; margin-top:4px; line-height:1.4; white-space: pre-wrap; word-break: break-all;">${memoText}</div>` : ''}                    </div>
                 </div>
             `;
             });
