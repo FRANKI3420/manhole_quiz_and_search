@@ -13,6 +13,17 @@
             --text: #eee;
         }
 
+
+        header {
+            background: #1f1f1f;
+            padding: 20px 15px;
+            text-align: center;
+            border-bottom: 2px solid #333;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
         body {
             background: var(--bg);
             color: var(--text);
@@ -334,11 +345,54 @@
 
 <body>
 
-    <div class="nav">
-        <a href="collection.html" class="back-btn">← 図鑑に戻る</a>
-        <a href="stats.html" class="back-btn">統計 →</a>
-        <!-- <div id="currentMonthDisplay" style="font-weight: bold;">2024年 1月</div> -->
+    <header>
+        <a href="index.html"
+            style="color: #ffffff; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
+            <div style="font-weight:bold;">取得カレンダー</div>
+        </a>
+    </header>
+
+    <div style="margin-top: 15px; display: flex; flex-direction: row; gap: 8px; justify-content: center; width: 100%;">
+        <a href="collection.html" style="
+            flex: 1;
+            padding: 10px 4px;
+            background: #333;
+            color: #4dabff;
+            text-decoration: none;
+            font-size: 12px;
+            border: 1px solid #4dabff;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+        ">🗃️ コレクション</a>
+
+        <a href="stats.html" style="
+            flex: 1;
+            padding: 10px 4px;
+            background: #333;
+            color: #4dabff;
+            text-decoration: none;
+            font-size: 12px;
+            border: 1px solid #4dabff;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+        ">📊 統計</a>
+
+        <a href="category.html" style="
+            flex: 1;
+            padding: 10px 4px;
+            background: #333;
+            color: #4dabff;
+            text-decoration: none;
+            font-size: 12px;
+            border: 1px solid #4dabff;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+        ">🗃️ カード図鑑</a>
     </div>
+
 
     <div class="calendar-container">
         <div class="cal-header">

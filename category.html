@@ -594,7 +594,10 @@
 
 <body>
     <header>
-        <div style="font-weight:bold;">マンホール図鑑</div>
+        <a href="index.html"
+            style="color: #ffffff; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
+            <div style="font-weight:bold;">マンホール図鑑</div>
+        </a>
     </header>
 
     <div style="margin-top: 15px; display: flex; flex-direction: row; gap: 8px; justify-content: center; width: 100%;">
@@ -635,7 +638,7 @@
         border-radius: 8px;
         text-align: center;
         font-weight: bold;
-    ">🏠 コレクション図鑑</a>
+    ">🗃️ コレクション図鑑</a>
     </div>
 
     <div class="control-panel">
@@ -667,13 +670,6 @@
 
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                 <div style="font-size: 12px; color: #888; font-weight: bold;">📂 条件で絞り込む</div>
-
-                <label
-                    style="font-size: 14px; color: #fff; display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 6px 10px; background: rgba(255,255,255,0.1); border-radius: 6px; user-select: none;">
-                    <input type="checkbox" id="uncollectedFilter" onchange="handleFilterChange()"
-                        style="cursor: pointer; accent-color: #4dabff; width: 18px; height: 18px; margin: 0;">
-                    未取得のみ
-                </label>
             </div>
 
             <div class="select-group" id="filterGroup">
@@ -691,13 +687,6 @@
 
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                 <div style="font-size: 12px; color: #888; font-weight: bold;">📂 ピクトグラム・コラボで絞り込む</div>
-
-                <label
-                    style="font-size: 14px; color: #fff; display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 6px 10px; background: rgba(255,255,255,0.1); border-radius: 6px; user-select: none;">
-                    <input type="checkbox" id="uncollectedFilter" onchange="handleFilterChange()"
-                        style="cursor: pointer; accent-color: #4dabff; width: 18px; height: 18px; margin: 0;">
-                    未取得のみ
-                </label>
             </div>
 
             <div style="display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap;">
@@ -946,15 +935,13 @@
         let selectedIds = new Set();
         let currentId = null;
         let currentCity = null;
+        let currentCollab = "";
 
         // --- ローカルストレージのキーを「名前」から「ID」へ完全マイグレーション ---
         async function migrateAddIdsToLocalStorage() {
             const storageKey = 'manhole_collection';
             const rawData = localStorage.getItem(storageKey);
-            if (!rawData) return;
-
-            const response = await fetch('master_data.json');
-            const masterDataList = await response.json();
+            if (!rawData || masterData.length === 0) return;
 
             const normalize = (str) => {
                 if (!str) return '';
@@ -964,7 +951,8 @@
             };
 
             const masterMap = {};
-            masterDataList.forEach(item => {
+            // 外部fetchではなく、すでに読み込んだ masterData を使用
+            masterData.forEach(item => {
                 if (item.old_id) {
                     masterMap[normalize(item.old_id)] = item.id;
                 }
@@ -977,7 +965,6 @@
 
             Object.keys(localData).forEach(oldIdKey => {
                 const normKey = normalize(oldIdKey);
-
                 let matchedId = masterMap[normKey];
 
                 if (!matchedId) {
@@ -985,14 +972,14 @@
                     matchedId = masterMap[baseName];
                 }
 
-                const isAlreadyId = masterDataList.some(m => m.id === oldIdKey);
+                const isAlreadyId = masterData.some(m => m.id === oldIdKey);
 
                 if (isAlreadyId) {
                     newLocalData[oldIdKey] = localData[oldIdKey];
                 } else if (matchedId) {
                     const itemData = localData[oldIdKey];
                     itemData.id = matchedId;
-                    newLocalData[matchedId] = itemData; // キーをIDに統一！
+                    newLocalData[matchedId] = itemData;
                     updatedCount++;
                 } else {
                     newLocalData[oldIdKey] = localData[oldIdKey];
@@ -1046,13 +1033,13 @@
             await migrateAddIdsToLocalStorage();
             updateStats();
             initFilters();
-            updatePrefStats();
-            updateEditionStats();
 
-            if (document.getElementById('prefFilter').value === "") {
+            // ★未定義関数の呼び出し（updatePrefStats / updateEditionStats）を削除しました
+
+            if (document.getElementById('prefFilter') && document.getElementById('prefFilter').value === "") {
                 setInitialLocation();
             }
-        });
+        }).catch(err => console.error("マスターデータの読み込みエラー:", err));
 
         // カードの所持状態を「ID優先」で取得する関数
         function getCardStat(card) {
@@ -1095,13 +1082,17 @@
             </div>
             `;
             }
-            document.getElementById('totalProgress').style.width = collectRate + '%';
-            document.getElementById('dateProgress').style.width = dateRate + '%';
+            const totalProg = document.getElementById('totalProgress');
+            const dateProg = document.getElementById('dateProgress');
+            if (totalProg) totalProg.style.width = collectRate + '%';
+            if (dateProg) dateProg.style.width = dateRate + '%';
         }
 
         function initFilters() {
             const pSel = document.getElementById('prefFilter');
             const eSel = document.getElementById('editionFilter');
+            if (!pSel || !eSel) return;
+
             pSel.innerHTML = '<option value="">都道府県を選択</option>';
             eSel.innerHTML = '<option value="">弾数を選択</option>';
 
@@ -1130,52 +1121,52 @@
 
             const allSelected = filtered.every(c => selectedIds.has(c.id));
             filtered.forEach(c => {
-                const el = document.querySelector(`[data-id="${c.id}"]`);
                 if (allSelected) {
                     selectedIds.delete(c.id);
-                    if (el) el.classList.remove('selecting-active');
                 } else {
                     selectedIds.add(c.id);
-                    if (el) el.classList.add('selecting-active');
                 }
             });
-            updateBulkButtonUI();
+            renderCollection(); // 再描画で選択状態を確実に反映
+            if (typeof updateBulkButtonUI === 'function') updateBulkButtonUI();
         }
 
         function handleSearchInput() {
             const searchInput = document.getElementById('searchInput');
             const clearBtn = document.getElementById('clearSearchBtn');
+            const filterGroup = document.getElementById('filterGroup');
             const searchVal = searchInput.value;
 
             if (searchVal.length > 0) {
-                clearBtn.style.display = 'flex';
+                if (clearBtn) clearBtn.style.display = 'flex';
                 document.getElementById('prefFilter').value = "";
                 document.getElementById('editionFilter').value = "";
-                document.getElementById('filterGroup').style.opacity = "0.3";
-                document.getElementById('filterGroup').style.pointerEvents = "none";
+                if (filterGroup) {
+                    filterGroup.style.opacity = "0.3";
+                    filterGroup.style.pointerEvents = "none";
+                }
             } else {
-                clearBtn.style.display = 'none';
-                document.getElementById('filterGroup').style.opacity = "1";
-                document.getElementById('filterGroup').style.pointerEvents = "auto";
+                if (clearBtn) clearBtn.style.display = 'none';
+                if (filterGroup) {
+                    filterGroup.style.opacity = "1";
+                    filterGroup.style.pointerEvents = "auto";
+                }
             }
             renderCollection();
         }
 
         function clearSearch() {
             const searchInput = document.getElementById('searchInput');
-            searchInput.value = "";
-            handleSearchInput();
-            searchInput.focus();
+            if (searchInput) {
+                searchInput.value = "";
+                handleSearchInput();
+                searchInput.focus();
+            }
         }
 
-        // ★追加: 選択中のコラボフィルターを保持する変数
-        let currentCollab = "";
-
-        // ★追加: コラボボタンを押した時の処理
         function setCollabFilter(val, btn) {
             currentCollab = val;
 
-            // ボタンのハイライト切り替え
             document.querySelectorAll('.collab-btn').forEach(b => {
                 b.classList.remove('active');
                 b.style.background = '#222';
@@ -1189,13 +1180,11 @@
                 btn.style.borderColor = '#555';
             }
 
-            // ★追加: コラボ（ガンダム・アイマスなど）を選択した時、都道府県・弾数・検索ワードをクリア
             if (currentCollab !== "") {
                 document.getElementById('prefFilter').value = "";
                 document.getElementById('editionFilter').value = "";
                 document.getElementById('searchInput').value = "";
             }
-
 
             renderCollection();
         }
@@ -1203,29 +1192,34 @@
         function handleFilterChange() {
             const pref = document.getElementById('prefFilter').value;
             const ed = document.getElementById('editionFilter').value;
+            const filterGroup = document.getElementById('filterGroup');
 
             if (pref !== "" || ed !== "") {
                 document.getElementById('searchInput').value = "";
-                document.getElementById('filterGroup').style.opacity = "1";
-                document.getElementById('filterGroup').style.pointerEvents = "auto";
+                if (filterGroup) {
+                    filterGroup.style.opacity = "1";
+                    filterGroup.style.pointerEvents = "auto";
+                }
             }
             renderCollection();
         }
 
         // コレクションの描画
         function renderCollection() {
-            const pref = document.getElementById('prefFilter').value;
-            const ed = document.getElementById('editionFilter').value;
-            const searchText = document.getElementById('searchInput').value.trim().toLowerCase();
-            const showUncollectedOnly = document.getElementById('uncollectedFilter').checked;
+            const pref = document.getElementById('prefFilter')?.value || "";
+            const ed = document.getElementById('editionFilter')?.value || "";
+            const searchText = (document.getElementById('searchInput')?.value || "").trim().toLowerCase();
+            const uncollectedElem = document.getElementById('uncollectedFilter');
+            const showUncollectedOnly = uncollectedElem ? uncollectedElem.checked : false;
             const listDiv = document.getElementById('collectionList');
             const bulkArea = document.getElementById('bulkActionArea');
             const statsDiv = document.getElementById('filterStats');
 
+            if (!listDiv) return;
+
             let filtered = [];
 
             if (searchText !== "") {
-                // 名前 (city) に加えて ID (id, old_id) で検索ヒット
                 filtered = masterData.filter(d =>
                     (d.city && d.city.toLowerCase().includes(searchText)) ||
                     (d.id && d.id.toLowerCase().includes(searchText)) ||
@@ -1235,19 +1229,17 @@
                 filtered = masterData.filter(d => {
                     const pMatch = !pref || d.pref === pref;
                     const eMatch = !ed || d.edition === ed;
-
                     const cMatch = !currentCollab || (d.tags && Array.isArray(d.tags) && d.tags.includes(currentCollab));
 
                     return pMatch && eMatch && cMatch;
                 });
             } else {
                 listDiv.innerHTML = '<div class="empty-state">検索ワード（市町村名・カードID）を入力するか、<br>条件から絞り込んでください</div>';
-                bulkArea.style.display = 'none';
+                if (bulkArea) bulkArea.style.display = 'none';
                 if (statsDiv) statsDiv.style.display = 'none';
                 return;
             }
 
-            // 「未取得のみ表示」がONの場合、取得済みのものを除外
             if (showUncollectedOnly) {
                 filtered = filtered.filter(c => {
                     const stats = getCardStat(c);
@@ -1255,27 +1247,23 @@
                 });
             }
 
-            // フィルター内統計（IDベースで判定）
             if (statsDiv) {
                 const totalInFilter = filtered.length;
                 const collectedInFilter = filtered.filter(c => getCardStat(c)?.collected);
                 const collectedCount = collectedInFilter.length;
-                const datedCountInFilter = collectedInFilter.filter(c => getCardStat(c)?.date).length;
-                const dateRateInFilter = collectedCount > 0 ? Math.round((datedCountInFilter / collectedCount) * 100) : 0;
                 const collectRateInFilter = totalInFilter > 0 ? Math.round((collectedCount / totalInFilter) * 100) : 0;
 
                 statsDiv.style.display = 'block';
                 statsDiv.innerHTML = `
-    <div style="margin-bottom: 5px;">
-        表示中: <b>${totalInFilter}</b>枚 / 取得済み: <b>${collectedCount}</b>枚
-        <span class="rate-badge" style="margin-left:5px;">収集率: ${collectRateInFilter}%</span>
-    </div>
-
-    `;
+                <div style="margin-bottom: 5px;">
+                    表示中: <b>${totalInFilter}</b>枚 / 取得済み: <b>${collectedCount}</b>枚
+                    <span class="rate-badge" style="margin-left:5px;">収集率: ${collectRateInFilter}%</span>
+                </div>
+                `;
             }
 
-            bulkArea.style.display = (filtered.length > 0) ? 'block' : 'none';
-            updateBulkButtonUI();
+            if (bulkArea) bulkArea.style.display = (filtered.length > 0) ? 'block' : 'none';
+            if (typeof updateBulkButtonUI === 'function') updateBulkButtonUI();
 
             // カード描画処理
             listDiv.innerHTML = filtered.map(c => {
@@ -1288,26 +1276,24 @@
 
                 const memoText = stats?.memo ?
                     `<div style="font-size:9px; color:#aaa; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; margin-top:2px;">
-        ${stats.memo}</div>`
-                    : "";
+                    ${stats.memo}</div>` : "";
 
-                // 取得・未取得に関わらず常に 'collected' クラス（色付き）を付与
+                // ❌ 取得・未取得に関わらず常に 'collected' クラス（色付き）を付与
                 let statusClass = 'collected';
                 if (isSelectionMode && isSelected) statusClass = 'selecting-active';
 
                 return `
-    <div class="card-container ${statusClass}" data-id="${c.id}" onclick="handleCardClick('${c.id}')">
-        <div class="check-mark">✓</div>
-        <img src="${c.url}" loading="lazy" alt="${c.city}" onerror="this.style.opacity='0.3';this.onerror=null;">
-        <div class="card-info">
-            <div style="font-weight:bold;">${c.city}</div>
-            ${memoText}
-            <div class="date-text" style="font-size: 10px; color: ${hasDate ? '#4dabff' : '#ffc107'}; height: 12px; margin-top: 2px;">
-                ${collectDateText}
-            </div>
-        </div>
-    </div>
-    `;
+                <div class="card-container ${statusClass}" data-id="${c.id}" onclick="handleCardClick('${c.id}')">
+                    <img src="${c.url}" loading="lazy" alt="${c.city}" onerror="this.style.opacity='0.3';this.onerror=null;">
+                    <div class="card-info">
+                        <div style="font-weight:bold;">${c.city}</div>
+                        ${memoText}
+                        <div class="date-text" style="font-size: 10px; color: ${hasDate ? '#4dabff' : '#ffc107'}; height: 12px; margin-top: 2px;">
+                            ${collectDateText}
+                        </div>
+                    </div>
+                </div>
+                `;
             }).join('');
         }
 

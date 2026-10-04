@@ -452,7 +452,6 @@
 
         .bar-bg {
             background: #333;
-            /* バーの背景（未取得分） */
             height: 8px;
             border-radius: 4px;
             margin-top: 4px;
@@ -594,7 +593,12 @@
 
 <body>
     <header>
-        <div style="font-weight:bold;">コレクション</div>
+        <header>
+            <a href="index.html"
+                style="color: #ffffff; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
+                <div style="font-weight:bold;">コレクション図鑑</div>
+            </a>
+        </header>
         <div class="progress-bar-bg">
             <div id="totalProgress"></div>
         </div>
@@ -631,7 +635,7 @@
         font-weight: bold;
     ">📊 統計</a>
 
-        <a href="index.html" style="
+        <a href="category.html" style="
         flex: 1;
         padding: 10px 4px;
         background: #333;
@@ -642,7 +646,7 @@
         border-radius: 8px;
         text-align: center;
         font-weight: bold;
-    ">🏠 メニュー</a>
+    ">🏠 カード図鑑</a>
     </div>
 
     <div class="control-panel">
