@@ -441,8 +441,8 @@
     <script>
         let masterData = [];
         let userStats = JSON.parse(localStorage.getItem('manhole_collection')) || {};
-        let currentDisplayDate = new Date();
         let currentYear, currentMonth;
+        let currentDisplayDate = new Date();
 
         // 初期読み込み
         async function init() {
@@ -457,7 +457,7 @@
                 masterData = await res.json();
                 console.log("JSON読み込み成功:", masterData.length, "件");
 
-                // --- ここからURLパラメータの解析を追加 ---
+                // URLパラメータの解析
                 const urlParams = new URLSearchParams(window.location.search);
                 const targetParam = urlParams.get('target'); // "2024-05" などの形式
 
@@ -465,24 +465,23 @@
                     const [tYear, tMonth] = targetParam.split('-');
                     currentYear = parseInt(tYear);
                     currentMonth = parseInt(tMonth) - 1; // JSの月は0-11のため
-                    console.log(`表示月を切り替えました: ${currentYear}年${currentMonth + 1}月`);
                 } else {
                     // パラメータがない場合は「今日」を表示
                     const now = new Date();
                     currentYear = now.getFullYear();
                     currentMonth = now.getMonth();
                 }
-                // --- 解析ここまで ---
+
+                // ★修正1: currentDisplayDate を現在の表示年月と同期させる
+                currentDisplayDate = new Date(currentYear, currentMonth, 1);
 
                 renderCalendar();
-                // もし図鑑統計関数（updatePrefStats）がある場合はここで呼ぶ
                 if (typeof updatePrefStats === 'function') updatePrefStats();
 
             } catch (e) {
                 console.error("エラー詳細:", e);
             }
         }
-        // ページ読み込み完了後に実行
         window.onload = init;
 
         function renderCalendar() {
@@ -498,9 +497,10 @@
             const year = currentYear;
             const month = currentMonth;
 
-            // --- 年セレクトボックスの生成 (2020年から現在の5年後まで) ---
+            // ★修正2: 年セレクトボックスの生成 (2019年から現在の5年後、または表示中の年までカバー)
             yearSelect.innerHTML = '';
-            for (let y = 2020; y <= new Date().getFullYear() + 5; y++) {
+            const maxYear = Math.max(new Date().getFullYear() + 5, year);
+            for (let y = 2019; y <= maxYear; y++) {
                 const opt = document.createElement('option');
                 opt.value = y;
                 opt.textContent = y;
@@ -508,7 +508,7 @@
                 yearSelect.appendChild(opt);
             }
 
-            // --- 月セレクトボックスの生成 ---
+            // 月セレクトボックスの生成
             monthSelect.innerHTML = '';
             for (let m = 0; m < 12; m++) {
                 const opt = document.createElement('option');
@@ -529,23 +529,19 @@
             // 空白埋め
             for (let i = 0; i < firstDay; i++) grid.innerHTML += `<div></div>`;
 
-            // --- 都道府県集計用のロジック ---
+            // 都道府県集計用のロジック
             let monthTotalCount = 0;
             let monthlyPrefs = {};
-
-            // userStats の全データを [キー, 値] の配列にしてループ
             const userStatsEntries = Object.entries(userStats);
 
             for (let date = 1; date <= lastDate; date++) {
                 const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
 
-                // その日の記録を「キー」を含めて抽出
                 const dayEntries = userStatsEntries.filter(([key, stat]) =>
                     stat.collected && stat.date === dateStr
                 );
 
                 dayEntries.forEach(([key, stat]) => {
-                    // IDまたはキーで比較
                     const card = masterData.find(c => {
                         const fullKey = `${c.city} (${c.id})`;
                         return key === fullKey || key === c.city || key === c.id || stat.id === fullKey || stat.id === c.id;
@@ -553,8 +549,6 @@
 
                     if (card && card.pref) {
                         monthlyPrefs[card.pref] = (monthlyPrefs[card.pref] || 0) + 1;
-                    } else {
-                        console.warn("マッチ失敗。キー:", key, " stat.id:", stat.id);
                     }
                 });
 
@@ -577,150 +571,14 @@
             renderPrefStats(monthlyPrefs);
         }
 
-        // バッジを描画する関数
-        // --- 1. バッジを描画する関数（クリックイベントを追加） ---
-        function renderPrefStats(stats) {
-            const area = document.getElementById('prefStatsArea');
-            const list = document.getElementById('prefBadgeList');
+        // ★修正3: 月を変更する関数（年跨ぎを自動計算）
+        function changeMonth(diff) {
+            // 現在の年・月から diff 分移動した新しい日付を作成
+            currentDisplayDate = new Date(currentYear, currentMonth + diff, 1);
+            currentYear = currentDisplayDate.getFullYear();
+            currentMonth = currentDisplayDate.getMonth();
 
-            if (Object.keys(stats).length === 0) {
-                area.style.display = 'none';
-                return;
-            }
-
-            area.style.display = 'block';
-            list.innerHTML = '';
-
-            // 枚数が多い順に並び替え
-            const sortedPrefs = Object.entries(stats).sort((a, b) => b[1] - a[1]);
-
-            sortedPrefs.forEach(([pref, count]) => {
-                const badge = document.createElement('div');
-                badge.className = 'pref-badge'; // CSS装飾用クラス名（任意）
-                badge.style.cssText = `
-            background: #333;
-            border: 1px solid #555;
-            padding: 5px 12px;
-            border-radius: 15px;
-            font-size: 12px;
-            color: #eee;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            cursor: pointer;
-            user-select: none;
-            transition: background 0.2s;
-        `;
-                badge.innerHTML = `${pref} <b style="color:var(--accent)">${count}</b>`;
-
-                // ホバー時のエフェクト
-                badge.onmouseover = () => badge.style.background = '#444';
-                badge.onmouseout = () => badge.style.background = '#333';
-
-                // ★クリック時に該当都道府県のカード一覧を表示
-                badge.onclick = () => showCardsForPref(pref, stats);
-
-                list.appendChild(badge);
-            });
-        }
-
-        // --- 都道府県別のカードを日付ごとのセクションに分けて表示する関数 ---
-        function showCardsForPref(pref, monthlyPrefs) {
-            // 日付選択の枠線ハイライトを解除
-            document.querySelectorAll('.day').forEach(d => d.classList.remove('selected-day'));
-
-            const title = document.getElementById('selectedDateTitle');
-            const list = document.getElementById('cardList');
-            list.innerHTML = '';
-
-            // 今月（currentYear, currentMonth）のフォーマット
-            const mStr = String(currentMonth + 1).padStart(2, '0');
-            const targetMonthPrefix = `${currentYear}-${mStr}-`;
-
-            // 今月収集したレコードのキーを取得
-            const targetKeys = Object.keys(userStats).filter(key => {
-                return userStats[key].collected && userStats[key].date && userStats[key].date.startsWith(targetMonthPrefix);
-            });
-
-            // 今月の記録の中から、クリックされた都道府県に該当するカードを抽出し、日付ごとにグループ化する
-            const groupedByDate = {};
-
-            targetKeys.forEach(tKey => {
-                const stat = userStats[tKey];
-                const card = masterData.find(c => {
-                    const fullKey = `${c.city} (${c.id})`;
-                    return tKey === fullKey || tKey === c.city || tKey === c.id || stat.id === fullKey || stat.id === c.id;
-                });
-
-                // 該当都道府県のカードのみ対象
-                if (card && card.pref === pref) {
-                    const dStr = stat.date; // YYYY-MM-DD
-                    if (!groupedByDate[dStr]) {
-                        groupedByDate[dStr] = [];
-                    }
-                    groupedByDate[dStr].push({ card, matchedKey: tKey, stat });
-                }
-            });
-
-            title.textContent = `${pref} の取得（${currentYear}年${currentMonth + 1}月）`;
-
-            const sortedDates = Object.keys(groupedByDate).sort(); // 日付順に並び替え
-
-            if (sortedDates.length === 0) {
-                list.innerHTML = '<div class="empty-msg">記録はありません</div>';
-                return;
-            }
-
-            // 日付ごとのセクションを生成
-            sortedDates.forEach(dateStr => {
-                const dayNum = parseInt(dateStr.split('-')[2], 10); // "01" -> 1
-                const count = groupedByDate[dateStr].length;
-
-                const sectionHeader = document.createElement('div');
-                sectionHeader.style.cssText = `
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 4px;
-            background: linear-gradient(90deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
-            border-left: 4px solid var(--accent, #3b82f6);
-            border-radius: 4px;
-            padding: 8px 12px;
-            margin: 20px 0 10px 0;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        `;
-
-                sectionHeader.innerHTML = `
-            <!-- 1行目: 大きな日付表記 -->
-            <div style="display: flex; align-items: baseline; gap: 4px;">
-                <span style="font-size: 20px; font-weight: bold; color: var(--accent, #3b82f6); letter-spacing: 0.5px; line-height: 1;">${dayNum}日</span>
-            </div>
-            <!-- 2行目: 改行して配置した枚数バッジ（折り返し防止付き） -->
-            <div style="font-size: 15px; color: #aaa; background: rgba(0,0,0,0.3); padding: 2px 8px; border-radius: 10px; white-space: nowrap;">
-                ${count}枚取得
-            </div>
-        `;
-                list.appendChild(sectionHeader);
-
-                // その日に取得したカード群を表示
-                groupedByDate[dateStr].forEach(({ card, matchedKey, stat }) => {
-                    const memoText = stat.memo || '';
-
-                    const cardEl = document.createElement('div');
-                    cardEl.className = 'card-mini';
-                    cardEl.style.cursor = 'pointer';
-                    cardEl.onclick = () => openDetail(card.id, matchedKey);
-
-                    cardEl.innerHTML = `
-                <img src="${card.url}" alt="${card.city}">
-                <div class="card-mini-info" style="flex:1;">
-                    <div style="font-weight:bold; color:#ffffff; font-size:14px;">${card.city}</div>
-                    ${memoText ? `<div style="font-size:12px; color:#dddddd; margin-top:4px; line-height:1.4; white-space: pre-wrap; word-break: break-all;">📝 ${memoText}</div>` : ''}
-                </div>
-            `;
-                    list.appendChild(cardEl);
-                });
-            });
+            renderCalendar();
         }
 
         function jumpToDate() {
@@ -734,12 +592,134 @@
             renderCalendar();
         }
 
-        function changeMonth(diff) {
-            currentDisplayDate.setMonth(currentDisplayDate.getMonth() + diff);
-            currentYear = currentDisplayDate.getFullYear();
-            currentMonth = currentDisplayDate.getMonth();
+        function renderPrefStats(stats) {
+            const area = document.getElementById('prefStatsArea');
+            const list = document.getElementById('prefBadgeList');
 
-            renderCalendar();
+            if (Object.keys(stats).length === 0) {
+                area.style.display = 'none';
+                return;
+            }
+
+            area.style.display = 'block';
+            list.innerHTML = '';
+
+            const sortedPrefs = Object.entries(stats).sort((a, b) => b[1] - a[1]);
+
+            sortedPrefs.forEach(([pref, count]) => {
+                const badge = document.createElement('div');
+                badge.className = 'pref-badge';
+                badge.style.cssText = `
+                        background: #333;
+                        border: 1px solid #555;
+                        padding: 5px 12px;
+                        border-radius: 15px;
+                        font-size: 12px;
+                        color: #eee;
+                        display: flex;
+                        align-items: center;
+                        gap: 6px;
+                        cursor: pointer;
+                        user-select: none;
+                        transition: background 0.2s;
+                    `;
+                badge.innerHTML = `${pref} <b style="color:var(--accent)">${count}</b>`;
+
+                badge.onmouseover = () => badge.style.background = '#444';
+                badge.onmouseout = () => badge.style.background = '#333';
+                badge.onclick = () => showCardsForPref(pref, stats);
+
+                list.appendChild(badge);
+            });
+        }
+
+        function showCardsForPref(pref, monthlyPrefs) {
+            document.querySelectorAll('.day').forEach(d => d.classList.remove('selected-day'));
+
+            const title = document.getElementById('selectedDateTitle');
+            const list = document.getElementById('cardList');
+            list.innerHTML = '';
+
+            const mStr = String(currentMonth + 1).padStart(2, '0');
+            const targetMonthPrefix = `${currentYear}-${mStr}-`;
+
+            const targetKeys = Object.keys(userStats).filter(key => {
+                return userStats[key].collected && userStats[key].date && userStats[key].date.startsWith(targetMonthPrefix);
+            });
+
+            const groupedByDate = {};
+
+            targetKeys.forEach(tKey => {
+                const stat = userStats[tKey];
+                const card = masterData.find(c => {
+                    const fullKey = `${c.city} (${c.id})`;
+                    return tKey === fullKey || tKey === c.city || tKey === c.id || stat.id === fullKey || stat.id === c.id;
+                });
+
+                if (card && card.pref === pref) {
+                    const dStr = stat.date;
+                    if (!groupedByDate[dStr]) {
+                        groupedByDate[dStr] = [];
+                    }
+                    groupedByDate[dStr].push({ card, matchedKey: tKey, stat });
+                }
+            });
+
+            title.textContent = `${pref} の取得（${currentYear}年${currentMonth + 1}月）`;
+
+            const sortedDates = Object.keys(groupedByDate).sort();
+
+            if (sortedDates.length === 0) {
+                list.innerHTML = '<div class="empty-msg">記録はありません</div>';
+                return;
+            }
+
+            sortedDates.forEach(dateStr => {
+                const dayNum = parseInt(dateStr.split('-')[2], 10);
+                const count = groupedByDate[dateStr].length;
+
+                const sectionHeader = document.createElement('div');
+                sectionHeader.style.cssText = `
+                        display: flex;
+                        flex-direction: column;
+                        align-items: flex-start;
+                        gap: 4px;
+                        background: linear-gradient(90deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
+                        border-left: 4px solid var(--accent, #3b82f6);
+                        border-radius: 4px;
+                        padding: 8px 12px;
+                        margin: 20px 0 10px 0;
+                        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+                    `;
+
+                sectionHeader.innerHTML = `
+                        <div style="display: flex; align-items: baseline; gap: 4px;">
+                            <span style="font-size: 20px; font-weight: bold; color: var(--accent, #3b82f6); letter-spacing: 0.5px; line-height: 1;">${dayNum}日</span>
+                        </div>
+                        <div style="font-size: 15px; color: #aaa; background: rgba(0,0,0,0.3); padding: 2px 8px; border-radius: 10px; white-space: nowrap;">
+                            ${count}枚取得
+                        </div>
+                    `;
+                list.appendChild(sectionHeader);
+
+                groupedByDate[dateStr].forEach(({ card, matchedKey, stat }) => {
+                    const memoText = stat.memo || '';
+
+                    const cardEl = document.createElement('div');
+                    cardEl.className = 'card-mini';
+                    cardEl.style.cursor = 'pointer';
+                    cardEl.onclick = () => openDetail(card.id, matchedKey);
+
+                    cardEl.innerHTML = `
+                            <img src="${card.url}" alt="${card.city}">
+                            <div class="card-mini-info" style="flex:1;">
+                                <div style="font-weight:bold; color:#ffffff; font-size:14px;">${card.city}</div>
+                                ${memoText ? `<div style="font-size:12px; color:#dddddd; margin-top:4px; line-height:1.4; white-space: pre-wrap; word-break: break-all;">📝 ${memoText}</div>` : ''}
+                            </div>
+                        `;
+                    list.appendChild(cardEl);
+                });
+            });
         }
 
         function showCardsForDate(dateStr, element) {
@@ -770,22 +750,20 @@
             cardsOnThisDay.forEach(card => {
                 const fullKey = `${card.city} (${card.id})`;
                 const matchedKey = targetKeys.find(tKey => tKey === fullKey || tKey === card.city || tKey === card.id) || fullKey;
-
-                // 対応するstatからメモを取得
                 const memoText = (userStats[matchedKey] && userStats[matchedKey].memo) ? userStats[matchedKey].memo : '';
 
                 list.innerHTML += `
-                <div class="card-mini" onclick="openDetail('${card.id}', '${matchedKey}')" style="cursor:pointer;">
-                    <img src="${card.url}" alt="${card.city}">
-                    <div class="card-mini-info" style="flex:1;">
-                        <div style="font-weight:bold;">${card.city}</div>
-${memoText ? `<div style="font-size:12px; color:#bbbbbb; margin-top:4px; line-height:1.4; white-space: pre-wrap; word-break: break-all;">${memoText}</div>` : ''}                    </div>
-                </div>
-            `;
+                        <div class="card-mini" onclick="openDetail('${card.id}', '${matchedKey}')" style="cursor:pointer;">
+                            <img src="${card.url}" alt="${card.city}">
+                            <div class="card-mini-info" style="flex:1;">
+                                <div style="font-weight:bold;">${card.city}</div>
+                                ${memoText ? `<div style="font-size:12px; color:#bbbbbb; margin-top:4px; line-height:1.4; white-space: pre-wrap; word-break: break-all;">${memoText}</div>` : ''}
+                            </div>
+                        </div>
+                    `;
             });
         }
 
-        // ★保持用変数を ID ベースに変更
         let currentCardId = "";
 
         function openDetail(cardId, matchedKey) {
@@ -793,47 +771,42 @@ ${memoText ? `<div style="font-size:12px; color:#bbbbbb; margin-top:4px; line-he
             const stat = userStats[matchedKey];
             if (!card || !stat) return;
 
-            // ★ ID を保持する
             currentCardId = card.id;
 
-            // 基本情報
             document.getElementById('modalImg').src = card.url;
             document.getElementById('modalTitle').textContent = card.city;
             document.getElementById('modalSub').textContent = `${card.pref} / ${card.edition}`;
             document.getElementById('modalDate').textContent = `取得日: ${stat.date.replace(/-/g, '.')}`;
 
-            // メモとボタンを生成
             const mainContent = document.getElementById('modalMainContent');
             mainContent.innerHTML = `
-            <div style="background:#1a1a1a; padding:10px; border-radius:8px; margin-bottom:15px;">
-                <textarea id="editMemoInput" 
-                    style="width:100%; min-height:40px; background:transparent; color:#ddd; border:none; outline:none; font-size:14px; font-family:inherit; line-height:1.6; resize:none;"
-                    placeholder="思い出メモを入力...">${stat.memo || ""}</textarea>
-            </div>
-    
-            <button class="edit-btn" onclick="saveMemo('${matchedKey}')" 
-                style="width:100%; background:var(--accent); color:white; padding:10px; border:none; border-radius:6px; font-weight:bold; cursor:pointer; margin-bottom:20px;">
-                メモを保存する
-            </button>
-    
-            <div style="border-top: 1px solid #444; padding-top: 15px;">
-                <button id="customSearchBtn" onclick="goToSearchPage()"
-                    style="width: 100%; background: #444; color: #fff; padding: 10px; font-size: 13px; border-radius: 6px; border: none; cursor: pointer; display: block;">
-                    🔍 画像で判定・検索
-                </button>
-            </div>
-        `;
+                    <div style="background:#1a1a1a; padding:10px; border-radius:8px; margin-bottom:15px;">
+                        <textarea id="editMemoInput" 
+                            style="width:100%; min-height:40px; background:transparent; color:#ddd; border:none; outline:none; font-size:14px; font-family:inherit; line-height:1.6; resize:none;"
+                            placeholder="思い出メモを入力...">${stat.memo || ""}</textarea>
+                    </div>
+            
+                    <button class="edit-btn" onclick="saveMemo('${matchedKey}')" 
+                        style="width:100%; background:var(--accent); color:white; padding:10px; border:none; border-radius:6px; font-weight:bold; cursor:pointer; margin-bottom:20px;">
+                        メモを保存する
+                    </button>
+            
+                    <div style="border-top: 1px solid #444; padding-top: 15px;">
+                        <button id="customSearchBtn" onclick="goToSearchPage()"
+                            style="width: 100%; background: #444; color: #fff; padding: 10px; font-size: 13px; border-radius: 6px; border: none; cursor: pointer; display: block;">
+                            🔍 画像で判定・検索
+                        </button>
+                    </div>
+                `;
 
             document.getElementById('modal').style.display = 'flex';
         }
 
-        // ★ ID で masterData から特定するように修正
         function goToSearchPage() {
             if (!currentCardId) return;
             const d = masterData.find(x => x.id === currentCardId);
             if (!d || !d.url) return;
 
-            // search.html へ渡すパラメータにも id を追加
             window.open(`search.html?img=${encodeURIComponent(d.url)}&city=${encodeURIComponent(d.city)}&id=${encodeURIComponent(d.id)}`, '_blank');
         }
 
@@ -859,7 +832,7 @@ ${memoText ? `<div style="font-size:12px; color:#bbbbbb; margin-top:4px; line-he
             document.getElementById('modal').style.display = 'none';
         }
 
-        // スワイプ操作の初期化
+        // ★修正4: スワイプ操作（右スワイプで翌月／左スワイプで前月）
         document.addEventListener('DOMContentLoaded', () => {
             const calendarArea = document.querySelector('.calendar-container');
 
@@ -880,9 +853,11 @@ ${memoText ? `<div style="font-size:12px; color:#bbbbbb; margin-top:4px; line-he
 
                     if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 70) {
                         if (diffX > 0) {
-                            changeMonth(-1);
-                        } else {
+                            // 右にスワイプ：次の月へ（12月なら翌年1月へ繰り越し）
                             changeMonth(1);
+                        } else {
+                            // 左にスワイプ：前の月へ（1月なら前年12月へ戻る）
+                            changeMonth(-1);
                         }
                     }
                 }, { passive: true });
