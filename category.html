@@ -1723,13 +1723,6 @@
                 document.body.appendChild(confetti); setTimeout(() => confetti.remove(), 3000);
             }
         }
-
-        function goToSearchPage() {
-            if (currentActiveCardId) {
-                const card = cardsData.find(c => c.id === currentActiveCardId);
-                window.open(`https://www.google.com/search?tbm=isch&q=${encodeURIComponent(card.pref + ' ' + card.city + ' マンホールカード')}`, '_blank');
-            }
-        }
     </script>
 </body>
 
