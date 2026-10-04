@@ -595,13 +595,6 @@
 <body>
     <header>
         <div style="font-weight:bold;">マンホール図鑑</div>
-        <div class="progress-bar-bg">
-            <div id="totalProgress"></div>
-        </div>
-        <div class="progress-bar-bg" style="height: 4px; margin-top: -8px; opacity: 0.8;">
-            <div id="dateProgress" style="background: #ffc107; height: 100%; width: 0%; transition: width 0.5s;"></div>
-        </div>
-        <div class="stats-text"></div>
     </header>
 
     <div style="margin-top: 15px; display: flex; flex-direction: row; gap: 8px; justify-content: center; width: 100%;">
@@ -631,7 +624,7 @@
         font-weight: bold;
     ">📊 統計</a>
 
-        <a href="index.html" style="
+        <a href="collection.html" style="
         flex: 1;
         padding: 10px 4px;
         background: #333;
@@ -642,17 +635,11 @@
         border-radius: 8px;
         text-align: center;
         font-weight: bold;
-    ">🏠 メニュー</a>
+    ">🏠 コレクション図鑑</a>
     </div>
 
     <div class="control-panel">
-        <div id="prefStatsContainer">
-            <div class="stats-title">
-                <span>都道府県別 制覇率</span>
-                <small id="totalProgressText" style="color:#888;"></small>
-            </div>
-            <div id="prefStatsGrid" class="pref-grid"></div>
-        </div>
+
 
         <div id="editionStatsGrid"></div>
 
@@ -697,28 +684,177 @@
                     <option value="">弾数を選択</option>
                 </select>
             </div>
+        </div>
+
+        <div id="filterSection"
+            style="margin: 0 0 15px 0; padding: 12px; background: #1a1a1a; border-radius: 10px; border: 1px solid #333;">
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <div style="font-size: 12px; color: #888; font-weight: bold;">📂 ピクトグラム・コラボで絞り込む</div>
+
+                <label
+                    style="font-size: 14px; color: #fff; display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 6px 10px; background: rgba(255,255,255,0.1); border-radius: 6px; user-select: none;">
+                    <input type="checkbox" id="uncollectedFilter" onchange="handleFilterChange()"
+                        style="cursor: pointer; accent-color: #4dabff; width: 18px; height: 18px; margin: 0;">
+                    未取得のみ
+                </label>
+            </div>
+
             <div style="display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap;">
+                <!-- すべてクリア -->
                 <button type="button" class="collab-btn active" onclick="setCollabFilter('', this)"
                     style="padding: 6px 12px; font-size: 12px; background: #333; color: #fff; border: 1px solid #555; border-radius: 20px; cursor: pointer;">
                     すべて
                 </button>
-                <!-- ↓ 引数を 'ガンダム' に変更 -->
+
+                <!-- コラボ -->
                 <button type="button" class="collab-btn" onclick="setCollabFilter('ガンダム', this)"
                     style="padding: 6px 12px; font-size: 12px; background: #222; color: #aaa; border: 1px solid #444; border-radius: 20px; cursor: pointer;">
                     🤖 ガンダム
                 </button>
-                <!-- ↓ 引数を 'アイドルマスター' に変更 -->
                 <button type="button" class="collab-btn" onclick="setCollabFilter('アイドルマスター', this)"
                     style="padding: 6px 12px; font-size: 12px; background: #222; color: #aaa; border: 1px solid #444; border-radius: 20px; cursor: pointer;">
                     ⭐ アイドルマスター
                 </button>
+
+                <!-- ピクトグラム（32種） -->
+                <button type="button" class="collab-btn" onclick="setCollabFilter('花', this)"
+                    style="padding: 6px 12px; font-size: 12px; background: #222; color: #aaa; border: 1px solid #444; border-radius: 20px; cursor: pointer;">
+                    🌸 花
+                </button>
+                <button type="button" class="collab-btn" onclick="setCollabFilter('木', this)"
+                    style="padding: 6px 12px; font-size: 12px; background: #222; color: #aaa; border: 1px solid #444; border-radius: 20px; cursor: pointer;">
+                    🌳 木
+                </button>
+                <button type="button" class="collab-btn" onclick="setCollabFilter('鳥', this)"
+                    style="padding: 6px 12px; font-size: 12px; background: #222; color: #aaa; border: 1px solid #444; border-radius: 20px; cursor: pointer;">
+                    🐦 鳥
+                </button>
+                <button type="button" class="collab-btn" onclick="setCollabFilter('魚', this)"
+                    style="padding: 6px 12px; font-size: 12px; background: #222; color: #aaa; border: 1px solid #444; border-radius: 20px; cursor: pointer;">
+                    🐟 魚
+                </button>
+                <button type="button" class="collab-btn" onclick="setCollabFilter('動物', this)"
+                    style="padding: 6px 12px; font-size: 12px; background: #222; color: #aaa; border: 1px solid #444; border-radius: 20px; cursor: pointer;">
+                    🦁 動物
+                </button>
+                <button type="button" class="collab-btn" onclick="setCollabFilter('昆虫', this)"
+                    style="padding: 6px 12px; font-size: 12px; background: #222; color: #aaa; border: 1px solid #444; border-radius: 20px; cursor: pointer;">
+                    🐞 昆虫
+                </button>
+                <button type="button" class="collab-btn" onclick="setCollabFilter('果物', this)"
+                    style="padding: 6px 12px; font-size: 12px; background: #222; color: #aaa; border: 1px solid #444; border-radius: 20px; cursor: pointer;">
+                    🍎 果物
+                </button>
+                <button type="button" class="collab-btn" onclick="setCollabFilter('野菜', this)"
+                    style="padding: 6px 12px; font-size: 12px; background: #222; color: #aaa; border: 1px solid #444; border-radius: 20px; cursor: pointer;">
+                    🥦 野菜
+                </button>
+                <button type="button" class="collab-btn" onclick="setCollabFilter('名物品', this)"
+                    style="padding: 6px 12px; font-size: 12px; background: #222; color: #aaa; border: 1px solid #444; border-radius: 20px; cursor: pointer;">
+                    🍱 名物品
+                </button>
+                <button type="button" class="collab-btn" onclick="setCollabFilter('観光名所', this)"
+                    style="padding: 6px 12px; font-size: 12px; background: #222; color: #aaa; border: 1px solid #444; border-radius: 20px; cursor: pointer;">
+                    🏯 観光名所
+                </button>
+                <button type="button" class="collab-btn" onclick="setCollabFilter('鉄道', this)"
+                    style="padding: 6px 12px; font-size: 12px; background: #222; color: #aaa; border: 1px solid #444; border-radius: 20px; cursor: pointer;">
+                    🚃 鉄道
+                </button>
+                <button type="button" class="collab-btn" onclick="setCollabFilter('乗物', this)"
+                    style="padding: 6px 12px; font-size: 12px; background: #222; color: #aaa; border: 1px solid #444; border-radius: 20px; cursor: pointer;">
+                    🚗 乗物
+                </button>
+                <button type="button" class="collab-btn" onclick="setCollabFilter('祭', this)"
+                    style="padding: 6px 12px; font-size: 12px; background: #222; color: #aaa; border: 1px solid #444; border-radius: 20px; cursor: pointer;">
+                    🏮 祭
+                </button>
+                <button type="button" class="collab-btn" onclick="setCollabFilter('イベント', this)"
+                    style="padding: 6px 12px; font-size: 12px; background: #222; color: #aaa; border: 1px solid #444; border-radius: 20px; cursor: pointer;">
+                    🎪 イベント
+                </button>
+                <button type="button" class="collab-btn" onclick="setCollabFilter('スポーツ', this)"
+                    style="padding: 6px 12px; font-size: 12px; background: #222; color: #aaa; border: 1px solid #444; border-radius: 20px; cursor: pointer;">
+                    ⚽ スポーツ
+                </button>
+                <button type="button" class="collab-btn" onclick="setCollabFilter('偉人', this)"
+                    style="padding: 6px 12px; font-size: 12px; background: #222; color: #aaa; border: 1px solid #444; border-radius: 20px; cursor: pointer;">
+                    👤 偉人
+                </button>
+                <button type="button" class="collab-btn" onclick="setCollabFilter('文学史', this)"
+                    style="padding: 6px 12px; font-size: 12px; background: #222; color: #aaa; border: 1px solid #444; border-radius: 20px; cursor: pointer;">
+                    📖 文学史
+                </button>
+                <button type="button" class="collab-btn" onclick="setCollabFilter('おとぎ話', this)"
+                    style="padding: 6px 12px; font-size: 12px; background: #222; color: #aaa; border: 1px solid #444; border-radius: 20px; cursor: pointer;">
+                    🐉 おとぎ話
+                </button>
+                <button type="button" class="collab-btn" onclick="setCollabFilter('キャラクター', this)"
+                    style="padding: 6px 12px; font-size: 12px; background: #222; color: #aaa; border: 1px solid #444; border-radius: 20px; cursor: pointer;">
+                    👾 キャラクター
+                </button>
+                <button type="button" class="collab-btn" onclick="setCollabFilter('広告宣伝', this)"
+                    style="padding: 6px 12px; font-size: 12px; background: #222; color: #aaa; border: 1px solid #444; border-radius: 20px; cursor: pointer;">
+                    📢 広告宣伝
+                </button>
+                <button type="button" class="collab-btn" onclick="setCollabFilter('富士山', this)"
+                    style="padding: 6px 12px; font-size: 12px; background: #222; color: #aaa; border: 1px solid #444; border-radius: 20px; cursor: pointer;">
+                    🗻 富士山
+                </button>
+                <button type="button" class="collab-btn" onclick="setCollabFilter('お城', this)"
+                    style="padding: 6px 12px; font-size: 12px; background: #222; color: #aaa; border: 1px solid #444; border-radius: 20px; cursor: pointer;">
+                    🏰 お城
+                </button>
+                <button type="button" class="collab-btn" onclick="setCollabFilter('橋梁', this)"
+                    style="padding: 6px 12px; font-size: 12px; background: #222; color: #aaa; border: 1px solid #444; border-radius: 20px; cursor: pointer;">
+                    🌉 橋梁
+                </button>
+                <button type="button" class="collab-btn" onclick="setCollabFilter('歴史的建造物', this)"
+                    style="padding: 6px 12px; font-size: 12px; background: #222; color: #aaa; border: 1px solid #444; border-radius: 20px; cursor: pointer;">
+                    🏛️ 歴史的建造物
+                </button>
+                <button type="button" class="collab-btn" onclick="setCollabFilter('幾何学模様', this)"
+                    style="padding: 6px 12px; font-size: 12px; background: #222; color: #aaa; border: 1px solid #444; border-radius: 20px; cursor: pointer;">
+                    🔷 幾何学模様
+                </button>
+                <button type="button" class="collab-btn" onclick="setCollabFilter('その他', this)"
+                    style="padding: 6px 12px; font-size: 12px; background: #222; color: #aaa; border: 1px solid #444; border-radius: 20px; cursor: pointer;">
+                    ❓ その他
+                </button>
+                <button type="button" class="collab-btn" onclick="setCollabFilter('海', this)"
+                    style="padding: 6px 12px; font-size: 12px; background: #222; color: #aaa; border: 1px solid #444; border-radius: 20px; cursor: pointer;">
+                    🌊 海
+                </button>
+                <button type="button" class="collab-btn" onclick="setCollabFilter('山', this)"
+                    style="padding: 6px 12px; font-size: 12px; background: #222; color: #aaa; border: 1px solid #444; border-radius: 20px; cursor: pointer;">
+                    ⛰️ 山
+                </button>
+                <button type="button" class="collab-btn" onclick="setCollabFilter('川', this)"
+                    style="padding: 6px 12px; font-size: 12px; background: #222; color: #aaa; border: 1px solid #444; border-radius: 20px; cursor: pointer;">
+                    🏞️ 川
+                </button>
+                <button type="button" class="collab-btn" onclick="setCollabFilter('湖・沼', this)"
+                    style="padding: 6px 12px; font-size: 12px; background: #222; color: #aaa; border: 1px solid #444; border-radius: 20px; cursor: pointer;">
+                    🚣 湖・沼
+                </button>
+                <button type="button" class="collab-btn" onclick="setCollabFilter('世界遺産', this)"
+                    style="padding: 6px 12px; font-size: 12px; background: #222; color: #aaa; border: 1px solid #444; border-radius: 20px; cursor: pointer;">
+                    🌍 世界遺産
+                </button>
+                <button type="button" class="collab-btn" onclick="setCollabFilter('下水道施設', this)"
+                    style="padding: 6px 12px; font-size: 12px; background: #222; color: #aaa; border: 1px solid #444; border-radius: 20px; cursor: pointer;">
+                    🏭 下水道施設
+                </button>
             </div>
         </div>
+
+
     </div>
 
     <div id="filterStats"
         style="padding: 10px; background: #222; text-align: center; font-size: 13px; color: #4dabff; border-bottom: 1px solid #333; display: none;">
-        表示中: <span id="currentFilteredCount">0</span>枚 （取得済み: <span id="currentCollectedInFilter">0</span>枚）
+        表示中: <span id="currentFilteredCount">0</span>枚）
     </div>
     <div id="selectionModeArea" style="text-align: center; margin: 10px 0; display:none;">
         <button id="selectModeBtn" class="btn-utility" onclick="toggleSelectionMode()"
@@ -1134,9 +1270,7 @@
         表示中: <b>${totalInFilter}</b>枚 / 取得済み: <b>${collectedCount}</b>枚
         <span class="rate-badge" style="margin-left:5px;">収集率: ${collectRateInFilter}%</span>
     </div>
-    <div style="font-size: 11px; color: #ffc107;">
-        表示内の日付登録: <b>${datedCountInFilter}</b>枚 (登録率: ${dateRateInFilter}%)
-    </div>
+
     `;
             }
 
@@ -1154,10 +1288,11 @@
 
                 const memoText = stats?.memo ?
                     `<div style="font-size:9px; color:#aaa; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; margin-top:2px;">
-                ${stats.memo}</div>`
+        ${stats.memo}</div>`
                     : "";
 
-                let statusClass = isCollected ? 'collected' : '';
+                // 取得・未取得に関わらず常に 'collected' クラス（色付き）を付与
+                let statusClass = 'collected';
                 if (isSelectionMode && isSelected) statusClass = 'selecting-active';
 
                 return `
@@ -1613,15 +1748,6 @@
         }
     </script>
 </body>
-<footer
-    style="margin-top: 40px; padding: 30px 15px; border-top: 1px solid #333; text-align: center; background: #1a1a1a;">
-    <div style="font-size: 12px; color: #666; margin-bottom: 15px;">データ管理（機種変更時の移行など）</div>
-    <div class="backup-row">
-        <button class="btn-utility" onclick="exportBackup()">エクスポート</button>
-        <button class="btn-utility" onclick="document.getElementById('importFile').click()">インポート</button>
-        <input type="file" id="importFile" style="display:none" onchange="importBackup(event)">
-    </div>
-    <div style="font-size: 10px; color: #444; margin-top: 20px;">© マンホール図鑑</div>
-</footer>
+
 
 </html>
