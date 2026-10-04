@@ -1034,11 +1034,9 @@
             updateStats();
             initFilters();
 
-            // ★未定義関数の呼び出し（updatePrefStats / updateEditionStats）を削除しました
-
-            if (document.getElementById('prefFilter') && document.getElementById('prefFilter').value === "") {
-                setInitialLocation();
-            }
+            // if (document.getElementById('prefFilter') && document.getElementById('prefFilter').value === "") {
+            //     setInitialLocation();
+            // }
         }).catch(err => console.error("マスターデータの読み込みエラー:", err));
 
         // カードの所持状態を「ID優先」で取得する関数
