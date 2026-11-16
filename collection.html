@@ -746,7 +746,7 @@
 
             <div
                 style="flex-shrink: 0; background: #222; padding: 12px; border-radius: 10px; display: flex; flex-direction: column; gap: 10px;">
-                <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div id="dateRow" style="display: flex; align-items: center; justify-content: space-between;">
                     <label style="font-size: 11px; color: #4dabff;">取得日</label>
                     <input type="date" id="collectDate" class="date-input" style="width: 60%; margin: 0; padding: 5px;">
                 </div>
@@ -869,9 +869,15 @@
                 return stat && stat.date && stat.date !== "";
             }).length;
 
+            const visitCollectedCount = collectedCards.filter(card => {
+                const fullKey = `${card.city} (${card.id})`;
+                const stat = userStats[fullKey] || userStats[card.city];
+                return stat && stat.method !== 'purchase';
+            }).length;
+
             // --- 以下、計算と表示処理 ---
             const collectRate = total > 0 ? Math.round((collectedCount / total) * 100) : 0;
-            const dateRate = collectedCount > 0 ? Math.round((datedCount / collectedCount) * 100) : 0;
+            const dateRate = visitCollectedCount > 0 ? Math.round((datedCount / visitCollectedCount) * 100) : 0;
 
             const statsText = document.querySelector('.stats-text');
             if (statsText) {
@@ -1021,7 +1027,8 @@
                 const collectedInFilter = filtered.filter(c => userStats[c.city]?.collected);
                 const collectedCount = collectedInFilter.length;
                 const datedCountInFilter = collectedInFilter.filter(c => userStats[c.city]?.date).length;
-                const dateRateInFilter = collectedCount > 0 ? Math.round((datedCountInFilter / collectedCount) * 100) : 0;
+                const visitCountInFilter = collectedInFilter.filter(c => userStats[c.city]?.method !== 'purchase').length;
+                const dateRateInFilter = visitCountInFilter > 0 ? Math.round((datedCountInFilter / visitCountInFilter) * 100) : 0;
                 const collectRateInFilter = totalInFilter > 0 ? Math.round((collectedCount / totalInFilter) * 100) : 0;
 
                 statsDiv.style.display = 'block';
@@ -1045,7 +1052,7 @@
                 const isCollected = stats?.collected;
                 const isSelected = selectedCities.has(c.city);
                 const hasDate = stats?.date && stats.date !== "";
-                const collectDateText = hasDate ? stats.date.replace(/-/g, '.') : (isCollected ? "日付未登録" : "");
+                const collectDateText = hasDate ? stats.date.replace(/-/g, '.') : (isCollected && stats?.method !== 'purchase' ? "日付未登録" : "");
 
                 // ★ メモがあれば表示用HTMLを作成（はみ出さないように ellipsis 指定）
                 const memoText = stats?.memo ?
@@ -1129,7 +1136,7 @@
                 const existingPrice = existingMethod === 'purchase' ? (userStats[cityName]?.price ?? "") : "";
                 userStats[cityName] = {
                     collected: true,
-                    date: targetDate,
+                    date: existingMethod === 'purchase' ? "" : targetDate,
                     memo: existingMemo,
                     method: existingMethod,
                     price: existingPrice
@@ -1230,13 +1237,18 @@
             const methodSel = document.getElementById('collectMethod');
             const priceRow = document.getElementById('priceRow');
             if (!methodSel || !priceRow) return;
-            priceRow.style.display = methodSel.value === 'purchase' ? 'flex' : 'none';
+            const isPurchase = methodSel.value === 'purchase';
+            priceRow.style.display = isPurchase ? 'flex' : 'none';
+            const dateRow = document.getElementById('dateRow');
+            if (dateRow) dateRow.style.display = isPurchase ? 'none' : 'flex';
+            const modalDate = document.getElementById('modalDate');
+            if (modalDate) modalDate.style.display = isPurchase ? 'none' : 'block';
         }
 
         function toggleCollect() {
-            const dateVal = document.getElementById('collectDate').value;
             const memoVal = document.getElementById('memoInput').value;
             const methodVal = document.getElementById('collectMethod')?.value === 'purchase' ? 'purchase' : 'visit';
+            const dateVal = methodVal === 'purchase' ? "" : document.getElementById('collectDate').value;
             const priceRaw = document.getElementById('purchasePrice')?.value;
             const priceVal = (methodVal === 'purchase' && priceRaw !== "" && priceRaw !== null && priceRaw !== undefined) ? Number(priceRaw) : "";
 
