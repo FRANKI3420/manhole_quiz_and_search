@@ -933,6 +933,22 @@
 
                 <div id="modalDate" style="text-align: right; min-height: 18px;"></div>
 
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <label style="font-size: 11px; color: #4dabff;">取得方法</label>
+                    <select id="collectMethod" onchange="togglePriceField()" style="width: 60%; margin: 0; padding: 5px; background: #333; color: #fff; border: 1px solid #444; border-radius: 4px;">
+                        <option value="visit">現地取得</option>
+                        <option value="purchase">購入</option>
+                    </select>
+                </div>
+
+                <div id="priceRow" style="display: none; align-items: center; justify-content: space-between;">
+                    <label style="font-size: 11px; color: #ffc107;">購入金額</label>
+                    <div style="width: 60%; display: flex; align-items: center; gap: 6px;">
+                        <input type="number" id="purchasePrice" min="0" step="1" inputmode="numeric" placeholder="例：1500" style="flex: 1; margin: 0; padding: 5px; background: #333; color: #fff; border: 1px solid #444; border-radius: 4px; box-sizing: border-box;">
+                        <span style="font-size: 12px; color: #aaa;">円</span>
+                    </div>
+                </div>
+
                 <div style="margin-top:10px;">
                     <label style="font-size:12px; color:#aaa;">思い出メモ（一行）</label>
                     <input type="text" id="memoInput" placeholder="例：家族旅行で立ち寄った！"
@@ -1310,6 +1326,10 @@
                 ${stats.memo}</div>`
                     : "";
 
+                const methodBadge = (isCollected && stats?.method === 'purchase') ?
+                    `<div style="font-size:9px; color:#ffc107; margin-top:2px;">🛒購入${(stats.price !== undefined && stats.price !== null && stats.price !== "" && !isNaN(Number(stats.price))) ? ` ${Number(stats.price).toLocaleString()}円` : ""}</div>`
+                    : "";
+
                 let statusClass = isCollected ? 'collected' : '';
                 if (isSelectionMode && isSelected) statusClass = 'selecting-active';
 
@@ -1319,7 +1339,7 @@
         <img src="${c.url}" loading="lazy" alt="${c.city}" onerror="this.style.opacity='0.3';this.onerror=null;">
         <div class="card-info">
             <div style="font-weight:bold;">${c.city}</div>
-            ${memoText}
+            ${memoText}${methodBadge}
             <div class="date-text" style="font-size: 10px; color: ${hasDate ? '#4dabff' : '#ffc107'}; height: 12px; margin-top: 2px;">
                 ${collectDateText}
             </div>
@@ -1377,13 +1397,18 @@
                 const d = masterData.find(x => x.id === id);
                 const cityName = d ? d.city : "";
 
-                const existingMemo = getCardStat(d)?.memo || "";
+                const existingStat = getCardStat(d);
+                const existingMemo = existingStat?.memo || "";
+                const existingMethod = existingStat?.method === 'purchase' ? 'purchase' : 'visit';
+                const existingPrice = existingMethod === 'purchase' ? (existingStat?.price ?? "") : "";
 
                 // IDをキーとして保存
                 userStats[id] = {
                     collected: true,
                     date: targetDate,
                     memo: existingMemo,
+                    method: existingMethod,
+                    price: existingPrice,
                     city: cityName,
                     id: id
                 };
@@ -1412,6 +1437,11 @@
             document.getElementById('modalTitle').textContent = d.city;
             document.getElementById('modalSub').textContent = `${d.pref} / ${d.edition}`;
             document.getElementById('memoInput').value = saved.memo || "";
+            const methodSel = document.getElementById('collectMethod');
+            if (methodSel) methodSel.value = saved.method === 'purchase' ? 'purchase' : 'visit';
+            const priceInput = document.getElementById('purchasePrice');
+            if (priceInput) priceInput.value = (saved.method === 'purchase' && saved.price !== undefined && saved.price !== null) ? saved.price : "";
+            togglePriceField();
 
             const dateInput = document.getElementById('collectDate');
             const dateDisplay = document.getElementById('modalDate');
@@ -1469,9 +1499,19 @@
             document.getElementById('modal').style.display = 'flex';
         }
 
+        function togglePriceField() {
+            const methodSel = document.getElementById('collectMethod');
+            const priceRow = document.getElementById('priceRow');
+            if (!methodSel || !priceRow) return;
+            priceRow.style.display = methodSel.value === 'purchase' ? 'flex' : 'none';
+        }
+
         function toggleCollect() {
             const dateVal = document.getElementById('collectDate').value;
             const memoVal = document.getElementById('memoInput').value;
+            const methodVal = document.getElementById('collectMethod')?.value === 'purchase' ? 'purchase' : 'visit';
+            const priceRaw = document.getElementById('purchasePrice')?.value;
+            const priceVal = (methodVal === 'purchase' && priceRaw !== "" && priceRaw !== null && priceRaw !== undefined) ? Number(priceRaw) : "";
 
             const d = masterData.find(x => x.id === currentId);
             const saved = d ? getCardStat(d) : null;
@@ -1482,6 +1522,8 @@
                 collected: true,
                 date: dateVal,
                 memo: memoVal,
+                method: methodVal,
+                price: priceVal,
                 city: currentCity,
                 id: currentId
             };
