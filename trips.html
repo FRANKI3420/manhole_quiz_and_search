@@ -350,6 +350,7 @@
                 cards.forEach(c => { if (visitMap[c.pref]) visitMap[c.pref].cards++; });
             });
             const visitRows = Object.entries(visitMap)
+                .filter(([pref]) => pref !== '世界' && pref !== 'その他')
                 .sort((a, b) => b[1].visits - a[1].visits || b[1].cards - a[1].cards)
                 .map(([pref, v]) => `
                     <div class="visit-row">
