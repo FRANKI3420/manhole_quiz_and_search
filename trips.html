@@ -88,6 +88,56 @@
             color: #aaa;
         }
 
+        .visit-list {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .visit-list h2 {
+            font-size: 16px;
+            color: var(--accent);
+            margin: 0 0 10px 0;
+        }
+
+        .visit-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 7px 2px;
+            border-bottom: 1px solid #3a3a3a;
+        }
+
+        .visit-row:last-child {
+            border-bottom: none;
+        }
+
+        .visit-pref {
+            font-weight: bold;
+            font-size: 15px;
+        }
+
+        .visit-sub {
+            font-size: 11px;
+            color: #999;
+            margin-left: 8px;
+            font-weight: normal;
+        }
+
+        .visit-count {
+            font-size: 17px;
+            font-weight: bold;
+            color: var(--accent);
+            white-space: nowrap;
+        }
+
+        .visit-count small {
+            font-size: 11px;
+            color: #aaa;
+        }
+
         .trip-card {
             background: var(--card-bg);
             border-radius: 12px;
@@ -200,10 +250,11 @@
     </div>
 
     <div class="rule-note">
-        取得日の間隔が2日以内のものを「同じ旅」として自動でまとめています（3枚以上の旅を表示）。購入したカードは日付を記録しないため含まれません。開くたびに手元の記録から自動計算されます。
+        取得日の間隔が2日以内のものを「同じ旅」として自動でまとめています（旅の一覧は3枚以上を表示）。訪問回数は旅単位で数えるので、同じ旅で複数日かかっても1回です。購入したカードは日付を記録しないため含まれません。開くたびに手元の記録から自動計算されます。
     </div>
 
     <div class="stats-summary" id="summaryArea"></div>
+    <div id="prefVisits"></div>
     <div id="tripList"></div>
 
     <script>
@@ -281,6 +332,32 @@
                 })
                 .filter(t => t.count >= 3)
                 .sort((a, b) => (a.dates[0] < b.dates[0] ? 1 : -1));
+
+            // 都道府県別の訪問回数（旅クラスタ単位：同じ旅で複数日でも1回）
+            const visitMap = {};
+            clusters.forEach(ds => {
+                const cardsInCluster = ds.flatMap(d => byDate.get(d));
+                const prefsInCluster = [...new Set(cardsInCluster.map(c => c.pref))];
+                prefsInCluster.forEach(pref => {
+                    if (!visitMap[pref]) visitMap[pref] = { visits: 0, cards: 0, last: "" };
+                    visitMap[pref].visits++;
+                    const lastInCluster = ds[ds.length - 1];
+                    if (lastInCluster > visitMap[pref].last) visitMap[pref].last = lastInCluster;
+                });
+            });
+            Object.values(visitMap).forEach(v => { v.cards = 0; });
+            byDate.forEach((cards, d) => {
+                cards.forEach(c => { if (visitMap[c.pref]) visitMap[c.pref].cards++; });
+            });
+            const visitRows = Object.entries(visitMap)
+                .sort((a, b) => b[1].visits - a[1].visits || b[1].cards - a[1].cards)
+                .map(([pref, v]) => `
+                    <div class="visit-row">
+                        <span class="visit-pref">${escapeHtml(pref)}<span class="visit-sub">取得 ${v.cards}枚 ・ 最終 ${v.last.replace(/-/g, '/')}</span></span>
+                        <span class="visit-count">${v.visits}<small> 回</small></span>
+                    </div>`).join('');
+            document.getElementById('prefVisits').innerHTML =
+                `<div class="visit-list"><h2>🗾 都道府県別の訪問回数</h2>${visitRows}</div>`;
 
             // サマリー
             const totalTripCards = trips.reduce((s, t) => s + t.count, 0);
