@@ -427,17 +427,23 @@
     <div id="prefStatsContainer">
         <div class="stats-title">
             <span>都道府県別 制覇率</span>
-            <small id="totalProgressText" style="color:#888;"></small>
+            <span style="display: flex; align-items: center; gap: 8px;">
+                <small id="totalProgressText" style="color:#888;"></small>
+                <button type="button" onclick="toggleStatsSection('prefStatsGrid', this)"
+                    style="font-size: 11px; padding: 3px 10px; background: #333; color: #4dabff; border: 1px solid #4dabff; border-radius: 20px; cursor: pointer;">開く ▼</button>
+            </span>
         </div>
-        <div id="prefStatsGrid" class="pref-grid"></div>
+        <div id="prefStatsGrid" class="pref-grid" style="display: none;"></div>
     </div>
 
     <div id="editionStatsContainer" class="stats-container"
         style="background: #1e1e1e; padding: 15px; border-radius: 12px; border: 1px solid #333; margin-top: 20px;">
         <div class="stats-title" style="margin-bottom: 15px;">
             <span>弾数別 制覇率</span>
+            <button type="button" onclick="toggleStatsSection('editionStatsGrid', this)"
+                    style="font-size: 11px; padding: 3px 10px; background: #333; color: #4dabff; border: 1px solid #4dabff; border-radius: 20px; cursor: pointer;">開く ▼</button>
         </div>
-        <div id="editionStatsGrid"></div>
+        <div id="editionStatsGrid" style="display: none;"></div>
     </div>
 
     <div class="chart-header"
@@ -839,6 +845,14 @@
         // ==========================================
         // 2. 都道府県の統計UI更新
         // ==========================================
+function toggleStatsSection(id, btn) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            const isOpen = el.style.display !== 'none';
+            el.style.display = isOpen ? 'none' : '';
+            if (btn) btn.textContent = isOpen ? '開く ▼' : '閉じる ▲';
+        }
+
         function updatePrefStats() {
             const grid = document.getElementById('prefStatsGrid');
             if (!grid || masterData.length === 0) return;
