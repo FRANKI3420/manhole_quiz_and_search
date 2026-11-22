@@ -138,6 +138,22 @@
             color: #aaa;
         }
 
+        .trip-min-btn {
+            font-size: 12px;
+            padding: 5px 12px;
+            background: #222;
+            color: #aaa;
+            border: 1px solid #444;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        .trip-min-btn.active {
+            background: #333;
+            color: #fff;
+            border-color: var(--accent);
+        }
+
         .trip-card {
             background: var(--card-bg);
             border-radius: 12px;
@@ -250,16 +266,25 @@
     </div>
 
     <div class="rule-note">
-        取得日の間隔が2日以内のものを「同じ旅」として自動でまとめています（旅の一覧は3枚以上を表示）。訪問回数は旅単位で数えるので、同じ旅で複数日かかっても1回です。購入したカードは日付を記録しないため含まれません。開くたびに手元の記録から自動計算されます。
+        取得日の間隔が2日以内のものを「同じ旅」として自動でまとめています（旅の一覧は下のボタンで表示する枚数を切り替えられます）。訪問回数は旅単位で数えるので、同じ旅で複数日かかっても1回です。購入したカードは日付を記録しないため含まれません。開くたびに手元の記録から自動計算されます。
     </div>
 
     <div class="stats-summary" id="summaryArea"></div>
     <div id="prefVisits"></div>
+    <div style="display: flex; gap: 8px; margin-bottom: 14px; align-items: center; flex-wrap: wrap;">
+        <span style="font-size: 12px; color: #888;">旅の表示:</span>
+        <button type="button" class="trip-min-btn active" onclick="setTripMin(3, this)">3枚以上</button>
+        <button type="button" class="trip-min-btn" onclick="setTripMin(2, this)">2枚以上</button>
+        <button type="button" class="trip-min-btn" onclick="setTripMin(1, this)">すべて（1枚〜）</button>
+    </div>
     <div id="tripList"></div>
 
     <script>
         const userStats = JSON.parse(localStorage.getItem('manhole_collection')) || {};
         let masterData = [];
+        let allTrips = [];
+        let tripByDate = null;
+        let currentTripMin = 3;
 
         function getCardStat(card) {
             const fullKey = `${card.city} (${card.id})`;
@@ -279,6 +304,67 @@
             const w = ["日", "月", "火", "水", "木", "金", "土"][date.getDay()];
             const base = `${date.getMonth() + 1}/${date.getDate()}(${w})`;
             return withYear ? `${date.getFullYear()}/${base}` : base;
+        }
+
+        function setTripMin(min, btn) {
+            currentTripMin = min;
+            document.querySelectorAll('.trip-min-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            renderTripList();
+        }
+
+        function renderTripList() {
+            if (!tripByDate) return;
+            const byDate = tripByDate;
+            const trips = allTrips.filter(t => t.count >= currentTripMin);
+
+            const totalTripCards = trips.reduce((sm, t) => sm + t.count, 0);
+            const avg = trips.length ? (totalTripCards / trips.length).toFixed(1) : 0;
+            const best = trips.reduce((m, t) => (t.count > (m?.count || 0) ? t : m), null);
+            document.getElementById('summaryArea').innerHTML = `
+                <div class="stat-box"><div>旅の回数</div><b>${trips.length}</b></div>
+                <div class="stat-box"><div>旅で取得した枚数</div><b>${totalTripCards}</b></div>
+                <div class="stat-box"><div>1旅あたり平均</div><b>${avg}<small> 枚</small></b></div>
+                <div class="stat-box"><div>最多の旅</div><b>${best ? best.count : 0}<small> 枚</small></b></div>
+            `;
+
+            if (trips.length === 0) {
+                document.getElementById('tripList').innerHTML = '<div class="empty">該当する旅はまだありません</div>';
+                return;
+            }
+
+            document.getElementById('tripList').innerHTML = trips.map(t => {
+                const start = parseDate(t.dates[0]);
+                const end = parseDate(t.dates[t.dates.length - 1]);
+                const period = t.dates.length === 1
+                    ? fmtDate(start, true)
+                    : `${fmtDate(start, true)} 〜 ${fmtDate(end, false)}`;
+                const days = Math.round((end - start) / 86400000) + 1;
+                const chips = t.prefs.map(pr => `<span class="pref-chip">${escapeHtml(pr)}</span>`).join('');
+                const months = [...new Set(t.dates.map(d => d.slice(0, 7)))];
+                const calLinks = months.map(ym => {
+                    const [yy, mm] = ym.split('-');
+                    return `<a class="cal-link" href="calender.html?target=${ym}">📅 ${yy}年${Number(mm)}月のカレンダーへ</a>`;
+                }).join('');
+                const detail = t.dates.map(d => {
+                    const names = byDate.get(d).map(c => `${escapeHtml(c.city)}（${escapeHtml(c.edition)}）`).join('、');
+                    return `<div class="day-block"><span class="day-title">${fmtDate(parseDate(d), false)}</span><div class="day-cards">${names}</div></div>`;
+                }).join('');
+                return `
+                <div class="trip-card">
+                    <div class="trip-head">
+                        <span class="trip-period">${period}</span>
+                        <span class="trip-count">${t.count}<small> 枚</small></span>
+                    </div>
+                    <div class="trip-meta">${days}日間 ・ ${t.cityCount}自治体</div>
+                    <div class="pref-chips">${chips}</div>
+                    <div class="cal-links">${calLinks}</div>
+                    <details>
+                        <summary>取得したカードを見る</summary>
+                        ${detail}
+                    </details>
+                </div>`;
+            }).join('');
         }
 
         fetch('master_data.json')
@@ -330,7 +416,6 @@
                     const cities = new Set(cards.map(x => x.card.city));
                     return { dates: ds, cards, prefs, cityCount: cities.size, count: cards.length };
                 })
-                .filter(t => t.count >= 3)
                 .sort((a, b) => (a.dates[0] < b.dates[0] ? 1 : -1));
 
             // 都道府県別の訪問回数（旅クラスタ単位：同じ旅で複数日でも1回）
@@ -360,54 +445,9 @@
             document.getElementById('prefVisits').innerHTML =
                 `<div class="visit-list"><h2>🗾 都道府県別の訪問回数</h2>${visitRows}</div>`;
 
-            // サマリー
-            const totalTripCards = trips.reduce((s, t) => s + t.count, 0);
-            const avg = trips.length ? (totalTripCards / trips.length).toFixed(1) : 0;
-            const best = trips.reduce((m, t) => (t.count > (m?.count || 0) ? t : m), null);
-            document.getElementById('summaryArea').innerHTML = `
-                <div class="stat-box"><div>旅の回数</div><b>${trips.length}</b></div>
-                <div class="stat-box"><div>旅で取得した枚数</div><b>${totalTripCards}</b></div>
-                <div class="stat-box"><div>1旅あたり平均</div><b>${avg}<small> 枚</small></b></div>
-                <div class="stat-box"><div>最多の旅</div><b>${best ? best.count : 0}<small> 枚</small></b></div>
-            `;
-
-            if (trips.length === 0) {
-                document.getElementById('tripList').innerHTML = '<div class="empty">3枚以上の旅はまだありません</div>';
-                return;
-            }
-
-            document.getElementById('tripList').innerHTML = trips.map(t => {
-                const start = parseDate(t.dates[0]);
-                const end = parseDate(t.dates[t.dates.length - 1]);
-                const period = t.dates.length === 1
-                    ? fmtDate(start, true)
-                    : `${fmtDate(start, true)} 〜 ${fmtDate(end, false)}`;
-                const days = Math.round((end - start) / 86400000) + 1;
-                const chips = t.prefs.map(p => `<span class="pref-chip">${escapeHtml(p)}</span>`).join('');
-                const months = [...new Set(t.dates.map(d => d.slice(0, 7)))];
-                const calLinks = months.map(ym => {
-                    const [yy, mm] = ym.split('-');
-                    return `<a class="cal-link" href="calender.html?target=${ym}">📅 ${yy}年${Number(mm)}月のカレンダーへ</a>`;
-                }).join('');
-                const detail = t.dates.map(d => {
-                    const names = byDate.get(d).map(c => `${escapeHtml(c.city)}（${escapeHtml(c.edition)}）`).join('、');
-                    return `<div class="day-block"><span class="day-title">${fmtDate(parseDate(d), false)}</span><div class="day-cards">${names}</div></div>`;
-                }).join('');
-                return `
-                <div class="trip-card">
-                    <div class="trip-head">
-                        <span class="trip-period">${period}</span>
-                        <span class="trip-count">${t.count}<small> 枚</small></span>
-                    </div>
-                    <div class="trip-meta">${days}日間 ・ ${t.cityCount}自治体</div>
-                    <div class="pref-chips">${chips}</div>
-                    <div class="cal-links">${calLinks}</div>
-                    <details>
-                        <summary>取得したカードを見る</summary>
-                        ${detail}
-                    </details>
-                </div>`;
-            }).join('');
+            allTrips = trips;
+            tripByDate = byDate;
+            renderTripList();
         }
     </script>
 </body>
