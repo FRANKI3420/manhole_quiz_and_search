@@ -312,7 +312,7 @@
                     return `<a class="cal-link" href="calender.html?target=${ym}">📅 ${yy}年${Number(mm)}月のカレンダーへ</a>`;
                 }).join('');
                 const detail = t.dates.map(d => {
-                    const names = byDate.get(d).map(c => `${escapeHtml(c.city)}（第${escapeHtml(c.edition)}弾）`).join('、');
+                    const names = byDate.get(d).map(c => `${escapeHtml(c.city)}（${escapeHtml(c.edition)}）`).join('、');
                     return `<div class="day-block"><span class="day-title">${fmtDate(parseDate(d), false)}</span><div class="day-cards">${names}</div></div>`;
                 }).join('');
                 return `
