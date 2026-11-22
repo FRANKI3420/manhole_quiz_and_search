@@ -142,6 +142,22 @@
             border-radius: 999px;
         }
 
+        .cal-links {
+            margin-top: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .cal-link {
+            color: var(--accent);
+            font-size: 13px;
+            text-decoration: none;
+            border: 1px solid var(--accent);
+            padding: 4px 10px;
+            border-radius: 999px;
+        }
+
         details {
             margin-top: 10px;
         }
@@ -290,6 +306,11 @@
                     : `${fmtDate(start, true)} 〜 ${fmtDate(end, false)}`;
                 const days = Math.round((end - start) / 86400000) + 1;
                 const chips = t.prefs.map(p => `<span class="pref-chip">${escapeHtml(p)}</span>`).join('');
+                const months = [...new Set(t.dates.map(d => d.slice(0, 7)))];
+                const calLinks = months.map(ym => {
+                    const [yy, mm] = ym.split('-');
+                    return `<a class="cal-link" href="calender.html?target=${ym}">📅 ${yy}年${Number(mm)}月のカレンダーへ</a>`;
+                }).join('');
                 const detail = t.dates.map(d => {
                     const names = byDate.get(d).map(c => `${escapeHtml(c.city)}（第${escapeHtml(c.edition)}弾）`).join('、');
                     return `<div class="day-block"><span class="day-title">${fmtDate(parseDate(d), false)}</span><div class="day-cards">${names}</div></div>`;
@@ -302,6 +323,7 @@
                     </div>
                     <div class="trip-meta">${days}日間 ・ ${t.cityCount}自治体</div>
                     <div class="pref-chips">${chips}</div>
+                    <div class="cal-links">${calLinks}</div>
                     <details>
                         <summary>取得したカードを見る</summary>
                         ${detail}
