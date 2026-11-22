@@ -653,12 +653,23 @@
         <div id="prefStatsContainer">
             <div class="stats-title">
                 <span>都道府県別 制覇率</span>
-                <small id="totalProgressText" style="color:#888;"></small>
+                <span style="display: flex; align-items: center; gap: 8px;">
+                    <small id="totalProgressText" style="color:#888;"></small>
+                    <button type="button" onclick="toggleStatsSection('prefStatsGrid', this)"
+                    style="font-size: 11px; padding: 3px 10px; background: #333; color: #4dabff; border: 1px solid #4dabff; border-radius: 20px; cursor: pointer;">開く ▼</button>
+                </span>
             </div>
-            <div id="prefStatsGrid" class="pref-grid"></div>
+            <div id="prefStatsGrid" class="pref-grid" style="display: none;"></div>
         </div>
 
-        <div id="editionStatsGrid"></div>
+        <div id="editionStatsContainer" style="background: #222; border-radius: 12px; padding: 15px; margin-bottom: 20px;">
+            <div class="stats-title">
+                <span>弾数別 制覇率</span>
+                <button type="button" onclick="toggleStatsSection('editionStatsGrid', this)"
+                    style="font-size: 11px; padding: 3px 10px; background: #333; color: #4dabff; border: 1px solid #4dabff; border-radius: 20px; cursor: pointer;">開く ▼</button>
+            </div>
+            <div id="editionStatsGrid" style="display: none;"></div>
+        </div>
 
 
         <div id="searchSection"
@@ -1216,6 +1227,14 @@
         let currentCollab = "";
 
         // ★追加: コラボボタンを押した時の処理
+function toggleStatsSection(id, btn) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            const isOpen = el.style.display !== 'none';
+            el.style.display = isOpen ? 'none' : '';
+            if (btn) btn.textContent = isOpen ? '開く ▼' : '閉じる ▲';
+        }
+
         function toggleCollabSection() {
             const area = document.getElementById('collabButtons');
             const btn = document.getElementById('collabToggleBtn');
@@ -1664,7 +1683,7 @@
                 groups[groupName].push(edStr);
             });
 
-            let html = '<h3 style="margin: 20px 0 10px 10px; font-size: 14px; border-left: 4px solid #4dabff; padding-left: 8px;">弾数別進捗</h3>';
+            let html = '';
 
             Object.keys(groups).sort((a, b) => {
                 return parseInt(a.replace(/[^0-9]/g, '')) - parseInt(b.replace(/[^0-9]/g, ''));
