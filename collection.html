@@ -707,7 +707,12 @@
             style="margin: 0 0 15px 0; padding: 12px; background: #1a1a1a; border-radius: 10px; border: 1px solid #333;">
 
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                <div style="font-size: 12px; color: #888; font-weight: bold;">📂 ピクトグラム・コラボで絞り込む</div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 12px; color: #888; font-weight: bold;">📂 ピクトグラム・コラボで絞り込む</span>
+                    <button type="button" id="collabToggleBtn" onclick="toggleCollabSection()"
+                        style="font-size: 11px; padding: 3px 10px; background: #333; color: #4dabff; border: 1px solid #4dabff; border-radius: 20px; cursor: pointer;">開く ▼</button>
+                    <span id="collabCurrent" style="font-size: 12px; color: #4dabff; font-weight: bold;"></span>
+                </div>
 
                 <label
                     style="font-size: 14px; color: #fff; display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 6px 10px; background: rgba(255,255,255,0.1); border-radius: 6px; user-select: none;">
@@ -717,7 +722,7 @@
                 </label>
             </div>
 
-            <div style="display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap;">
+            <div id="collabButtons" style="display: none; gap: 8px; margin-bottom: 10px; flex-wrap: wrap;">
                 <!-- すべてクリア -->
                 <button type="button" class="collab-btn active" onclick="setCollabFilter('', this)"
                     style="padding: 6px 12px; font-size: 12px; background: #333; color: #fff; border: 1px solid #555; border-radius: 20px; cursor: pointer;">
@@ -1211,8 +1216,19 @@
         let currentCollab = "";
 
         // ★追加: コラボボタンを押した時の処理
+        function toggleCollabSection() {
+            const area = document.getElementById('collabButtons');
+            const btn = document.getElementById('collabToggleBtn');
+            if (!area) return;
+            const isOpen = area.style.display !== 'none';
+            area.style.display = isOpen ? 'none' : 'flex';
+            if (btn) btn.textContent = isOpen ? '開く ▼' : '閉じる ▲';
+        }
+
         function setCollabFilter(val, btn) {
             currentCollab = val;
+            const cc = document.getElementById('collabCurrent');
+            if (cc) cc.textContent = val ? `選択中: ${val}` : '';
 
             // ボタンのハイライト切り替え
             document.querySelectorAll('.collab-btn').forEach(b => {
