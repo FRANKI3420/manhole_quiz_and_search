@@ -114,6 +114,15 @@
             border-bottom: none;
         }
 
+        .visit-row {
+            cursor: pointer;
+        }
+
+        .visit-row.selected {
+            background: rgba(77, 171, 255, 0.15);
+            border-radius: 6px;
+        }
+
         .visit-pref {
             font-weight: bold;
             font-size: 15px;
@@ -276,6 +285,7 @@
         <button type="button" class="trip-min-btn active" onclick="setTripMin(3, this)">3枚以上</button>
         <button type="button" class="trip-min-btn" onclick="setTripMin(2, this)">2枚以上</button>
         <button type="button" class="trip-min-btn" onclick="setTripMin(1, this)">すべて（1枚〜）</button>
+        <span id="prefFilterStatus" style="font-size: 12px; color: var(--accent); font-weight: bold;"></span>
     </div>
     <div id="tripList"></div>
 
@@ -285,6 +295,7 @@
         let allTrips = [];
         let tripByDate = null;
         let currentTripMin = 3;
+        let selectedPref = null;
 
         function getCardStat(card) {
             const fullKey = `${card.city} (${card.id})`;
@@ -306,6 +317,16 @@
             return withYear ? `${date.getFullYear()}/${base}` : base;
         }
 
+        function togglePrefFilter(pref) {
+            selectedPref = (selectedPref === pref) ? null : pref;
+            document.querySelectorAll('.visit-row').forEach(r => {
+                r.classList.toggle('selected', r.dataset.pref === selectedPref);
+            });
+            const st = document.getElementById('prefFilterStatus');
+            if (st) st.textContent = selectedPref ? `絞り込み中: ${selectedPref}` : '';
+            renderTripList();
+        }
+
         function setTripMin(min, btn) {
             currentTripMin = min;
             document.querySelectorAll('.trip-min-btn').forEach(b => b.classList.remove('active'));
@@ -316,7 +337,7 @@
         function renderTripList() {
             if (!tripByDate) return;
             const byDate = tripByDate;
-            const trips = allTrips.filter(t => t.count >= currentTripMin);
+            const trips = allTrips.filter(t => t.count >= currentTripMin && (!selectedPref || t.prefs.includes(selectedPref)));
 
             const totalTripCards = trips.reduce((sm, t) => sm + t.count, 0);
             const avg = trips.length ? (totalTripCards / trips.length).toFixed(1) : 0;
@@ -438,12 +459,12 @@
                 .filter(([pref]) => pref !== '世界' && pref !== 'その他')
                 .sort((a, b) => b[1].visits - a[1].visits || b[1].cards - a[1].cards)
                 .map(([pref, v]) => `
-                    <div class="visit-row">
+                    <div class="visit-row" data-pref="${escapeHtml(pref)}" onclick="togglePrefFilter('${pref}')">
                         <span class="visit-pref">${escapeHtml(pref)}<span class="visit-sub">取得 ${v.cards}枚 ・ 最終 ${v.last.replace(/-/g, '/')}</span></span>
                         <span class="visit-count">${v.visits}<small> 回</small></span>
                     </div>`).join('');
             document.getElementById('prefVisits').innerHTML =
-                `<div class="visit-list"><h2>🗾 都道府県別の訪問回数</h2>${visitRows}</div>`;
+                `<div class="visit-list"><h2>🗾 都道府県別の訪問回数</h2><div style="font-size: 11px; color: #888; margin-bottom: 6px;">県名をタップすると、その県を含む旅だけ表示します（もう一度タップで解除）</div>${visitRows}</div>`;
 
             allTrips = trips;
             tripByDate = byDate;
