@@ -178,6 +178,22 @@
             cursor: pointer;
         }
 
+        .year-btn {
+            font-size: 12px;
+            padding: 5px 12px;
+            background: #222;
+            color: #aaa;
+            border: 1px solid #444;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        .year-btn.active {
+            background: #333;
+            color: #fff;
+            border-color: var(--accent);
+        }
+
         .trip-min-btn.active {
             background: #333;
             color: #fff;
@@ -299,6 +315,7 @@
         取得日の間隔が2日以内のものを「同じ旅」として自動でまとめています（旅の一覧は下のボタンで表示する枚数を切り替えられます）。訪問回数は旅単位で数えるので、同じ旅で複数日かかっても1回です。購入したカードは日付を記録しないため含まれません。開くたびに手元の記録から自動計算されます。
     </div>
 
+    <div id="yearBar" style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 14px;"></div>
     <div class="stats-summary" id="summaryArea"></div>
     <div id="prefVisits"></div>
     <div style="display: flex; gap: 8px; margin-bottom: 14px; align-items: center; flex-wrap: wrap;">
@@ -318,6 +335,8 @@
         let tripByDate = null;
         let currentTripMin = 3;
         let selectedPref = null;
+        let selectedYear = null;
+        let allClusters = [];
 
         function getCardStat(card) {
             const fullKey = `${card.city} (${card.id})`;
@@ -362,6 +381,41 @@
             renderTripList();
         }
 
+        function setYear(y, btn) {
+            selectedYear = y;
+            selectedPref = null;
+            document.querySelectorAll('.year-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            renderVisits();
+            renderTripList();
+        }
+
+        function renderVisits() {
+            if (!tripByDate) return;
+            const byDate = tripByDate;
+            const clusters = selectedYear ? allClusters.filter(ds => ds[0].startsWith(selectedYear)) : allClusters;
+            const visitMap = {};
+            clusters.forEach(ds => {
+                const cardsInCluster = ds.flatMap(d => byDate.get(d));
+                const perPref = {};
+                cardsInCluster.forEach(c => { perPref[c.pref] = (perPref[c.pref] || 0) + 1; });
+                Object.entries(perPref).forEach(([pref, n]) => {
+                    if (!visitMap[pref]) visitMap[pref] = { visits: 0, cards: 0, last: "" };
+                    visitMap[pref].visits++;
+                    visitMap[pref].cards += n;
+                    const lastInCluster = ds[ds.length - 1];
+                    if (lastInCluster > visitMap[pref].last) visitMap[pref].last = lastInCluster;
+                });
+            });
+            const visitRows = Object.entries(visitMap)
+                .filter(([pref]) => pref !== '世界' && pref !== 'その他')
+                .sort((a, b) => b[1].visits - a[1].visits || b[1].cards - a[1].cards)
+                .map(([pref, v]) => `<button type="button" class="visit-chip" data-pref="${escapeHtml(pref)}" title="取得 ${v.cards}枚 ・ 最終 ${v.last.replace(/-/g, '/')}" onclick="togglePrefFilter('${pref}')">${escapeHtml(pref)} <b>${v.visits}回</b></button>`).join('');
+            document.getElementById('prefVisits').innerHTML =
+                `<div class="visit-list"><h2>🗾 都道府県別の訪問回数</h2><div style="font-size: 11px; color: #888; margin-bottom: 8px;">県名をタップすると、その県を含む旅だけ表示します（もう一度タップで解除）</div><div class="visit-chips">${visitRows}</div></div>`;
+            refreshPrefFilterUI();
+        }
+
         function setTripMin(min, btn) {
             currentTripMin = min;
             document.querySelectorAll('.trip-min-btn').forEach(b => b.classList.remove('active'));
@@ -372,7 +426,9 @@
         function renderTripList() {
             if (!tripByDate) return;
             const byDate = tripByDate;
-            const trips = allTrips.filter(t => t.count >= currentTripMin && (!selectedPref || t.prefs.includes(selectedPref)));
+            const trips = allTrips.filter(t => t.count >= currentTripMin
+                && (!selectedYear || t.dates[0].startsWith(selectedYear))
+                && (!selectedPref || t.prefs.includes(selectedPref)));
 
             const totalTripCards = trips.reduce((sm, t) => sm + t.count, 0);
             const avg = trips.length ? (totalTripCards / trips.length).toFixed(1) : 0;
@@ -464,6 +520,13 @@
                 }
             }
             clusters.push(current);
+            allClusters = clusters;
+
+            const years = [...new Set(dates.map(d => d.slice(0, 4)))].sort().reverse();
+            document.getElementById('yearBar').innerHTML =
+                `<span style="font-size: 12px; color: #888;">年:</span>` +
+                `<button type="button" class="year-btn${!selectedYear ? ' active' : ''}" onclick="setYear(null, this)">すべて</button>` +
+                years.map(y => `<button type="button" class="year-btn${selectedYear === y ? ' active' : ''}" onclick="setYear('${y}', this)">${y}年</button>`).join('');
 
             const trips = clusters
                 .map(ds => {
@@ -474,31 +537,9 @@
                 })
                 .sort((a, b) => (a.dates[0] < b.dates[0] ? 1 : -1));
 
-            // 都道府県別の訪問回数（旅クラスタ単位：同じ旅で複数日でも1回）
-            const visitMap = {};
-            clusters.forEach(ds => {
-                const cardsInCluster = ds.flatMap(d => byDate.get(d));
-                const prefsInCluster = [...new Set(cardsInCluster.map(c => c.pref))];
-                prefsInCluster.forEach(pref => {
-                    if (!visitMap[pref]) visitMap[pref] = { visits: 0, cards: 0, last: "" };
-                    visitMap[pref].visits++;
-                    const lastInCluster = ds[ds.length - 1];
-                    if (lastInCluster > visitMap[pref].last) visitMap[pref].last = lastInCluster;
-                });
-            });
-            Object.values(visitMap).forEach(v => { v.cards = 0; });
-            byDate.forEach((cards, d) => {
-                cards.forEach(c => { if (visitMap[c.pref]) visitMap[c.pref].cards++; });
-            });
-            const visitRows = Object.entries(visitMap)
-                .filter(([pref]) => pref !== '世界' && pref !== 'その他')
-                .sort((a, b) => b[1].visits - a[1].visits || b[1].cards - a[1].cards)
-                .map(([pref, v]) => `<button type="button" class="visit-chip" data-pref="${escapeHtml(pref)}" title="取得 ${v.cards}枚 ・ 最終 ${v.last.replace(/-/g, '/')}" onclick="togglePrefFilter('${pref}')">${escapeHtml(pref)} <b>${v.visits}回</b></button>`).join('');
-            document.getElementById('prefVisits').innerHTML =
-                `<div class="visit-list"><h2>🗾 都道府県別の訪問回数</h2><div style="font-size: 11px; color: #888; margin-bottom: 8px;">県名をタップすると、その県を含む旅だけ表示します（もう一度タップで解除）</div><div class="visit-chips">${visitRows}</div></div>`;
-
             allTrips = trips;
             tripByDate = byDate;
+            renderVisits();
             renderTripList();
         }
     </script>
