@@ -585,6 +585,7 @@
             }
         }
     </style>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 
 <body>
@@ -1598,6 +1599,7 @@ function toggleStatsSection(id, btn) {
 
         function saveAndRefresh() {
             localStorage.setItem('manhole_collection', JSON.stringify(userStats));
+            scheduleAutoBackup();
             updateStats();
             renderCollection();
             setTimeout(() => closeModal(), 600);
@@ -1613,6 +1615,148 @@ function toggleStatsSection(id, btn) {
             if (!d || !d.url) return;
             window.open(`search.html?img=${encodeURIComponent(d.url)}&city=${encodeURIComponent(d.city)}`, '_blank');
         }
+
+        // --- Google Drive 自動バックアップ ---
+        const DRIVE_FILE_NAME = 'manhole_backup_auto.json';
+        let driveToken = null, driveTokenExpiry = 0, driveTokenClient = null, driveBackupTimer = null;
+
+        function driveClientId() { return localStorage.getItem('manhole_drive_client_id') || ''; }
+
+        function driveHash(str) {
+            let h = 0;
+            for (let i = 0; i < str.length; i++) { h = (Math.imul(31, h) + str.charCodeAt(i)) | 0; }
+            return String(h);
+        }
+
+        function driveTokenValid() { return !!driveToken && Date.now() < driveTokenExpiry; }
+
+        function updateDriveStatus() {
+            const el = document.getElementById('driveStatus');
+            if (!el) return;
+            const setup = document.getElementById('driveSetup');
+            if (!driveClientId()) {
+                el.textContent = '未設定：GoogleクライアントIDを入力してください';
+                if (setup) setup.style.display = '';
+                return;
+            }
+            if (setup) setup.style.display = 'none';
+            const last = localStorage.getItem('manhole_drive_last_backup');
+            const lastStr = last ? new Date(last).toLocaleString('ja-JP') : 'まだ';
+            const data = localStorage.getItem('manhole_collection') || '{}';
+            const dirty = localStorage.getItem('manhole_drive_backup_hash') !== driveHash(data);
+            if (!driveTokenValid()) el.textContent = `ログインしていません（最終バックアップ: ${lastStr}）。自動保存にはログインが必要です`;
+            else if (dirty) el.textContent = `ログイン中・バックアップ待ち…（最終: ${lastStr}）`;
+            else el.textContent = `✅ 自動バックアップ有効（最終: ${lastStr}）`;
+        }
+
+        function saveDriveClientId() {
+            const inp = document.getElementById('driveClientId');
+            const v = (inp.value || '').trim();
+            if (!v) { alert('クライアントIDを入力してください'); return; }
+            localStorage.setItem('manhole_drive_client_id', v);
+            updateDriveStatus();
+            alert('保存しました。「Googleでログイン」を押してください');
+        }
+
+        function initDriveClient() {
+            if (!driveClientId() || !(window.google && google.accounts && google.accounts.oauth2)) return false;
+            if (driveTokenClient) return true;
+            driveTokenClient = google.accounts.oauth2.initTokenClient({
+                client_id: driveClientId(),
+                scope: 'https://www.googleapis.com/auth/drive.file',
+                callback: (resp) => {
+                    if (resp && resp.access_token) {
+                        driveToken = resp.access_token;
+                        driveTokenExpiry = Date.now() + (Number(resp.expires_in || 3600) - 60) * 1000;
+                        updateDriveStatus();
+                        scheduleAutoBackup(500);
+                    } else {
+                        alert('ログインできませんでした');
+                    }
+                }
+            });
+            return true;
+        }
+
+        function driveLogin() {
+            if (!driveClientId()) { alert('先にクライアントIDを入力して保存してください'); return; }
+            if (!initDriveClient()) { alert('Googleログインの準備中です。数秒待ってからもう一度押してください'); return; }
+            driveTokenClient.requestAccessToken();
+        }
+
+        function scheduleAutoBackup(delay = 4000) {
+            updateDriveStatus();
+            if (!driveClientId()) return;
+            clearTimeout(driveBackupTimer);
+            driveBackupTimer = setTimeout(runAutoBackup, delay);
+        }
+
+        async function driveApi(path, options = {}) {
+            const r = await fetch('https://www.googleapis.com/' + path, {
+                ...options,
+                headers: { Authorization: 'Bearer ' + driveToken, ...(options.headers || {}) }
+            });
+            if (!r.ok) throw new Error('Drive API ' + r.status);
+            return r;
+        }
+
+        async function driveFindFile() {
+            const q = encodeURIComponent(`name='${DRIVE_FILE_NAME}' and trashed=false`);
+            const data = await (await driveApi(`drive/v3/files?q=${q}&fields=files(id)`)).json();
+            return (data.files && data.files.length) ? data.files[0].id : null;
+        }
+
+        async function runAutoBackup() {
+            if (!driveTokenValid()) { updateDriveStatus(); return; }
+            const data = localStorage.getItem('manhole_collection') || '{}';
+            const h = driveHash(data);
+            if (localStorage.getItem('manhole_drive_backup_hash') === h) { updateDriveStatus(); return; }
+            try {
+                const fileId = await driveFindFile();
+                const boundary = 'mh' + Date.now();
+                const metadata = { name: DRIVE_FILE_NAME, mimeType: 'application/json' };
+                const body = `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify(metadata)}\r\n--${boundary}\r\nContent-Type: application/json\r\n\r\n${data}\r\n--${boundary}--`;
+                const headers = { 'Content-Type': 'multipart/related; boundary=' + boundary };
+                if (fileId) {
+                    await driveApi(`upload/drive/v3/files/${fileId}?uploadType=multipart`, { method: 'PATCH', headers, body });
+                } else {
+                    await driveApi('upload/drive/v3/files?uploadType=multipart', { method: 'POST', headers, body });
+                }
+                localStorage.setItem('manhole_drive_backup_hash', h);
+                localStorage.setItem('manhole_drive_last_backup', new Date().toISOString());
+            } catch (e) { console.warn('auto backup failed', e); }
+            updateDriveStatus();
+        }
+
+        function driveBackupNow() {
+            if (!driveTokenValid()) { alert('先にGoogleでログインしてください'); return; }
+            runAutoBackup();
+        }
+
+        async function driveRestore() {
+            if (!driveTokenValid()) { alert('先にGoogleでログインしてください'); return; }
+            if (!confirm('Driveの自動バックアップで現在のデータを上書きしますか？')) return;
+            try {
+                const fileId = await driveFindFile();
+                if (!fileId) { alert('Driveに自動バックアップが見つかりません'); return; }
+                const text = await (await driveApi(`drive/v3/files/${fileId}?alt=media`)).text();
+                userStats = JSON.parse(text);
+                localStorage.setItem('manhole_collection', JSON.stringify(userStats));
+                localStorage.setItem('manhole_drive_backup_hash', driveHash(JSON.stringify(userStats)));
+                updateStats();
+                renderCollection();
+                updatePrefStats();
+                updateEditionStats();
+                updateDriveStatus();
+                alert('復元しました');
+            } catch (e) { alert('復元に失敗しました'); }
+        }
+
+        window.addEventListener('load', () => {
+            const inp = document.getElementById('driveClientId');
+            if (inp && driveClientId()) inp.value = driveClientId();
+            updateDriveStatus();
+        });
 
         function exportBackup() {
             const blob = new Blob([JSON.stringify(userStats, null, 2)], { type: 'application/json' });
@@ -1630,6 +1774,7 @@ function toggleStatsSection(id, btn) {
                 try {
                     userStats = JSON.parse(e.target.result);
                     localStorage.setItem('manhole_collection', JSON.stringify(userStats));
+                    scheduleAutoBackup();
                     updateStats();
                     renderCollection();
                     alert('インポート完了');
@@ -1852,6 +1997,21 @@ function toggleStatsSection(id, btn) {
         <button class="btn-utility" onclick="exportBackup()">エクスポート</button>
         <button class="btn-utility" onclick="document.getElementById('importFile').click()">インポート</button>
         <input type="file" id="importFile" style="display:none" onchange="importBackup(event)">
+    </div>
+    <div style="margin-top: 20px;">
+        <div style="font-size: 12px; color: #666; margin-bottom: 8px;">☁️ Google Drive 自動バックアップ</div>
+        <div id="driveStatus" style="font-size: 11px; color: #888; margin-bottom: 8px;">未設定</div>
+        <div id="driveSetup" style="margin-bottom: 8px;">
+            <input type="text" id="driveClientId" placeholder="Google クライアントID"
+                style="width: min(420px, 80vw); padding: 6px 8px; font-size: 12px; background: #222; color: #ddd; border: 1px solid #444; border-radius: 6px;">
+            <button class="btn-utility" onclick="saveDriveClientId()">IDを保存</button>
+        </div>
+        <div class="backup-row">
+            <button class="btn-utility" onclick="driveLogin()">Googleでログイン</button>
+            <button class="btn-utility" onclick="driveBackupNow()">今すぐバックアップ</button>
+            <button class="btn-utility" onclick="driveRestore()">Driveから復元</button>
+        </div>
+        <div style="font-size: 10px; color: #555; margin-top: 8px;">データが変わると数秒後に Drive の manhole_backup_auto.json へ自動保存します（ログイン中のみ）</div>
     </div>
     <div style="font-size: 10px; color: #444; margin-top: 20px;">© マンホール図鑑</div>
 </footer>
