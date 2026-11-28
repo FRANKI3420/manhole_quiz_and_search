@@ -474,6 +474,7 @@
 
 
 
+    <script src="common.js"></script>
     <script>
         const userStats = JSON.parse(localStorage.getItem('manhole_collection')) || {};
         let monthPositions = []; // スクロール検知用
@@ -482,13 +483,6 @@
         let currentFilterEdition = null; // nullなら全弾、文字列（"第1弾"など）ならその弾のみ
         let masterData = []; // グローバルで保持するマスタデータ
 
-        // --- 【追加】カードの収集ステータスをID優先で取得する共通関数 ---
-        function getCardStat(card) {
-            if (!card) return null;
-            const fullKey = `${card.city} (${card.id})`;
-            // 1. ID単体(card.id) -> 2. ID付き旧キー -> 3. 市区町村名のみ の順で検索
-            return userStats[card.id] || userStats[fullKey] || userStats[card.city] || null;
-        }
 
         // --- 初回ロード処理 ---
         window.addEventListener('DOMContentLoaded', () => {
@@ -845,13 +839,6 @@
         // ==========================================
         // 2. 都道府県の統計UI更新
         // ==========================================
-function toggleStatsSection(id, btn) {
-            const el = document.getElementById(id);
-            if (!el) return;
-            const isOpen = el.style.display !== 'none';
-            el.style.display = isOpen ? 'none' : '';
-            if (btn) btn.textContent = isOpen ? '開く ▼' : '閉じる ▲';
-        }
 
         function updatePrefStats() {
             const grid = document.getElementById('prefStatsGrid');

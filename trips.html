@@ -328,6 +328,7 @@
     </div>
     <div id="tripList"></div>
 
+    <script src="common.js"></script>
     <script>
         const userStats = JSON.parse(localStorage.getItem('manhole_collection')) || {};
         let masterData = [];
@@ -338,11 +339,7 @@
         let selectedYear = null;
         let allClusters = [];
 
-        function getCardStat(card) {
-            const fullKey = `${card.city} (${card.id})`;
-            return userStats[card.id] || userStats[fullKey] || userStats[card.city] || null;
-        }
-
+        
         function escapeHtml(str) {
             return String(str ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
         }
