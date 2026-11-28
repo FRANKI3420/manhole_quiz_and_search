@@ -46227,5 +46227,1605 @@
       }
     ],
     "tags": []
+  },
+  {
+    "id": "01-692-A",
+    "pref": "北海道",
+    "city": "中標津町 (A001)",
+    "url": "http://www.gk-p.jp/wp-content/uploads/mhc/01-692-A-01.jpg",
+    "edition": "第30弾",
+    "card_id": "01-692-A",
+    "old_id": "中標津町",
+    "palette": [
+      {
+        "hex": "#85949b",
+        "ratio": 32.9
+      },
+      {
+        "hex": "#3b773c",
+        "ratio": 20.6
+      },
+      {
+        "hex": "#697c73",
+        "ratio": 17.5
+      },
+      {
+        "hex": "#e8e8e7",
+        "ratio": 14.6
+      },
+      {
+        "hex": "#2b3030",
+        "ratio": 14.5
+      }
+    ],
+    "tags": []
+  },
+  {
+    "id": "02-201-B",
+    "pref": "青森県",
+    "city": "青森市 (B001)",
+    "url": "http://www.gk-p.jp/wp-content/uploads/mhc/02-201-B-01.jpg",
+    "edition": "第30弾",
+    "card_id": "02-201-B",
+    "old_id": "青森市 (B001)",
+    "palette": [
+      {
+        "hex": "#7b878d",
+        "ratio": 41.5
+      },
+      {
+        "hex": "#415b44",
+        "ratio": 22.1
+      },
+      {
+        "hex": "#a0bd3b",
+        "ratio": 15.3
+      },
+      {
+        "hex": "#f1f2f0",
+        "ratio": 10.9
+      },
+      {
+        "hex": "#a2c5cd",
+        "ratio": 10.2
+      }
+    ],
+    "tags": []
+  },
+  {
+    "id": "02-442-A",
+    "pref": "青森県",
+    "city": "五戸町 (A001)",
+    "url": "http://www.gk-p.jp/wp-content/uploads/mhc/02-442-A-01.jpg",
+    "edition": "第30弾",
+    "card_id": "02-442-A",
+    "old_id": "五戸町",
+    "palette": [
+      {
+        "hex": "#898c8a",
+        "ratio": 33.1
+      },
+      {
+        "hex": "#513a48",
+        "ratio": 24.9
+      },
+      {
+        "hex": "#e9e9de",
+        "ratio": 14.8
+      },
+      {
+        "hex": "#9ebd39",
+        "ratio": 14.6
+      },
+      {
+        "hex": "#4d8144",
+        "ratio": 12.6
+      }
+    ],
+    "tags": []
+  },
+  {
+    "id": "04-341-A",
+    "pref": "宮城県",
+    "city": "丸森町 (A001)",
+    "url": "http://www.gk-p.jp/wp-content/uploads/mhc/04-341-A-01.jpg",
+    "edition": "第30弾",
+    "card_id": "04-341-A",
+    "old_id": "丸森町",
+    "palette": [
+      {
+        "hex": "#888a80",
+        "ratio": 32.2
+      },
+      {
+        "hex": "#445e37",
+        "ratio": 24.9
+      },
+      {
+        "hex": "#cfc089",
+        "ratio": 18.2
+      },
+      {
+        "hex": "#9cbb37",
+        "ratio": 13.8
+      },
+      {
+        "hex": "#f1f2f1",
+        "ratio": 10.8
+      }
+    ],
+    "tags": []
+  },
+  {
+    "id": "07-209-B",
+    "pref": "福島県",
+    "city": "相馬市 (B001)",
+    "url": "http://www.gk-p.jp/wp-content/uploads/mhc/07-209-B-01.jpg",
+    "edition": "第30弾",
+    "card_id": "07-209-B",
+    "old_id": "相馬市 (B001)",
+    "palette": [
+      {
+        "hex": "#878c8d",
+        "ratio": 31.8
+      },
+      {
+        "hex": "#edeee5",
+        "ratio": 26.0
+      },
+      {
+        "hex": "#28374d",
+        "ratio": 15.5
+      },
+      {
+        "hex": "#9ebd39",
+        "ratio": 14.6
+      },
+      {
+        "hex": "#4e7e43",
+        "ratio": 12.1
+      }
+    ],
+    "tags": []
+  },
+  {
+    "id": "07-211-B",
+    "pref": "福島県",
+    "city": "田村市 (B001)",
+    "url": "http://www.gk-p.jp/wp-content/uploads/mhc/07-211-B-01.jpg",
+    "edition": "第30弾",
+    "card_id": "07-211-B",
+    "old_id": "田村市 (B001)",
+    "palette": [
+      {
+        "hex": "#949584",
+        "ratio": 44.2
+      },
+      {
+        "hex": "#587544",
+        "ratio": 18.6
+      },
+      {
+        "hex": "#9ebd39",
+        "ratio": 14.6
+      },
+      {
+        "hex": "#edefe8",
+        "ratio": 12.1
+      },
+      {
+        "hex": "#292a23",
+        "ratio": 10.5
+      }
+    ],
+    "tags": []
+  },
+  {
+    "id": "07-466-A",
+    "pref": "福島県",
+    "city": "矢吹町 (A001)",
+    "url": "http://www.gk-p.jp/wp-content/uploads/mhc/07-466-A-01.jpg",
+    "edition": "第30弾",
+    "card_id": "07-466-A",
+    "old_id": "矢吹町",
+    "palette": [
+      {
+        "hex": "#898e8e",
+        "ratio": 36.2
+      },
+      {
+        "hex": "#4b4d56",
+        "ratio": 27.6
+      },
+      {
+        "hex": "#9ebe3a",
+        "ratio": 14.2
+      },
+      {
+        "hex": "#e9ece6",
+        "ratio": 12.9
+      },
+      {
+        "hex": "#48893a",
+        "ratio": 9.0
+      }
+    ],
+    "tags": []
+  },
+  {
+    "id": "09-000-B",
+    "pref": "栃木県",
+    "city": "栃木県 (流域下水道) (B001)",
+    "url": "http://www.gk-p.jp/wp-content/uploads/mhc/09-000-B-01.jpg",
+    "edition": "第30弾",
+    "card_id": "09-000-B",
+    "old_id": "栃木県 (流域下水道) (B001)",
+    "palette": [
+      {
+        "hex": "#7a8993",
+        "ratio": 41.9
+      },
+      {
+        "hex": "#413538",
+        "ratio": 18.1
+      },
+      {
+        "hex": "#e9ebef",
+        "ratio": 15.2
+      },
+      {
+        "hex": "#a7b6c5",
+        "ratio": 15.1
+      },
+      {
+        "hex": "#146992",
+        "ratio": 9.8
+      }
+    ],
+    "tags": []
+  },
+  {
+    "id": "09-204-C",
+    "pref": "栃木県",
+    "city": "佐野市 (C001)",
+    "url": "http://www.gk-p.jp/wp-content/uploads/mhc/09-204-C-01.jpg",
+    "edition": "第30弾",
+    "card_id": "09-204-C",
+    "old_id": "佐野市 (C001)",
+    "palette": [
+      {
+        "hex": "#89818b",
+        "ratio": 30.4
+      },
+      {
+        "hex": "#709cb5",
+        "ratio": 24.4
+      },
+      {
+        "hex": "#e1e5e8",
+        "ratio": 18.7
+      },
+      {
+        "hex": "#2d2c33",
+        "ratio": 16.5
+      },
+      {
+        "hex": "#116991",
+        "ratio": 10.0
+      }
+    ],
+    "tags": []
+  },
+  {
+    "id": "11-207-A",
+    "pref": "埼玉県",
+    "city": "秩父市 (A001)",
+    "url": "http://www.gk-p.jp/wp-content/uploads/mhc/11-207-A-01.jpg",
+    "edition": "第30弾",
+    "card_id": "11-207-A",
+    "old_id": "秩父市",
+    "palette": [
+      {
+        "hex": "#8c8483",
+        "ratio": 34.7
+      },
+      {
+        "hex": "#34373f",
+        "ratio": 19.9
+      },
+      {
+        "hex": "#6e9eb1",
+        "ratio": 18.6
+      },
+      {
+        "hex": "#21648e",
+        "ratio": 15.0
+      },
+      {
+        "hex": "#eeefed",
+        "ratio": 11.9
+      }
+    ],
+    "tags": []
+  },
+  {
+    "id": "11-214-A",
+    "pref": "埼玉県",
+    "city": "春日部市 (A001)",
+    "url": "http://www.gk-p.jp/wp-content/uploads/mhc/11-214-A-01.jpg",
+    "edition": "第30弾",
+    "card_id": "11-214-A",
+    "old_id": "春日部市",
+    "palette": [
+      {
+        "hex": "#788991",
+        "ratio": 44.3
+      },
+      {
+        "hex": "#3d3534",
+        "ratio": 17.0
+      },
+      {
+        "hex": "#a4b8c5",
+        "ratio": 14.6
+      },
+      {
+        "hex": "#f0f0ef",
+        "ratio": 13.8
+      },
+      {
+        "hex": "#116792",
+        "ratio": 10.3
+      }
+    ],
+    "tags": []
+  },
+  {
+    "id": "13-209-C",
+    "pref": "東京都",
+    "city": "町田市 (C001)",
+    "url": "http://www.gk-p.jp/wp-content/uploads/mhc/13-209-C-01.jpg",
+    "edition": "第30弾",
+    "card_id": "13-209-C",
+    "old_id": "町田市 (C001)",
+    "palette": [
+      {
+        "hex": "#808f97",
+        "ratio": 50.1
+      },
+      {
+        "hex": "#e6e9e8",
+        "ratio": 16.3
+      },
+      {
+        "hex": "#484645",
+        "ratio": 16.1
+      },
+      {
+        "hex": "#1b6e91",
+        "ratio": 8.9
+      },
+      {
+        "hex": "#c3a354",
+        "ratio": 8.7
+      }
+    ],
+    "tags": []
+  },
+  {
+    "id": "14-206-G",
+    "pref": "神奈川県",
+    "city": "小田原市 (G001)",
+    "url": "http://www.gk-p.jp/wp-content/uploads/mhc/14-206-G-01.jpg",
+    "edition": "第30弾",
+    "card_id": "14-206-G",
+    "old_id": "小田原市 (G001)",
+    "palette": [
+      {
+        "hex": "#7a8a94",
+        "ratio": 40.5
+      },
+      {
+        "hex": "#393b42",
+        "ratio": 22.8
+      },
+      {
+        "hex": "#eff0ee",
+        "ratio": 14.0
+      },
+      {
+        "hex": "#9ab6ca",
+        "ratio": 13.7
+      },
+      {
+        "hex": "#0e6a93",
+        "ratio": 9.0
+      }
+    ],
+    "tags": []
+  },
+  {
+    "id": "15-202-H",
+    "pref": "新潟県",
+    "city": "長岡市 (H001)",
+    "url": "http://www.gk-p.jp/wp-content/uploads/mhc/15-202-H-01.jpg",
+    "edition": "第30弾",
+    "card_id": "15-202-H",
+    "old_id": "長岡市 (H001)",
+    "palette": [
+      {
+        "hex": "#838c95",
+        "ratio": 34.0
+      },
+      {
+        "hex": "#0c60a1",
+        "ratio": 22.5
+      },
+      {
+        "hex": "#dce7ec",
+        "ratio": 18.6
+      },
+      {
+        "hex": "#844a41",
+        "ratio": 13.2
+      },
+      {
+        "hex": "#272529",
+        "ratio": 11.7
+      }
+    ],
+    "tags": []
+  },
+  {
+    "id": "15-224-J",
+    "pref": "新潟県",
+    "city": "佐渡市 (J001)",
+    "url": "http://www.gk-p.jp/wp-content/uploads/mhc/15-224-J-01.jpg",
+    "edition": "第30弾",
+    "card_id": "15-224-J",
+    "old_id": "佐渡市 (J001)",
+    "palette": [
+      {
+        "hex": "#868984",
+        "ratio": 33.4
+      },
+      {
+        "hex": "#125f9e",
+        "ratio": 25.3
+      },
+      {
+        "hex": "#303042",
+        "ratio": 18.0
+      },
+      {
+        "hex": "#eff0f1",
+        "ratio": 11.7
+      },
+      {
+        "hex": "#7aa8ce",
+        "ratio": 11.6
+      }
+    ],
+    "tags": []
+  },
+  {
+    "id": "16-201-J",
+    "pref": "富山県",
+    "city": "富山市 (J001)",
+    "url": "http://www.gk-p.jp/wp-content/uploads/mhc/16-201-J-01.jpg",
+    "edition": "第30弾",
+    "card_id": "16-201-J",
+    "old_id": "富山市 (J001)",
+    "palette": [
+      {
+        "hex": "#7c8693",
+        "ratio": 34.8
+      },
+      {
+        "hex": "#0b5d9f",
+        "ratio": 23.0
+      },
+      {
+        "hex": "#f3f3f4",
+        "ratio": 22.3
+      },
+      {
+        "hex": "#26354b",
+        "ratio": 13.2
+      },
+      {
+        "hex": "#b4bcc4",
+        "ratio": 6.7
+      }
+    ],
+    "tags": []
+  },
+  {
+    "id": "19-204-C",
+    "pref": "山梨県",
+    "city": "都留市 (C001)",
+    "url": "http://www.gk-p.jp/wp-content/uploads/mhc/19-204-C-01.jpg",
+    "edition": "第30弾",
+    "card_id": "19-204-C",
+    "old_id": "都留市 (C001)",
+    "palette": [
+      {
+        "hex": "#848788",
+        "ratio": 33.4
+      },
+      {
+        "hex": "#e5ba15",
+        "ratio": 25.7
+      },
+      {
+        "hex": "#523f3d",
+        "ratio": 20.6
+      },
+      {
+        "hex": "#f6f5ee",
+        "ratio": 11.5
+      },
+      {
+        "hex": "#d5c9a6",
+        "ratio": 8.8
+      }
+    ],
+    "tags": []
+  },
+  {
+    "id": "19-368-A",
+    "pref": "山梨県",
+    "city": "富士川町 (A001)",
+    "url": "http://www.gk-p.jp/wp-content/uploads/mhc/19-368-A-01.jpg",
+    "edition": "第30弾",
+    "card_id": "19-368-A",
+    "old_id": "富士川町",
+    "palette": [
+      {
+        "hex": "#8b898a",
+        "ratio": 32.5
+      },
+      {
+        "hex": "#e6bd1b",
+        "ratio": 27.3
+      },
+      {
+        "hex": "#2c343c",
+        "ratio": 17.8
+      },
+      {
+        "hex": "#eae9e3",
+        "ratio": 14.9
+      },
+      {
+        "hex": "#336791",
+        "ratio": 7.6
+      }
+    ],
+    "tags": []
+  },
+  {
+    "id": "20-485-A",
+    "pref": "長野県",
+    "city": "白馬村 (A001)",
+    "url": "http://www.gk-p.jp/wp-content/uploads/mhc/20-485-A-01.jpg",
+    "edition": "第30弾",
+    "card_id": "20-485-A",
+    "old_id": "白馬村",
+    "palette": [
+      {
+        "hex": "#898b8e",
+        "ratio": 30.3
+      },
+      {
+        "hex": "#e7ba18",
+        "ratio": 25.6
+      },
+      {
+        "hex": "#edede8",
+        "ratio": 17.0
+      },
+      {
+        "hex": "#4a4c60",
+        "ratio": 14.3
+      },
+      {
+        "hex": "#21242e",
+        "ratio": 12.9
+      }
+    ],
+    "tags": []
+  },
+  {
+    "id": "20-521-A",
+    "pref": "長野県",
+    "city": "坂城町 (A001)",
+    "url": "http://www.gk-p.jp/wp-content/uploads/mhc/20-521-A-01.jpg",
+    "edition": "第30弾",
+    "card_id": "20-521-A",
+    "old_id": "坂城町",
+    "palette": [
+      {
+        "hex": "#8d8b8d",
+        "ratio": 30.4
+      },
+      {
+        "hex": "#e7bb18",
+        "ratio": 26.2
+      },
+      {
+        "hex": "#eae9e4",
+        "ratio": 18.9
+      },
+      {
+        "hex": "#2b2d2a",
+        "ratio": 12.5
+      },
+      {
+        "hex": "#6a584e",
+        "ratio": 11.9
+      }
+    ],
+    "tags": []
+  },
+  {
+    "id": "21-206-C",
+    "pref": "岐阜県",
+    "city": "中津川市 (C001)",
+    "url": "http://www.gk-p.jp/wp-content/uploads/mhc/21-206-C-01.jpg",
+    "edition": "第30弾",
+    "card_id": "21-206-C",
+    "old_id": "中津川市 (C001)",
+    "palette": [
+      {
+        "hex": "#868586",
+        "ratio": 36.3
+      },
+      {
+        "hex": "#e7b813",
+        "ratio": 24.1
+      },
+      {
+        "hex": "#c7c2b8",
+        "ratio": 16.5
+      },
+      {
+        "hex": "#2f2d2d",
+        "ratio": 11.8
+      },
+      {
+        "hex": "#f3f2f2",
+        "ratio": 11.3
+      }
+    ],
+    "tags": []
+  },
+  {
+    "id": "22-000-A",
+    "pref": "静岡県",
+    "city": "静岡県 (流域下水道)",
+    "url": "http://www.gk-p.jp/wp-content/uploads/mhc/22-000-A-01.jpg",
+    "edition": "第30弾",
+    "card_id": "22-000-A",
+    "old_id": "静岡県 (流域下水道)",
+    "palette": [
+      {
+        "hex": "#858e99",
+        "ratio": 32.5
+      },
+      {
+        "hex": "#e8ba18",
+        "ratio": 24.5
+      },
+      {
+        "hex": "#2b313b",
+        "ratio": 16.5
+      },
+      {
+        "hex": "#edebe4",
+        "ratio": 15.1
+      },
+      {
+        "hex": "#746363",
+        "ratio": 11.4
+      }
+    ],
+    "tags": []
+  },
+  {
+    "id": "23-202-H",
+    "pref": "愛知県",
+    "city": "岡崎市 (H001)",
+    "url": "http://www.gk-p.jp/wp-content/uploads/mhc/23-202-H-01.jpg",
+    "edition": "第30弾",
+    "card_id": "23-202-H",
+    "old_id": "岡崎市 (H001)",
+    "palette": [
+      {
+        "hex": "#88888b",
+        "ratio": 32.3
+      },
+      {
+        "hex": "#404448",
+        "ratio": 26.7
+      },
+      {
+        "hex": "#e7b507",
+        "ratio": 19.1
+      },
+      {
+        "hex": "#f0edea",
+        "ratio": 15.2
+      },
+      {
+        "hex": "#ebce54",
+        "ratio": 6.6
+      }
+    ],
+    "tags": []
+  },
+  {
+    "id": "25-209-D",
+    "pref": "滋賀県",
+    "city": "甲賀市 (D001)",
+    "url": "http://www.gk-p.jp/wp-content/uploads/mhc/25-209-D-01.jpg",
+    "edition": "第30弾",
+    "card_id": "25-209-D",
+    "old_id": "甲賀市 (D001)",
+    "palette": [
+      {
+        "hex": "#84868a",
+        "ratio": 30.1
+      },
+      {
+        "hex": "#cb7c14",
+        "ratio": 24.2
+      },
+      {
+        "hex": "#484d4e",
+        "ratio": 23.8
+      },
+      {
+        "hex": "#efeeeb",
+        "ratio": 14.1
+      },
+      {
+        "hex": "#c4b9a9",
+        "ratio": 7.8
+      }
+    ],
+    "tags": []
+  },
+  {
+    "id": "28-201-B",
+    "pref": "兵庫県",
+    "city": "姫路市 (B001)",
+    "url": "http://www.gk-p.jp/wp-content/uploads/mhc/28-201-B-01.jpg",
+    "edition": "第30弾",
+    "card_id": "28-201-B",
+    "old_id": "姫路市 (B001)",
+    "palette": [
+      {
+        "hex": "#808081",
+        "ratio": 38.6
+      },
+      {
+        "hex": "#cb7d14",
+        "ratio": 25.1
+      },
+      {
+        "hex": "#303333",
+        "ratio": 13.4
+      },
+      {
+        "hex": "#f2f1f0",
+        "ratio": 12.6
+      },
+      {
+        "hex": "#b2bac3",
+        "ratio": 10.3
+      }
+    ],
+    "tags": []
+  },
+  {
+    "id": "28-586-A",
+    "pref": "兵庫県",
+    "city": "新温泉町 (A001)",
+    "url": "http://www.gk-p.jp/wp-content/uploads/mhc/28-586-A-01.jpg",
+    "edition": "第30弾",
+    "card_id": "28-586-A",
+    "old_id": "新温泉町",
+    "palette": [
+      {
+        "hex": "#7f8386",
+        "ratio": 33.1
+      },
+      {
+        "hex": "#ca7c14",
+        "ratio": 23.5
+      },
+      {
+        "hex": "#3a302e",
+        "ratio": 21.5
+      },
+      {
+        "hex": "#edefef",
+        "ratio": 13.4
+      },
+      {
+        "hex": "#c6b496",
+        "ratio": 8.5
+      }
+    ],
+    "tags": []
+  },
+  {
+    "id": "29-211-A",
+    "pref": "奈良県",
+    "city": "葛城市 (A001)",
+    "url": "http://www.gk-p.jp/wp-content/uploads/mhc/29-211-A-01.jpg",
+    "edition": "第30弾",
+    "card_id": "29-211-A",
+    "old_id": "葛城市",
+    "palette": [
+      {
+        "hex": "#908e8f",
+        "ratio": 32.0
+      },
+      {
+        "hex": "#cb7c13",
+        "ratio": 24.1
+      },
+      {
+        "hex": "#edebe7",
+        "ratio": 17.6
+      },
+      {
+        "hex": "#293849",
+        "ratio": 16.8
+      },
+      {
+        "hex": "#794961",
+        "ratio": 9.4
+      }
+    ],
+    "tags": []
+  },
+  {
+    "id": "39-212-F",
+    "pref": "高知県",
+    "city": "香美市 (F001)",
+    "url": "http://www.gk-p.jp/wp-content/uploads/mhc/39-212-F-01.jpg",
+    "edition": "第30弾",
+    "card_id": "39-212-F",
+    "old_id": "香美市 (F001)",
+    "palette": [
+      {
+        "hex": "#908790",
+        "ratio": 33.9
+      },
+      {
+        "hex": "#963089",
+        "ratio": 20.4
+      },
+      {
+        "hex": "#2c3b4f",
+        "ratio": 19.2
+      },
+      {
+        "hex": "#ebe5e6",
+        "ratio": 13.9
+      },
+      {
+        "hex": "#b0711f",
+        "ratio": 12.7
+      }
+    ],
+    "tags": []
+  },
+  {
+    "id": "47-311-A",
+    "pref": "沖縄県",
+    "city": "恩納村 (A001)",
+    "url": "http://www.gk-p.jp/wp-content/uploads/mhc/47-311-A-01.jpg",
+    "edition": "第30弾",
+    "card_id": "47-311-A",
+    "old_id": "恩納村",
+    "palette": [
+      {
+        "hex": "#89878d",
+        "ratio": 38.3
+      },
+      {
+        "hex": "#d199b9",
+        "ratio": 30.5
+      },
+      {
+        "hex": "#f0ecef",
+        "ratio": 14.8
+      },
+      {
+        "hex": "#414e54",
+        "ratio": 13.8
+      },
+      {
+        "hex": "#d1ab46",
+        "ratio": 2.6
+      }
+    ],
+    "tags": []
+  },
+  {
+    "id": "47-350-A",
+    "pref": "沖縄県",
+    "city": "南風原町 (A001)",
+    "url": "http://www.gk-p.jp/wp-content/uploads/mhc/47-350-A-01.jpg",
+    "edition": "第30弾",
+    "card_id": "47-350-A",
+    "old_id": "南風原町",
+    "palette": [
+      {
+        "hex": "#4b4d55",
+        "ratio": 38.3
+      },
+      {
+        "hex": "#86868c",
+        "ratio": 24.6
+      },
+      {
+        "hex": "#dda5c4",
+        "ratio": 16.0
+      },
+      {
+        "hex": "#f4f1f3",
+        "ratio": 10.9
+      },
+      {
+        "hex": "#ce76a6",
+        "ratio": 10.2
+      }
+    ],
+    "tags": []
+  },
+  {
+    "id": "04-581-B",
+    "pref": "宮城県",
+    "city": "女川町 (B001)",
+    "url": "http://www.gk-p.jp/wp-content/uploads/mhc/04-581-B-01.jpg",
+    "edition": "第30弾",
+    "card_id": "04-581-B",
+    "old_id": "女川町 (B001)",
+    "palette": [
+      {
+        "hex": "#858f93",
+        "ratio": 31.2
+      },
+      {
+        "hex": "#ebefee",
+        "ratio": 29.2
+      },
+      {
+        "hex": "#252a33",
+        "ratio": 14.8
+      },
+      {
+        "hex": "#9ebf3a",
+        "ratio": 14.2
+      },
+      {
+        "hex": "#4b833f",
+        "ratio": 10.5
+      }
+    ],
+    "tags": []
+  },
+  {
+    "id": "09-201-E",
+    "pref": "栃木県",
+    "city": "宇都宮市 (E001)",
+    "url": "http://www.gk-p.jp/wp-content/uploads/mhc/09-201-E-01.jpg",
+    "edition": "第30弾",
+    "card_id": "09-201-E",
+    "old_id": "宇都宮市 (E001)",
+    "palette": [
+      {
+        "hex": "#899aa0",
+        "ratio": 39.6
+      },
+      {
+        "hex": "#ece3e4",
+        "ratio": 20.7
+      },
+      {
+        "hex": "#757276",
+        "ratio": 17.6
+      },
+      {
+        "hex": "#2b2a35",
+        "ratio": 12.6
+      },
+      {
+        "hex": "#0d6a93",
+        "ratio": 9.5
+      }
+    ],
+    "tags": []
+  },
+  {
+    "id": "09-214-B",
+    "pref": "栃木県",
+    "city": "さくら市 (B001)",
+    "url": "http://www.gk-p.jp/wp-content/uploads/mhc/09-214-B-01.jpg",
+    "edition": "第30弾",
+    "card_id": "09-214-B",
+    "old_id": "さくら市 (B001)",
+    "palette": [
+      {
+        "hex": "#7b888d",
+        "ratio": 50.1
+      },
+      {
+        "hex": "#373736",
+        "ratio": 15.1
+      },
+      {
+        "hex": "#9fb4be",
+        "ratio": 13.3
+      },
+      {
+        "hex": "#f0f0ef",
+        "ratio": 11.8
+      },
+      {
+        "hex": "#0f6993",
+        "ratio": 9.7
+      }
+    ],
+    "tags": []
+  },
+  {
+    "id": "15-204-B",
+    "pref": "新潟県",
+    "city": "三条市 (B001)",
+    "url": "http://www.gk-p.jp/wp-content/uploads/mhc/15-204-B-01.jpg",
+    "edition": "第30弾",
+    "card_id": "15-204-B",
+    "old_id": "三条市 (B001)",
+    "palette": [
+      {
+        "hex": "#818589",
+        "ratio": 38.7
+      },
+      {
+        "hex": "#0c60a1",
+        "ratio": 22.4
+      },
+      {
+        "hex": "#303336",
+        "ratio": 14.8
+      },
+      {
+        "hex": "#bfb9b0",
+        "ratio": 12.1
+      },
+      {
+        "hex": "#f1f0ee",
+        "ratio": 12.0
+      }
+    ],
+    "tags": []
+  },
+  {
+    "id": "20-563-A",
+    "pref": "長野県",
+    "city": "野沢温泉村 (A001)",
+    "url": "http://www.gk-p.jp/wp-content/uploads/mhc/20-563-A-01.jpg",
+    "edition": "第30弾",
+    "card_id": "20-563-A",
+    "old_id": "野沢温泉村",
+    "palette": [
+      {
+        "hex": "#7b8b8b",
+        "ratio": 35.2
+      },
+      {
+        "hex": "#e7b914",
+        "ratio": 23.5
+      },
+      {
+        "hex": "#e9eceb",
+        "ratio": 15.3
+      },
+      {
+        "hex": "#b9c0a7",
+        "ratio": 13.7
+      },
+      {
+        "hex": "#2e544e",
+        "ratio": 12.3
+      }
+    ],
+    "tags": []
+  },
+  {
+    "id": "22-216-A",
+    "pref": "静岡県",
+    "city": "袋井市 (A001)",
+    "url": "http://www.gk-p.jp/wp-content/uploads/mhc/22-216-A-01.jpg",
+    "edition": "第30弾",
+    "card_id": "22-216-A",
+    "old_id": "袋井市",
+    "palette": [
+      {
+        "hex": "#858488",
+        "ratio": 32.5
+      },
+      {
+        "hex": "#e8b913",
+        "ratio": 24.0
+      },
+      {
+        "hex": "#3b3e43",
+        "ratio": 23.5
+      },
+      {
+        "hex": "#f6f5f3",
+        "ratio": 10.9
+      },
+      {
+        "hex": "#d4c0b1",
+        "ratio": 9.1
+      }
+    ],
+    "tags": []
+  },
+  {
+    "id": "22-220-B",
+    "pref": "静岡県",
+    "city": "裾野市 (B001)",
+    "url": "http://www.gk-p.jp/wp-content/uploads/mhc/22-220-B-01.jpg",
+    "edition": "第30弾",
+    "card_id": "22-220-B",
+    "old_id": "裾野市 (B001)",
+    "palette": [
+      {
+        "hex": "#878a8b",
+        "ratio": 30.9
+      },
+      {
+        "hex": "#e8bb18",
+        "ratio": 25.2
+      },
+      {
+        "hex": "#372e40",
+        "ratio": 18.1
+      },
+      {
+        "hex": "#efede8",
+        "ratio": 13.2
+      },
+      {
+        "hex": "#445d7e",
+        "ratio": 12.6
+      }
+    ],
+    "tags": []
+  },
+  {
+    "id": "22-304-B",
+    "pref": "静岡県",
+    "city": "南伊豆町 (B001)",
+    "url": "http://www.gk-p.jp/wp-content/uploads/mhc/22-304-B-01.jpg",
+    "edition": "第30弾",
+    "card_id": "22-304-B",
+    "old_id": "南伊豆町 (B001)",
+    "palette": [
+      {
+        "hex": "#818690",
+        "ratio": 35.4
+      },
+      {
+        "hex": "#3f3a46",
+        "ratio": 20.8
+      },
+      {
+        "hex": "#e6b508",
+        "ratio": 18.9
+      },
+      {
+        "hex": "#eeecea",
+        "ratio": 18.2
+      },
+      {
+        "hex": "#eace54",
+        "ratio": 6.8
+      }
+    ],
+    "tags": []
+  },
+  {
+    "id": "22-341-A",
+    "pref": "静岡県",
+    "city": "清水町 (A001)",
+    "url": "http://www.gk-p.jp/wp-content/uploads/mhc/22-341-A-01.jpg",
+    "edition": "第30弾",
+    "card_id": "22-341-A",
+    "old_id": "清水町",
+    "palette": [
+      {
+        "hex": "#384640",
+        "ratio": 33.4
+      },
+      {
+        "hex": "#83888a",
+        "ratio": 28.5
+      },
+      {
+        "hex": "#e5b509",
+        "ratio": 19.8
+      },
+      {
+        "hex": "#f2f1ed",
+        "ratio": 11.3
+      },
+      {
+        "hex": "#eace54",
+        "ratio": 7.0
+      }
+    ],
+    "tags": []
+  },
+  {
+    "id": "24-205-C",
+    "pref": "三重県",
+    "city": "桑名市 (C001)",
+    "url": "http://www.gk-p.jp/wp-content/uploads/mhc/24-205-C-01.jpg",
+    "edition": "第30弾",
+    "card_id": "24-205-C",
+    "old_id": "桑名市 (C001)",
+    "palette": [
+      {
+        "hex": "#7d898c",
+        "ratio": 34.7
+      },
+      {
+        "hex": "#e6b406",
+        "ratio": 19.4
+      },
+      {
+        "hex": "#3b4447",
+        "ratio": 18.8
+      },
+      {
+        "hex": "#eeebe3",
+        "ratio": 13.7
+      },
+      {
+        "hex": "#e0c24a",
+        "ratio": 13.4
+      }
+    ],
+    "tags": []
+  },
+  {
+    "id": "26-213-A",
+    "pref": "京都府",
+    "city": "南丹市 (A001)",
+    "url": "http://www.gk-p.jp/wp-content/uploads/mhc/26-213-A-01.jpg",
+    "edition": "第30弾",
+    "card_id": "26-213-A",
+    "old_id": "南丹市",
+    "palette": [
+      {
+        "hex": "#928e90",
+        "ratio": 36.8
+      },
+      {
+        "hex": "#cb7c13",
+        "ratio": 24.0
+      },
+      {
+        "hex": "#6b595f",
+        "ratio": 16.4
+      },
+      {
+        "hex": "#ece9e7",
+        "ratio": 13.8
+      },
+      {
+        "hex": "#232528",
+        "ratio": 9.0
+      }
+    ],
+    "tags": []
+  },
+  {
+    "id": "26-465-A",
+    "pref": "京都府",
+    "city": "与謝野町 (A001)",
+    "url": "http://www.gk-p.jp/wp-content/uploads/mhc/26-465-A-01.jpg",
+    "edition": "第30弾",
+    "card_id": "26-465-A",
+    "old_id": "与謝野町",
+    "palette": [
+      {
+        "hex": "#8c8d8c",
+        "ratio": 30.6
+      },
+      {
+        "hex": "#c87e18",
+        "ratio": 26.2
+      },
+      {
+        "hex": "#1b212c",
+        "ratio": 16.0
+      },
+      {
+        "hex": "#4f5953",
+        "ratio": 14.3
+      },
+      {
+        "hex": "#e9ece9",
+        "ratio": 13.0
+      }
+    ],
+    "tags": []
+  },
+  {
+    "id": "27-207-D",
+    "pref": "大阪府",
+    "city": "高槻市 (D001)",
+    "url": "http://www.gk-p.jp/wp-content/uploads/mhc/27-207-D-01.jpg",
+    "edition": "第30弾",
+    "card_id": "27-207-D",
+    "old_id": "高槻市 (D001)",
+    "palette": [
+      {
+        "hex": "#918c8a",
+        "ratio": 32.6
+      },
+      {
+        "hex": "#cc7c14",
+        "ratio": 23.9
+      },
+      {
+        "hex": "#77524b",
+        "ratio": 15.9
+      },
+      {
+        "hex": "#edebe4",
+        "ratio": 15.1
+      },
+      {
+        "hex": "#2c2c38",
+        "ratio": 12.5
+      }
+    ],
+    "tags": []
+  },
+  {
+    "id": "27-217-B",
+    "pref": "大阪府",
+    "city": "松原市 (B001)",
+    "url": "http://www.gk-p.jp/wp-content/uploads/mhc/27-217-B-01.jpg",
+    "edition": "第30弾",
+    "card_id": "27-217-B",
+    "old_id": "松原市 (B001)",
+    "palette": [
+      {
+        "hex": "#848a91",
+        "ratio": 33.7
+      },
+      {
+        "hex": "#383841",
+        "ratio": 22.5
+      },
+      {
+        "hex": "#c8750a",
+        "ratio": 20.0
+      },
+      {
+        "hex": "#eceae8",
+        "ratio": 15.2
+      },
+      {
+        "hex": "#d5a850",
+        "ratio": 8.6
+      }
+    ],
+    "tags": []
+  },
+  {
+    "id": "27-225-B",
+    "pref": "大阪府",
+    "city": "高石市 (B001)",
+    "url": "http://www.gk-p.jp/wp-content/uploads/mhc/27-225-B-01.jpg",
+    "edition": "第30弾",
+    "card_id": "27-225-B",
+    "old_id": "高石市 (B001)",
+    "palette": [
+      {
+        "hex": "#84817f",
+        "ratio": 33.3
+      },
+      {
+        "hex": "#cf8023",
+        "ratio": 25.6
+      },
+      {
+        "hex": "#3c3b2e",
+        "ratio": 16.1
+      },
+      {
+        "hex": "#f6f4ef",
+        "ratio": 13.7
+      },
+      {
+        "hex": "#ddbba2",
+        "ratio": 11.3
+      }
+    ],
+    "tags": []
+  },
+  {
+    "id": "29-363-B",
+    "pref": "奈良県",
+    "city": "田原本町 (B001)",
+    "url": "http://www.gk-p.jp/wp-content/uploads/mhc/29-363-B-01.jpg",
+    "edition": "第30弾",
+    "card_id": "29-363-B",
+    "old_id": "田原本町 (B001)",
+    "palette": [
+      {
+        "hex": "#908b8b",
+        "ratio": 31.2
+      },
+      {
+        "hex": "#ca7915",
+        "ratio": 25.2
+      },
+      {
+        "hex": "#5cabce",
+        "ratio": 18.1
+      },
+      {
+        "hex": "#edeae8",
+        "ratio": 14.5
+      },
+      {
+        "hex": "#2b383d",
+        "ratio": 11.0
+      }
+    ],
+    "tags": []
+  },
+  {
+    "id": "35-204-B",
+    "pref": "山口県",
+    "city": "萩市 (B001)",
+    "url": "http://www.gk-p.jp/wp-content/uploads/mhc/35-204-B-01.jpg",
+    "edition": "第30弾",
+    "card_id": "35-204-B",
+    "old_id": "萩市 (B001)",
+    "palette": [
+      {
+        "hex": "#918e8c",
+        "ratio": 31.2
+      },
+      {
+        "hex": "#9b0b11",
+        "ratio": 22.5
+      },
+      {
+        "hex": "#6c6b62",
+        "ratio": 18.4
+      },
+      {
+        "hex": "#383e42",
+        "ratio": 15.4
+      },
+      {
+        "hex": "#edebe9",
+        "ratio": 12.4
+      }
+    ],
+    "tags": []
+  },
+  {
+    "id": "40-230-A",
+    "pref": "福岡県",
+    "city": "糸島市 (A001)",
+    "url": "http://www.gk-p.jp/wp-content/uploads/mhc/40-230-A-01.jpg",
+    "edition": "第30弾",
+    "card_id": "40-230-A",
+    "old_id": "糸島市",
+    "palette": [
+      {
+        "hex": "#8e878a",
+        "ratio": 29.8
+      },
+      {
+        "hex": "#d697b6",
+        "ratio": 26.8
+      },
+      {
+        "hex": "#f2ebe6",
+        "ratio": 15.5
+      },
+      {
+        "hex": "#77635c",
+        "ratio": 14.6
+      },
+      {
+        "hex": "#363a3e",
+        "ratio": 13.4
+      }
+    ],
+    "tags": []
+  },
+  {
+    "id": "40-381-B",
+    "pref": "福岡県",
+    "city": "芦屋町 (B001)",
+    "url": "http://www.gk-p.jp/wp-content/uploads/mhc/40-381-B-01.jpg",
+    "edition": "第30弾",
+    "card_id": "40-381-B",
+    "old_id": "芦屋町 (B001)",
+    "palette": [
+      {
+        "hex": "#82838d",
+        "ratio": 33.1
+      },
+      {
+        "hex": "#d892b9",
+        "ratio": 23.9
+      },
+      {
+        "hex": "#efebef",
+        "ratio": 17.5
+      },
+      {
+        "hex": "#392a35",
+        "ratio": 16.9
+      },
+      {
+        "hex": "#9fbad5",
+        "ratio": 8.7
+      }
+    ],
+    "tags": []
+  },
+  {
+    "id": "43-443-C",
+    "pref": "熊本県",
+    "city": "益城町 (C001)",
+    "url": "http://www.gk-p.jp/wp-content/uploads/mhc/43-443-C-01.jpg",
+    "edition": "第30弾",
+    "card_id": "43-443-C",
+    "old_id": "益城町 (C001)",
+    "palette": [
+      {
+        "hex": "#8e8c88",
+        "ratio": 33.7
+      },
+      {
+        "hex": "#d696b8",
+        "ratio": 25.9
+      },
+      {
+        "hex": "#2a2a33",
+        "ratio": 16.1
+      },
+      {
+        "hex": "#f1ecef",
+        "ratio": 13.5
+      },
+      {
+        "hex": "#5d6564",
+        "ratio": 10.8
+      }
+    ],
+    "tags": []
   }
 ]
