@@ -438,6 +438,7 @@
         </div>
     </div>
 
+    <script src="common.js"></script>
     <script>
         let masterData = [];
         let userStats = JSON.parse(localStorage.getItem('manhole_collection')) || {};
@@ -542,10 +543,7 @@
                 );
 
                 dayEntries.forEach(([key, stat]) => {
-                    const card = masterData.find(c => {
-                        const fullKey = `${c.city} (${c.id})`;
-                        return key === fullKey || key === c.city || key === c.id || stat.id === fullKey || stat.id === c.id;
-                    });
+                    const card = masterData.find(c => statKeyMatchesCard(key, stat, c));
 
                     if (card && card.pref) {
                         monthlyPrefs[card.pref] = (monthlyPrefs[card.pref] || 0) + 1;
@@ -651,10 +649,7 @@
 
             targetKeys.forEach(tKey => {
                 const stat = userStats[tKey];
-                const card = masterData.find(c => {
-                    const fullKey = `${c.city} (${c.id})`;
-                    return tKey === fullKey || tKey === c.city || tKey === c.id || stat.id === fullKey || stat.id === c.id;
-                });
+                const card = masterData.find(c => statKeyMatchesCard(tKey, stat, c));
 
                 if (card && card.pref === pref) {
                     const dStr = stat.date;
@@ -737,10 +732,9 @@
                 return userStats[key].collected && userStats[key].date === dateStr;
             });
 
-            const cardsOnThisDay = masterData.filter(card => {
-                const fullKey = `${card.city} (${card.id})`;
-                return targetKeys.some(tKey => tKey === fullKey || tKey === card.city || tKey === card.id);
-            });
+            const cardsOnThisDay = masterData.filter(card =>
+                targetKeys.some(tKey => statKeyMatchesCard(tKey, userStats[tKey], card))
+            );
 
             if (cardsOnThisDay.length === 0) {
                 list.innerHTML = '<div class="empty-msg">記録はありません</div>';
@@ -749,7 +743,7 @@
 
             cardsOnThisDay.forEach(card => {
                 const fullKey = `${card.city} (${card.id})`;
-                const matchedKey = targetKeys.find(tKey => tKey === fullKey || tKey === card.city || tKey === card.id) || fullKey;
+                const matchedKey = targetKeys.find(tKey => statKeyMatchesCard(tKey, userStats[tKey], card)) || fullKey;
                 const memoText = (userStats[matchedKey] && userStats[matchedKey].memo) ? userStats[matchedKey].memo : '';
 
                 list.innerHTML += `

@@ -816,25 +816,7 @@ function updateEditionStats() {
     const grid = document.getElementById('editionStatsGrid');
     if (!grid || masterData.length === 0) return;
 
-    const edStats = {};
-    let maxEdNum = 0;
-
-    masterData.forEach(card => {
-        const edNum = parseInt(card.edition.replace(/[^0-9]/g, ''));
-        if (isNaN(edNum)) return;
-
-        if (edNum > maxEdNum) maxEdNum = edNum;
-
-        const edStr = card.edition;
-        if (!edStats[edStr]) {
-            edStats[edStr] = { total: 0, collected: 0, num: edNum };
-        }
-        edStats[edStr].total++;
-
-        if (getCardStat(card)?.collected) {
-            edStats[edStr].collected++;
-        }
-    });
+    const { edStats, maxEdNum } = computeEditionCounts();
 
     const sortedEditions = Object.keys(edStats).sort((a, b) => edStats[a].num - edStats[b].num);
     const groups = {};
@@ -933,15 +915,7 @@ function updatePrefStats() {
         "九州・沖縄": ["福岡県", "佐賀県", "長崎県", "熊本県", "大分県", "宮崎県", "鹿児島県", "沖縄県"]
     };
 
-    const prefStats = {};
-    masterData.forEach(card => {
-        if (!prefStats[card.pref]) prefStats[card.pref] = { total: 0, collected: 0 };
-        prefStats[card.pref].total++;
-
-        if (getCardStat(card)?.collected) {
-            prefStats[card.pref].collected++;
-        }
-    });
+    const prefStats = computePrefCounts();
 
     let html = '';
 
