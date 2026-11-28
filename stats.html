@@ -467,6 +467,11 @@
             <div>月平均 (全期間)</div>
             <b id="avgCount">0.0</b>
         </div>
+        <div class="stat-box" style="grid-column: span 2;">
+            <div>🏁 全制覇の到達予測</div>
+            <b id="forecastText" style="font-size: 15px;">-</b>
+            <div id="forecastNote" style="font-size: 11px; color: #888; margin-top: 2px;"></div>
+        </div>
     </div>
     <div class="chart-container">
         <canvas id="historyChart" width="1200" height="300"></canvas>
@@ -492,6 +497,7 @@
                     masterData = data;
 
                     // 1. まずUIと地図のベースを作る
+                    renderForecast();
                     updatePrefStats();
                     updateEditionStats();
 
@@ -839,6 +845,49 @@
         // ==========================================
         // 2. 都道府県の統計UI更新
         // ==========================================
+
+        // 全制覇の到達予測（直近1年の取得ペースから計算）
+        function renderForecast() {
+            const textEl = document.getElementById('forecastText');
+            const noteEl = document.getElementById('forecastNote');
+            if (!textEl || masterData.length === 0) return;
+
+            const total = masterData.length;
+            let collected = 0;
+            masterData.forEach(card => {
+                if (getCardStat(card)?.collected) collected++;
+            });
+            const remaining = total - collected;
+
+            if (remaining <= 0) {
+                textEl.textContent = '🎉 全制覇達成！';
+                if (noteEl) noteEl.textContent = '';
+                return;
+            }
+
+            // 直近1年（365日）の取得ペース ※購入分は日付がないため含まない
+            const now = new Date();
+            const cutoff = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+            let recent = 0;
+            Object.values(userStats).forEach(stat => {
+                if (stat && stat.collected && stat.date) {
+                    const d = new Date(stat.date + 'T00:00:00');
+                    if (d >= cutoff && d <= now) recent++;
+                }
+            });
+
+            const perMonth = recent / 12;
+            if (perMonth <= 0) {
+                textEl.textContent = `残り ${remaining} 枚`;
+                if (noteEl) noteEl.textContent = '直近1年の取得記録がないため、到達時期は予測できません';
+                return;
+            }
+
+            const monthsNeeded = Math.ceil(remaining / perMonth);
+            const eta = new Date(now.getFullYear(), now.getMonth() + monthsNeeded, 1);
+            textEl.textContent = `残り ${remaining} 枚 → ${eta.getFullYear()}年${eta.getMonth() + 1}月頃`;
+            if (noteEl) noteEl.textContent = `直近1年のペース（月平均 ${perMonth.toFixed(1)} 枚）で計算 ※新しい弾の追加分・購入分は含まない`;
+        }
 
         function updatePrefStats() {
             const grid = document.getElementById('prefStatsGrid');
